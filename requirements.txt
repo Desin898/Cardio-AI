@@ -5,6 +5,7 @@ pandas>=2.0,<3.0
 # Image processing
 opencv-python>=4.8
 scikit-image>=0.22
+albumentations>=1.4
 
 # Visualization
 matplotlib>=3.8,<3.9
