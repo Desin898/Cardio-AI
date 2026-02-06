@@ -8,7 +8,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.utils.class_weight import compute_class_weight
-
+from torch.optim.lr_scheduler import StepLR
 from ecg_risk_prediction.models.ecg_cnn import ECGCNN
 
 
@@ -99,7 +99,6 @@ def load_ecg_data():
 # TRAINING PIPELINE
 def train():
     print(f"Using device: {DEVICE}")
-
     X, y = load_ecg_data()
 
     X_train, X_val, y_train, y_val = train_test_split(
@@ -112,42 +111,37 @@ def train():
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    # MODEL
     model = ECGCNN(num_classes=NUM_CLASSES).to(DEVICE)
 
-    # CLASS-WEIGHTED LOSS
-    class_weights = compute_class_weight(
-        class_weight="balanced",
-        classes=np.unique(y_train),
-        y=y_train
-    )
+    class_weights = compute_class_weight("balanced", classes=np.unique(y_train), y=y_train)
     class_weights = torch.tensor(class_weights, dtype=torch.float32).to(DEVICE)
 
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-    # TRAIN LOOP
+    # 1. ADD SCHEDULER: Reduce LR by half every 7 epochs
+    scheduler = StepLR(optimizer, step_size=7, gamma=0.5)
+
+    best_acc = 0.0  # 2. BEST MODEL TRACKER
+
     for epoch in range(EPOCHS):
         model.train()
         train_loss = 0
-
         for X_batch, y_batch in train_loader:
             X_batch, y_batch = X_batch.to(DEVICE), y_batch.to(DEVICE)
-
             optimizer.zero_grad()
             outputs = model(X_batch)
             loss = criterion(outputs, y_batch)
             loss.backward()
             optimizer.step()
-
             train_loss += loss.item()
 
-        train_loss /= len(train_loader)
+        # Update Scheduler
+        scheduler.step()
 
         # Validation
         model.eval()
         correct, total = 0, 0
-
         with torch.no_grad():
             for X_batch, y_batch in val_loader:
                 X_batch, y_batch = X_batch.to(DEVICE), y_batch.to(DEVICE)
@@ -158,14 +152,16 @@ def train():
 
         val_accuracy = correct / total
 
-        print(f"Epoch [{epoch+1}/{EPOCHS}] | "
-              f"Train Loss: {train_loss:.4f} | "
-              f"Val Accuracy: {val_accuracy:.4f}")
+        # 3. SAVE BEST MODEL LOGIC
+        if val_accuracy > best_acc:
+            best_acc = val_accuracy
+            torch.save(model.state_dict(), os.path.join(OUTPUT_DIR, "best_ecg_cnn.pth"))
+            print(f"*** Epoch [{epoch + 1}] | New Best Acc: {val_accuracy:.4f} - Saved! ***")
+        else:
+            print(
+                f"Epoch [{epoch + 1}/{EPOCHS}] | Train Loss: {train_loss / len(train_loader):.4f} | Val Acc: {val_accuracy:.4f}")
 
-    # SAVE MODEL
-    model_path = os.path.join(OUTPUT_DIR, "ecg_cnn_model.pth")
-    torch.save(model.state_dict(), model_path)
-    print(f"Model saved to {model_path}")
+    print(f"Training Complete. Best Accuracy achieved: {best_acc:.4f}")
 
 
 if __name__ == "__main__":
