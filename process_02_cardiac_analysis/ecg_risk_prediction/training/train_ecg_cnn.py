@@ -5,9 +5,12 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import matplotlib.pyplot as plt
+import seaborn as sns
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.utils.class_weight import compute_class_weight
+from sklearn.metrics import confusion_matrix, classification_report
 from torch.optim.lr_scheduler import StepLR
 from ecg_risk_prediction.models.ecg_cnn import ECGCNN
 
@@ -16,7 +19,7 @@ from ecg_risk_prediction.models.ecg_cnn import ECGCNN
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 32
-EPOCHS = 20
+EPOCHS = 50
 LEARNING_RATE = 1e-3
 NUM_CLASSES = 4
 RANDOM_STATE = 42
@@ -118,11 +121,9 @@ def train():
 
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    scheduler = StepLR(optimizer, step_size=10, gamma=0.5)
 
-    # 1. ADD SCHEDULER: Reduce LR by half every 7 epochs
-    scheduler = StepLR(optimizer, step_size=7, gamma=0.5)
-
-    best_acc = 0.0  # 2. BEST MODEL TRACKER
+    best_acc = 0.0
 
     for epoch in range(EPOCHS):
         model.train()
@@ -136,32 +137,46 @@ def train():
             optimizer.step()
             train_loss += loss.item()
 
-        # Update Scheduler
         scheduler.step()
 
-        # Validation
+        # Validation with Metric Collection
         model.eval()
-        correct, total = 0, 0
+        all_preds = []
+        all_targets = []
         with torch.no_grad():
             for X_batch, y_batch in val_loader:
                 X_batch, y_batch = X_batch.to(DEVICE), y_batch.to(DEVICE)
                 outputs = model(X_batch)
                 _, predicted = torch.max(outputs, 1)
-                total += y_batch.size(0)
-                correct += (predicted == y_batch).sum().item()
+                all_preds.extend(predicted.cpu().numpy())
+                all_targets.extend(y_batch.cpu().numpy())
 
-        val_accuracy = correct / total
+        val_accuracy = np.mean(np.array(all_preds) == np.array(all_targets))
 
-        # 3. SAVE BEST MODEL LOGIC
         if val_accuracy > best_acc:
             best_acc = val_accuracy
             torch.save(model.state_dict(), os.path.join(OUTPUT_DIR, "best_ecg_cnn.pth"))
             print(f"*** Epoch [{epoch + 1}] | New Best Acc: {val_accuracy:.4f} - Saved! ***")
         else:
             print(
-                f"Epoch [{epoch + 1}/{EPOCHS}] | Train Loss: {train_loss / len(train_loader):.4f} | Val Acc: {val_accuracy:.4f}")
+                f"Epoch [{epoch + 1}/{EPOCHS}] | Loss: {train_loss / len(train_loader):.4f} | Acc: {val_accuracy:.4f}")
 
-    print(f"Training Complete. Best Accuracy achieved: {best_acc:.4f}")
+    # FINAL EVALUATION UPGRADE
+    print("\n" + "=" * 40)
+    print("FINAL CLINICAL REPORT")
+    print("=" * 40)
+    target_names = ['Normal', 'Abnormal', 'Active MI', 'History of MI']
+    print(classification_report(all_targets, all_preds, target_names=target_names))
+
+    # Confusion Matrix Visualization
+    cm = confusion_matrix(all_targets, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=target_names, yticklabels=target_names)
+    plt.title('Cardiac Risk Classification Confusion Matrix')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.savefig(os.path.join(OUTPUT_DIR, "evaluation_matrix.png"))
+    print(f"Evaluation visualization saved to {OUTPUT_DIR}/evaluation_matrix.png")
 
 
 if __name__ == "__main__":
