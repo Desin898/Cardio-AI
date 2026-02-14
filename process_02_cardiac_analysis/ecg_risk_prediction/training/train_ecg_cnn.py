@@ -123,11 +123,16 @@ def train():
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     scheduler = StepLR(optimizer, step_size=10, gamma=0.5)
 
+    # History tracking lists
+    history = {'train_loss': [], 'val_acc': []}
+
     best_acc = 0.0
 
     for epoch in range(EPOCHS):
         model.train()
         train_loss = 0
+        running_loss = 0.0
+
         for X_batch, y_batch in train_loader:
             X_batch, y_batch = X_batch.to(DEVICE), y_batch.to(DEVICE)
             optimizer.zero_grad()
@@ -151,7 +156,12 @@ def train():
                 all_preds.extend(predicted.cpu().numpy())
                 all_targets.extend(y_batch.cpu().numpy())
 
+        avg_train_loss = running_loss / len(train_loader)
         val_accuracy = np.mean(np.array(all_preds) == np.array(all_targets))
+
+        # Save to history for plotting
+        history['train_loss'].append(avg_train_loss)
+        history['val_acc'].append(val_accuracy)
 
         if val_accuracy > best_acc:
             best_acc = val_accuracy
@@ -178,6 +188,26 @@ def train():
     plt.savefig(os.path.join(OUTPUT_DIR, "evaluation_matrix.png"))
     print(f"Evaluation visualization saved to {OUTPUT_DIR}/evaluation_matrix.png")
 
+    #  Learning Curves Plotting ---
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(range(1, EPOCHS + 1), history['train_loss'], color='red', label='Loss')
+    plt.title('Training Loss Curve')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.grid(True)
+
+    plt.subplot(1, 2, 2)
+    plt.plot(range(1, EPOCHS + 1), history['val_acc'], color='blue', label='Accuracy')
+    plt.title('Validation Accuracy Curve')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUTPUT_DIR, "learning_curves.png"))
+    print(f"\nLearning curves saved to {OUTPUT_DIR}/learning_curves.png")
 
 if __name__ == "__main__":
     train()
