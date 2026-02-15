@@ -124,14 +124,15 @@ def train():
     scheduler = StepLR(optimizer, step_size=10, gamma=0.5)
 
     # History tracking lists
-    history = {'train_loss': [], 'val_acc': []}
-
+    history = {
+        'train_loss': [], 'train_acc': [],
+        'val_loss': [], 'val_acc': []
+    }
     best_acc = 0.0
 
     for epoch in range(EPOCHS):
         model.train()
-        train_loss = 0
-        running_loss = 0.0
+        t_loss, t_correct, t_total = 0, 0, 0
 
         for X_batch, y_batch in train_loader:
             X_batch, y_batch = X_batch.to(DEVICE), y_batch.to(DEVICE)
@@ -140,74 +141,53 @@ def train():
             loss = criterion(outputs, y_batch)
             loss.backward()
             optimizer.step()
-            train_loss += loss.item()
 
-        scheduler.step()
+            t_loss += loss.item()
+            _, pred = torch.max(outputs, 1)
+            t_total += y_batch.size(0)
+            t_correct += (pred == y_batch).sum().item()
+
 
         # Validation with Metric Collection
         model.eval()
-        all_preds = []
+        v_loss, v_correct, v_total = 0, 0, 0
+        all_probs = []  # For ROC
         all_targets = []
+
         with torch.no_grad():
             for X_batch, y_batch in val_loader:
                 X_batch, y_batch = X_batch.to(DEVICE), y_batch.to(DEVICE)
                 outputs = model(X_batch)
-                _, predicted = torch.max(outputs, 1)
-                all_preds.extend(predicted.cpu().numpy())
+                loss = criterion(outputs, y_batch)
+
+                v_loss += loss.item()
+                probs = torch.softmax(outputs, dim=1)
+                _, pred = torch.max(outputs, 1)
+
+                v_total += y_batch.size(0)
+                v_correct += (pred == y_batch).sum().item()
+
+                all_probs.extend(probs.cpu().numpy())
                 all_targets.extend(y_batch.cpu().numpy())
 
-        avg_train_loss = running_loss / len(train_loader)
-        val_accuracy = np.mean(np.array(all_preds) == np.array(all_targets))
+        # Record Metrics
+        scheduler.step()
+        history['train_loss'].append(t_loss / len(train_loader))
+        history['train_acc'].append(t_correct / t_total)
+        history['val_loss'].append(v_loss / len(val_loader))
+        history['val_acc'].append(v_correct / v_total)
 
-        # Save to history for plotting
-        history['train_loss'].append(avg_train_loss)
-        history['val_acc'].append(val_accuracy)
-
-        if val_accuracy > best_acc:
-            best_acc = val_accuracy
+        if (v_correct / v_total) > best_acc:
+            best_acc = v_correct / v_total
             torch.save(model.state_dict(), os.path.join(OUTPUT_DIR, "best_ecg_cnn.pth"))
-            print(f"*** Epoch [{epoch + 1}] | New Best Acc: {val_accuracy:.4f} - Saved! ***")
-        else:
-            print(
-                f"Epoch [{epoch + 1}/{EPOCHS}] | Loss: {train_loss / len(train_loader):.4f} | Acc: {val_accuracy:.4f}")
+            # Save raw data
+            evaluation_data = {'targets': all_targets, 'probs': all_probs}
+            torch.save(evaluation_data, os.path.join(OUTPUT_DIR, "eval_data.pth"))
+            print(f"*** Epoch [{epoch + 1}] | New Best Acc: {best_acc:.4f} - Saved Data! ***")
 
-    # FINAL EVALUATION UPGRADE
-    print("\n" + "=" * 40)
-    print("FINAL CLINICAL REPORT")
-    print("=" * 40)
-    target_names = ['Normal', 'Abnormal', 'Active MI', 'History of MI']
-    print(classification_report(all_targets, all_preds, target_names=target_names))
-
-    # Confusion Matrix Visualization
-    cm = confusion_matrix(all_targets, all_preds)
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=target_names, yticklabels=target_names)
-    plt.title('Cardiac Risk Classification Confusion Matrix')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    plt.savefig(os.path.join(OUTPUT_DIR, "evaluation_matrix.png"))
-    print(f"Evaluation visualization saved to {OUTPUT_DIR}/evaluation_matrix.png")
-
-    #  Learning Curves Plotting ---
-    plt.figure(figsize=(12, 5))
-
-    plt.subplot(1, 2, 1)
-    plt.plot(range(1, EPOCHS + 1), history['train_loss'], color='red', label='Loss')
-    plt.title('Training Loss Curve')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.grid(True)
-
-    plt.subplot(1, 2, 2)
-    plt.plot(range(1, EPOCHS + 1), history['val_acc'], color='blue', label='Accuracy')
-    plt.title('Validation Accuracy Curve')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.grid(True)
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "learning_curves.png"))
-    print(f"\nLearning curves saved to {OUTPUT_DIR}/learning_curves.png")
+        # Save CSV for Learning Curves
+        pd.DataFrame(history).to_csv(os.path.join(OUTPUT_DIR, "training_metrics.csv"), index=False)
+        print("Training complete. Metrics saved to outputs/training_metrics.csv")
 
 if __name__ == "__main__":
     train()
