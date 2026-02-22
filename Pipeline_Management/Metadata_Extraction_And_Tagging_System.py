@@ -47,67 +47,87 @@ def _read_metadata(metadata_path: Path) -> Dict:
 
 def _write_metadata(metadata_path: Path, data: Dict) -> None:
     """
-    Writes updated metadata back to metadata.json.
-
-    Before saving, it updates the 'last_updated' field to maintain
-    an audit trail of changes.
-
-    Parameters:
-        metadata_path (Path): Path to metadata.json.
-        data (Dict): Updated metadata content.
+    Writes updated metadata safely using atomic replacement.
+    Prevents corruption during unexpected shutdowns.
     """
+
     data["last_updated"] = datetime.utcnow().isoformat()
 
-    with open(metadata_path, "w") as f:
+    temp_path = metadata_path.with_suffix(".tmp")
+
+    with open(temp_path, "w") as f:
         json.dump(data, f, indent=4)
 
+    # Atomic replace
+    temp_path.replace(metadata_path)
 
+# Add validation function
+def _validate_patient_data(patient_data: Dict) -> None:
+    """
+    Validates required patient fields before session creation.
+    Ensures data consistency and prevents incomplete records.
+    """
+
+    required_fields = ["patient_id", "age", "gender"]
+
+    for field in required_fields:
+        if field not in patient_data:
+            raise ValueError(f"Missing required field: {field}")
+
+
+
+#Patient Session Initialization
+# Multi-Session support
 def initialize_patient_session(patient_data: Dict, base_dir: str = "patients") -> Path:
     """
-    Creates a patient session folder and initializes metadata.json.
+    Creates a unique session folder per patient visit.
+    Supports scalability for multiple consultations.
     """
 
-    patient_id = patient_data["patient_id"]
-    patient_dir = Path(base_dir) / patient_id
+    _validate_patient_data(patient_data)
 
-    # Create structured folders
-    (patient_dir / "ecg").mkdir(parents=True, exist_ok=True)
-    (patient_dir / "angiogram").mkdir(parents=True, exist_ok=True)
+    patient_id = patient_data["patient_id"]
+
+    session_id = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    session_dir = Path(base_dir) / patient_id / "sessions" / session_id
+
+    (session_dir / "ecg").mkdir(parents=True, exist_ok=True)
+    (session_dir / "angiogram").mkdir(parents=True, exist_ok=True)
 
     metadata = {
         "patient_id": patient_id,
-        "schema_version": "1.0",
+        "session_id": session_id,
+        "schema_version": "1.1",
         "created_at": datetime.utcnow().isoformat(),
         "last_updated": datetime.utcnow().isoformat(),
-
         "patient_profile": patient_data,
-
         "risk_prediction": {},
-
-        "ecg": {
-            "uploaded": False
-        },
-
-        "angiogram": {
-            "uploaded": False
-        }
+        "ecg": {"uploaded": False},
+        "angiogram": {"uploaded": False}
     }
 
-    metadata_path = patient_dir / "metadata.json"
+    metadata_path = session_dir / "metadata.json"
     _write_metadata(metadata_path, metadata)
 
     return metadata_path
 
+#Update risk details of the patient
 def update_risk_prediction(
     metadata_path: Path,
     risk_level: str,
     risk_percentage: float,
     model_name: str = "XGBoost"
 ) -> None:
+    """
+    Updates the latest risk prediction result.
+    Preserves structure and allows future extensions.
+    """
 
     metadata = _read_metadata(metadata_path)
 
-    metadata["risk_prediction"] = {
+    metadata.setdefault("risk_prediction", {})
+
+    metadata["risk_prediction"]["latest"] = {
         "risk_level": risk_level,
         "risk_percentage": risk_percentage,
         "model": model_name,
@@ -116,6 +136,8 @@ def update_risk_prediction(
 
     _write_metadata(metadata_path, metadata)
 
+
+#Update ecg details of the patient
 def update_ecg_metadata(
     metadata_path: Path,
     raw_image_path: str,
@@ -124,25 +146,36 @@ def update_ecg_metadata(
     classification_result: str,
     model_name: str = "ECG_CNN"
 ) -> None:
+    """
+    Updates ECG-related metadata without overwriting existing fields.
+    Ensures scalability and future extensibility.
+    """
 
     metadata = _read_metadata(metadata_path)
 
-    metadata["ecg"] = {
-        "uploaded": True,
-        "raw_image_path": raw_image_path,
-        "processed_csv_path": processed_csv_path,
-        "preprocessing": {
-            "steps": preprocessing_steps
-        },
-        "classification": {
-            "patient_type": classification_result,
-            "model": model_name,
-            "timestamp": datetime.utcnow().isoformat()
-        }
+    # Ensure ECG block exists
+    metadata.setdefault("ecg", {})
+
+    metadata["ecg"]["uploaded"] = True
+    metadata["ecg"]["raw_image_path"] = raw_image_path
+    metadata["ecg"]["processed_csv_path"] = processed_csv_path
+
+    metadata["ecg"]["preprocessing"] = {
+        "steps": preprocessing_steps,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+    metadata["ecg"]["classification"] = {
+        "patient_type": classification_result,
+        "model": model_name,
+        "timestamp": datetime.utcnow().isoformat()
     }
 
     _write_metadata(metadata_path, metadata)
+    metadata = _read_metadata(metadata_path)
 
+
+#Update Angiogram details of the patient
 def update_angiogram_metadata(
     metadata_path: Path,
     dicom_path: str,
@@ -151,37 +184,45 @@ def update_angiogram_metadata(
     segmentation_mask_path: str,
     segmentation_model: str = "DeepSA-based"
 ) -> None:
+    """
+    Updates angiogram-related metadata safely.
+    Avoids overwriting unrelated data fields.
+    """
 
     metadata = _read_metadata(metadata_path)
 
-    metadata["angiogram"] = {
-        "uploaded": True,
-        "dicom_path": dicom_path,
-        "selected_frames": selected_frame_paths,
-        "preprocessing": {
-            "steps": preprocessing_steps
-        },
-        "segmentation": {
-            "mask_path": segmentation_mask_path,
-            "model": segmentation_model,
-            "timestamp": datetime.utcnow().isoformat()
-        }
+    metadata.setdefault("angiogram", {})
+
+    metadata["angiogram"]["uploaded"] = True
+    metadata["angiogram"]["dicom_path"] = dicom_path
+    metadata["angiogram"]["selected_frames"] = selected_frame_paths
+
+    metadata["angiogram"]["preprocessing"] = {
+        "steps": preprocessing_steps,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+    metadata["angiogram"]["segmentation"] = {
+        "mask_path": segmentation_mask_path,
+        "model": segmentation_model,
+        "timestamp": datetime.utcnow().isoformat()
     }
 
     _write_metadata(metadata_path, metadata)
 
+# Retrieval Functions
 def get_patient_profile(metadata_path: Path) -> Dict:
     metadata = _read_metadata(metadata_path)
-    return metadata["patient_profile"]
+    return metadata.get("patient_profile", {})
 
 def get_ecg_image_path(metadata_path: Path) -> str:
     metadata = _read_metadata(metadata_path)
-    return metadata["ecg"].get("raw_image_path")
+    return metadata.get("ecg", {}).get("raw_image_path")
 
 def get_risk_percentage(metadata_path: Path) -> float:
     metadata = _read_metadata(metadata_path)
-    return metadata["risk_prediction"].get("risk_percentage")
+    return metadata.get("risk_prediction", {}).get("risk_percentage")
 
 def get_selected_frames(metadata_path: Path) -> List[str]:
     metadata = _read_metadata(metadata_path)
-    return metadata["angiogram"].get("selected_frames", [])
+    return metadata.get("angiogram", {}).get("selected_frames", [])
