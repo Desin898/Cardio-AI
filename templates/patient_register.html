@@ -7,38 +7,44 @@
     <div class="col-md-8">
         <div class="card shadow">
             <div class="card-header bg-primary text-white text-center">
-                <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i> Patient Registration</h4>
+                <h4 class="mb-0">
+                    <i class="bi bi-person-plus me-2"></i> Patient Registration
+                </h4>
             </div>
+
             <div class="card-body">
                 <form method="POST" action="{{ url_for('patient_register') }}" novalidate>
+
+                    <!-- PERSONAL INFORMATION -->
                     <h5 class="mb-4">Personal Information</h5>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Full Name *</label>
-                            <input type="text" class="form-control" id="name" name="name" 
+                            <input type="text" class="form-control" id="name" name="name"
                                    required placeholder="Enter your full name">
                             <div class="invalid-feedback">
                                 Please enter your full name.
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6 mb-3">
                             <label for="email" class="form-label">Email Address *</label>
-                            <input type="email" class="form-control" id="email" name="email" 
+                            <input type="email" class="form-control" id="email" name="email"
                                    required placeholder="Enter your email">
                             <div class="invalid-feedback">
                                 Please enter a valid email address.
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="age" class="form-label">Age</label>
-                            <input type="number" class="form-control" id="age" name="age" 
+                            <input type="number" class="form-control" id="age" name="age"
                                    min="18" max="100" placeholder="Enter your age">
                         </div>
-                        
+
                         <div class="col-md-6 mb-3">
                             <label for="gender" class="form-label">Gender</label>
                             <select class="form-select" id="gender" name="gender">
@@ -49,90 +55,134 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" id="phone" name="phone" 
+                        <input type="tel" class="form-control" id="phone" name="phone"
                                placeholder="Enter your phone number">
                     </div>
-                    
+
+                    <!-- ACCOUNT SECURITY -->
                     <h5 class="mb-4 mt-5">Account Security</h5>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="password" class="form-label">Password *</label>
-                            <input type="password" class="form-control" id="password" name="password" 
+                            <input type="password" class="form-control" id="password" name="password"
                                    required minlength="6" placeholder="Create a password">
                             <div class="form-text">Minimum 6 characters</div>
                             <div class="invalid-feedback">
                                 Password must be at least 6 characters long.
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6 mb-3">
                             <label for="confirm_password" class="form-label">Confirm Password *</label>
-                            <input type="password" class="form-control" id="confirm_password" 
+                            <input type="password" class="form-control" id="confirm_password"
                                    name="confirm_password" required placeholder="Confirm your password">
                             <div class="invalid-feedback">
                                 Passwords must match.
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
-                        <label class="form-check-label" for="terms">
-                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
-                            and <a href="#" class="text-decoration-none">Privacy Policy</a>
-                        </label>
-                        <div class="invalid-feedback">
-                            You must agree to the terms and conditions.
+
+                    <!-- TERMS & CONDITIONS -->
+                    <div class="terms-container mt-4">
+                        <h5 class="mb-3">
+                            <i class="bi bi-shield-check me-2"></i>
+                            Terms & Conditions and Medical Disclaimer
+                        </h5>
+
+                        <div class="terms-box">
+                            <p><strong>Medical Advisory Notice:</strong><br>
+                            This Coronary Artery Disease Prediction and Recommendation System provides AI-based
+                            risk predictions and general health recommendations based on uploaded ECG data and
+                            user-provided information. The results are for informational and advisory purposes only
+                            and DO NOT constitute medical diagnosis, treatment, or professional medical advice.</p>
+
+                            <p>Users must consult a qualified medical professional or cardiologist before making
+                            any medical decisions based on the system’s output.</p>
+
+                            <p><strong>No Emergency Use:</strong><br>
+                            This system must not be used for medical emergencies. If you are experiencing chest pain,
+                            shortness of breath, or symptoms of a heart attack, immediately seek emergency medical care.</p>
+
+                            <p><strong>Accuracy Disclaimer:</strong><br>
+                            While we strive to provide accurate predictions using validated machine learning models,
+                            we do not guarantee 100% accuracy of results. Predictions are probabilistic in nature.</p>
+
+                            <p><strong>Data Privacy & Security:</strong><br>
+                            Your uploaded ECG files and personal information are encrypted and securely stored.
+                            Data is used solely for prediction and system improvement in compliance with healthcare
+                            data protection standards.</p>
+
+                            <p><strong>User Responsibility:</strong><br>
+                            By registering, you confirm that the information you provide is accurate to the best
+                            of your knowledge and that you understand this system does not replace professional healthcare.</p>
+                        </div>
+
+                        <div class="form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                            <label class="form-check-label terms-label" for="terms">
+                                I have read and understood the Medical Disclaimer and agree that
+                                this system provides advisory predictions only and is not a substitute
+                                for professional medical diagnosis.
+                            </label>
+                            <div class="invalid-feedback">
+                                You must accept the Terms & Conditions before proceeding.
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="alert alert-info">
-                        <h6><i class="bi bi-info-circle me-2"></i> Important Note</h6>
-                        <p class="mb-0">Your health data is protected with end-to-end encryption. 
-                        We comply with all healthcare privacy regulations including HIPAA.</p>
-                    </div>
-                    
+
+                    <!-- BUTTONS -->
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <a href="{{ url_for('index') }}" class="btn btn-secondary me-md-2">Cancel</a>
-                        <button type="submit" class="btn btn-primary" onclick="validateRegistration()">
+                        <button type="submit" class="btn btn-primary"
+                                onclick="validateRegistration(event)">
                             <i class="bi bi-person-plus me-2"></i> Create Account
                         </button>
                     </div>
                 </form>
-                
+
                 <div class="mt-4 text-center">
-                    <p>Already have an account? 
-                        <a href="{{ url_for('patient_login') }}" class="text-decoration-none">Login here</a>
+                    <p>Already have an account?
+                        <a href="{{ url_for('patient_login') }}" class="text-decoration-none">
+                            Login here
+                        </a>
                     </p>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
 <script>
-function validateRegistration() {
+function validateRegistration(event) {
     const form = document.querySelector('form');
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm_password').value;
-    
-    // Check if passwords match
+    const termsChecked = document.getElementById('terms').checked;
+
     if (password !== confirmPassword) {
         event.preventDefault();
         alert('Passwords do not match!');
         return false;
     }
-    
-    // Check form validity
+
+    if (!termsChecked) {
+        event.preventDefault();
+        alert('You must accept the Terms & Conditions.');
+        return false;
+    }
+
     if (form.checkValidity() === false) {
         event.preventDefault();
         event.stopPropagation();
     }
-    
+
     form.classList.add('was-validated');
 }
 </script>
+
 {% endblock %}
