@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Initial Risk Screening{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-clipboard-check"></i> Initial Risk Screening Questionnaire</h4>
+                <p class="mb-0">Based on Process 04: Initial Risk Screening Gateway from IPython Notebook</p>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="bi bi-info-circle"></i> How this works:</h6>
+                    <p class="mb-0">This screening uses a Random Forest AI model to determine if you need mandatory ECG testing. 
+                    The system analyzes your lifestyle and clinical factors to provide personalized recommendations.</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('patient_screening') }}" id="screeningForm">
+                    <!-- Personal Information -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Personal Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Age *</label>
+                                        <input type="number" class="form-control" name="age" min="18" max="100" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Gender *</label>
+                                        <select class="form-select" name="gender" required>
+                                            <option value="">Select</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">BMI *</label>
+                                        <input type="number" class="form-control" name="bmi" step="0.1" min="15" max="50" required>
+                                        <small class="text-muted">Calculate: weight(kg) / (height(m))²</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Clinical Measurements -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Clinical Measurements</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Systolic BP (mmHg) *</label>
+                                        <input type="number" class="form-control" name="systolic_bp" min="80" max="200" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Diastolic BP (mmHg) *</label>
+                                        <input type="number" class="form-control" name="diastolic_bp" min="50" max="150" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Cholesterol (mg/dL) *</label>
+                                        <input type="number" class="form-control" name="cholesterol" min="100" max="400" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Glucose (mg/dL) *</label>
+                                        <input type="number" class="form-control" name="glucose" min="70" max="300" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lifestyle Factors -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Lifestyle Factors</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Smoking Status *</label>
+                                        <select class="form-select" name="smoker" required>
+                                            <option value="">Select</option>
+                                            <option value="Yes">Current Smoker</option>
+                                            <option value="No">Non-Smoker</option>
+                                            <option value="Former">Former Smoker</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Years Smoking</label>
+                                        <input type="number" class="form-control" name="years_smoking" min="0" max="60" value="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Exercise (hours/week) *</label>
+                                        <input type="number" class="form-control" name="exercise_hours" step="0.5" min="0" max="40" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Alcohol Consumption *</label>
+                                        <select class="form-select" name="alcohol" required>
+                                            <option value="">Select</option>
+                                            <option value="None">None</option>
+                                            <option value="Light">Light</option>
+                                            <option value="Heavy">Heavy</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Physical Activity *</label>
+                                        <select class="form-select" name="physical_activity" required>
+                                            <option value="">Select</option>
+                                            <option value="Sedentary">Sedentary</option>
+                                            <option value="Moderate">Moderate</option>
+                                            <option value="Active">Active</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Stress Level *</label>
+                                        <select class="form-select" name="stress_level" required>
+                                            <option value="">Select</option>
+                                            <option value="Low">Low</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="High">High</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Sleep Hours/Day *</label>
+                                        <input type="number" class="form-control" name="sleep_hours" step="0.1" min="4" max="12" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Diabetes *</label>
+                                        <select class="form-select" name="diabetes" required>
+                                            <option value="">Select</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Family History of Heart Disease *</label>
+                                        <select class="form-select" name="family_history" required>
+                                            <option value="">Select</option>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Symptoms -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Symptoms (Select all that apply)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for symptom in ['chest_pain', 'shortness_breath', 'fatigue', 'dizziness', 'palpitations', 'arm_pain'] %}
+                                <div class="col-md-4">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" name="symptoms" value="{{ symptom }}" id="{{ symptom }}">
+                                        <label class="form-check-label" for="{{ symptom }}">
+                                            {% if symptom == 'chest_pain' %}
+                                            <i class="bi bi-heartbreak text-danger"></i> Chest Pain
+                                            {% elif symptom == 'shortness_breath' %}
+                                            <i class="bi bi-wind text-info"></i> Shortness of Breath
+                                            {% elif symptom == 'fatigue' %}
+                                            <i class="bi bi-moon text-warning"></i> Fatigue
+                                            {% elif symptom == 'dizziness' %}
+                                            <i class="bi bi-arrow-repeat text-secondary"></i> Dizziness
+                                            {% elif symptom == 'palpitations' %}
+                                            <i class="bi bi-heart-pulse text-danger"></i> Heart Palpitations
+                                            {% else %}
+                                            <i class="bi bi-hand-index text-primary"></i> Arm/Jaw Pain
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-robot"></i> Analyze with AI Gateway Model
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Model Info -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-cpu"></i> AI Model Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>Algorithm</h6>
+                        <p>Random Forest Classifier</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Explainability</h6>
+                        <p>SHAP (SHapley Additive exPlanations)</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Purpose</h6>
+                        <p>Initial Screening Gateway (Process 04)</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="small text-muted mb-0">
+                        <i class="bi bi-info-circle"></i> This model determines if ECG upload is mandatory or optional based on lifestyle/clinical factors.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Upload ECG Data{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-heart-pulse"></i> Upload ECG Data</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="bi bi-info-circle"></i> Instructions:</h6>
+                    <ul class="mb-0">
+                        <li>Supported formats: PNG, JPG, DICOM, CSV, TXT</li>
+                        <li>Ensure ECG signals are clear and without excessive noise</li>
+                        <li>For paper ECGs, scan at minimum 300 DPI</li>
+                        <li>Maximum file size: 50MB</li>
+                    </ul>
+                </div>
+                
+                <form method="POST" action="{{ url_for('upload_ecg') }}" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="ecg_file" class="form-label">Select ECG File</label>
+                        <input class="form-control" type="file" id="ecg_file" name="ecg_file" accept=".png,.jpg,.jpeg,.dcm,.csv,.txt" required>
+                        <div class="form-text">
+                            Upload your ECG recording or scanned ECG image
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">ECG Type</label>
+                        <select class="form-select" name="ecg_type">
+                            <option value="12_lead">12-Lead ECG</option>
+                            <option value="single_lead">Single-Lead ECG</option>
+                            <option value="holter">Holter Monitor Recording</option>
+                            <option value="scanned">Scanned Paper ECG</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Additional Notes</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Any additional information about the ECG recording..."></textarea>
+                    </div>
+                    
+                    <!-- Preview Area -->
+                    <div class="mb-4 border p-3 rounded text-center" id="previewArea" style="display: none;">
+                        <h6>ECG Preview</h6>
+                        <img id="filePreview" class="img-fluid rounded" style="max-height: 200px;">
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('patient_dashboard') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload"></i> Upload and Analyze
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Processing Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">What happens next?</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="display-4 text-primary">
+                            <i class="bi bi-cpu"></i>
+                        </div>
+                        <h6>AI Processing</h6>
+                        <p class="small">Our 1D CNN model analyzes ECG patterns for ischemic signs</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="display-4 text-primary">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h6>Risk Assessment</h6>
+                        <p class="small">Risk score calculated based on ECG abnormalities</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="display-4 text-primary">
+                            <i class="bi bi-file-earmark-medical"></i>
+                        </div>
+                        <h6>Report Generation</h6>
+                        <p class="small">Detailed report with recommendations generated</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('ecg_file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const previewArea = document.getElementById('previewArea');
+    const filePreview = document.getElementById('filePreview');
+    
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            filePreview.src = e.target.result;
+            previewArea.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        previewArea.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
