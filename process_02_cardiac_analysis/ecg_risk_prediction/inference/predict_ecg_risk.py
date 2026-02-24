@@ -42,7 +42,7 @@ class CardiacPredictor:
         scores = {"LAD (Anterior)": lad_score, "RCA (Inferior)": rca_score, "LCX (Lateral)": lcx_score}
         suspected = max(scores, key=scores.get)
 
-        # Plot the activity for the tutor
+        # Plot the activity
         self.plot_lead_activity(lead_activity, suspected)
         return suspected
 
@@ -77,7 +77,11 @@ class CardiacPredictor:
 if __name__ == "__main__":
     predictor = CardiacPredictor()
     # Change this path to test different files!
-    sample_file = "../data/ECG Images of Myocardial Infarction Patients (240x12=2880)_flattened.csv"
+    sample_file = (".."
+                   ""
+                   ""
+                   ""
+                   "/data/single_uploaded_ecg_row.csv")
     report = predictor.predict(sample_file)
 
     print("\n--- PATIENT CARDIAC RISK REPORT ---")
