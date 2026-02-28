@@ -17,10 +17,55 @@ patients/
 """
 
 import json
+import os
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List
+from cryptography.fernet import Fernet
 
+
+# ENCRYPTION SETUP
+
+def _load_or_create_key(key_path: str = "secret.key") -> bytes:
+    """
+    Loads encryption key from file.
+    If not exists, creates one and saves it.
+    """
+    if os.path.exists(key_path):
+        with open(key_path, "rb") as f:
+            return f.read()
+    else:
+        key = Fernet.generate_key()
+        with open(key_path, "wb") as f:
+            f.write(key)
+        return key
+
+
+SECRET_KEY = _load_or_create_key()
+cipher = Fernet(SECRET_KEY)
+
+
+def _encrypt_and_save(file_bytes: bytes, save_path: Path) -> Path:
+    """
+    Encrypts binary content and saves as .enc file.
+    """
+    encrypted_data = cipher.encrypt(file_bytes)
+    encrypted_path = save_path.with_suffix(".enc")
+
+    with open(encrypted_path, "wb") as f:
+        f.write(encrypted_data)
+
+    return encrypted_path
+
+
+def _decrypt_file(encrypted_path: Path) -> bytes:
+    """
+    Decrypts encrypted file.
+    """
+    with open(encrypted_path, "rb") as f:
+        encrypted_data = f.read()
+
+    return cipher.decrypt(encrypted_data)
 
 def _read_metadata(metadata_path: Path) -> Dict:
     """
@@ -74,6 +119,41 @@ def _validate_patient_data(patient_data: Dict) -> None:
         if field not in patient_data:
             raise ValueError(f"Missing required field: {field}")
 
+def _validate_existing_patient(base_dir: str, patient_data: Dict) -> None:
+    """
+    Ensures that if a patient already exists, their demographic
+    information matches previous records.
+    """
+
+    patient_root = Path(base_dir) / patient_data["patient_id"]
+
+    # If patient folder does not exist, this is a new patient → OK
+    if not patient_root.exists():
+        return
+
+    sessions_dir = patient_root / "sessions"
+
+    # If no sessions exist yet, allow creation
+    if not sessions_dir.exists():
+        return
+
+    # Get any existing metadata.json (first session is enough)
+    metadata_files = list(sessions_dir.glob("*/metadata.json"))
+
+    if not metadata_files:
+        return
+
+    existing_metadata = _read_metadata(metadata_files[0])
+    existing_profile = existing_metadata.get("patient_profile", {})
+
+    # Compare immutable demographic fields
+    if (
+        existing_profile.get("age") != patient_data.get("age")
+        or existing_profile.get("gender") != patient_data.get("gender")
+    ):
+        raise ValueError(
+            "Patient demographic mismatch for existing patient_id."
+        )
 
 
 #Patient Session Initialization
@@ -85,6 +165,7 @@ def initialize_patient_session(patient_data: Dict, base_dir: str = "patients") -
     """
 
     _validate_patient_data(patient_data)
+    _validate_existing_patient(base_dir, patient_data)
 
     patient_id = patient_data["patient_id"]
 
@@ -111,12 +192,32 @@ def initialize_patient_session(patient_data: Dict, base_dir: str = "patients") -
 
     return metadata_path
 
+# ENCRYPTED SAVE HELPERS
+def save_encrypted_ecg(metadata_path: Path, file_bytes: bytes, filename: str) -> str:
+    session_dir = metadata_path.parent
+    ecg_dir = session_dir / "ecg"
+
+    save_path = ecg_dir / filename
+    encrypted_path = _encrypt_and_save(file_bytes, save_path)
+
+    return str(encrypted_path)
+
+
+def save_encrypted_angiogram(metadata_path: Path, file_bytes: bytes, filename: str) -> str:
+    session_dir = metadata_path.parent
+    angio_dir = session_dir / "angiogram"
+
+    save_path = angio_dir / filename
+    encrypted_path = _encrypt_and_save(file_bytes, save_path)
+
+    return str(encrypted_path)
+
+
 #Update risk details of the patient
 def update_risk_prediction(
     metadata_path: Path,
     risk_level: str,
     risk_percentage: float,
-    model_name: str = "XGBoost"
 ) -> None:
     """
     Updates the latest risk prediction result.
@@ -130,7 +231,6 @@ def update_risk_prediction(
     metadata["risk_prediction"]["latest"] = {
         "risk_level": risk_level,
         "risk_percentage": risk_percentage,
-        "model": model_name,
         "timestamp": datetime.utcnow().isoformat()
     }
 
@@ -144,7 +244,6 @@ def update_ecg_metadata(
     processed_csv_path: str,
     preprocessing_steps: List[str],
     classification_result: str,
-    model_name: str = "ECG_CNN"
 ) -> None:
     """
     Updates ECG-related metadata without overwriting existing fields.
@@ -152,38 +251,30 @@ def update_ecg_metadata(
     """
 
     metadata = _read_metadata(metadata_path)
-
-    # Ensure ECG block exists
     metadata.setdefault("ecg", {})
 
-    metadata["ecg"]["uploaded"] = True
-    metadata["ecg"]["raw_image_path"] = raw_image_path
-    metadata["ecg"]["processed_csv_path"] = processed_csv_path
-
-    metadata["ecg"]["preprocessing"] = {
-        "steps": preprocessing_steps,
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-    metadata["ecg"]["classification"] = {
-        "patient_type": classification_result,
-        "model": model_name,
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    metadata["ecg"].update({
+        "uploaded": True,
+        "raw_image_path": raw_image_path,
+        "processed_csv_path": processed_csv_path,
+        "classification": {
+            "patient_type": classification_result,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    })
 
     _write_metadata(metadata_path, metadata)
     metadata = _read_metadata(metadata_path)
 
 
-#Update Angiogram details of the patient
+# Update Angiogram details of the patient
 def update_angiogram_metadata(
     metadata_path: Path,
     dicom_path: str,
     selected_frame_paths: List[str],
-    preprocessing_steps: List[str],
     segmentation_mask_path: str,
-    segmentation_model: str = "DeepSA-based"
 ) -> None:
+
     """
     Updates angiogram-related metadata safely.
     Avoids overwriting unrelated data fields.
@@ -193,20 +284,15 @@ def update_angiogram_metadata(
 
     metadata.setdefault("angiogram", {})
 
-    metadata["angiogram"]["uploaded"] = True
-    metadata["angiogram"]["dicom_path"] = dicom_path
-    metadata["angiogram"]["selected_frames"] = selected_frame_paths
-
-    metadata["angiogram"]["preprocessing"] = {
-        "steps": preprocessing_steps,
-        "timestamp": datetime.utcnow().isoformat()
-    }
-
-    metadata["angiogram"]["segmentation"] = {
-        "mask_path": segmentation_mask_path,
-        "model": segmentation_model,
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    metadata["angiogram"].update({
+        "uploaded": True,
+        "dicom_path": dicom_path,
+        "selected_frames": selected_frame_paths,
+        "segmentation": {
+            "mask_path": segmentation_mask_path,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    })
 
     _write_metadata(metadata_path, metadata)
 
@@ -221,7 +307,9 @@ def get_ecg_image_path(metadata_path: Path) -> str:
 
 def get_risk_percentage(metadata_path: Path) -> float:
     metadata = _read_metadata(metadata_path)
-    return metadata.get("risk_prediction", {}).get("risk_percentage")
+    return metadata.get("risk_prediction", {}) \
+        .get("latest", {}) \
+        .get("risk_percentage")
 
 def get_selected_frames(metadata_path: Path) -> List[str]:
     metadata = _read_metadata(metadata_path)

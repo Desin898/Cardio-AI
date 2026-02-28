@@ -1,5 +1,5 @@
 # Core numerical & data handling
-numpy>=1.26,<2.0
+numpy~=2.2.6
 pandas>=2.0,<3.0
 
 # Image processing
@@ -9,7 +9,7 @@ albumentations>=1.4
 pydicom>=2.4,<3.0
 
 # Visualization
-matplotlib>=3.8,<3.9
+matplotlib~=3.10.7
 seaborn>=0.13
 
 # Machine learning / statistics
@@ -25,3 +25,4 @@ notebook
 
 # Utility
 tqdm
+cryptography~=42.0.5
