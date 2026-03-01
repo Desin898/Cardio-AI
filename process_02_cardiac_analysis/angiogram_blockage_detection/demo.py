@@ -31,7 +31,7 @@ tfmc2 = T.Compose([
 ])
 
 # Path to the pre-trained model checkpoint [cite: 22, 80]
-ckpts = ['ckpt/fscad_36249.ckpt']
+ckpts = ["ckpt/fscad_36249.ckpt"]
 
 # Initialize and load the UNet model [cite: 22]
 netE = UNet(1, 1, 32, bilinear=True)
@@ -138,4 +138,4 @@ demo = gr.Interface(
 
 if __name__ == "__main__":
     # Launch the local server
-    demo.launch(server_name='0.0.0.0', share=False)
+    demo.launch(server_name='127.0.0.1', share=False)
