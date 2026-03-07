@@ -10,12 +10,13 @@ from utils import fusion_predict, make_mask, clear_mask
 from pathlib import Path
 import cv2
 from skimage import morphology
+from inference.vessel_analyzer import VesselAnalyzer
 
 # Configuration constants
 SIZE = 512
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Pre-processing transforms: Scale 1 includes Top-Hat enhancement [cite: 21, 80, 81]
+# Pre-processing transforms
 tfmc1 = T.Compose([
     T.Resize(SIZE),
     T.Lambda(lambda img: tophat(img, 50)),
@@ -23,72 +24,144 @@ tfmc1 = T.Compose([
     T.Normalize((0.5,), (0.5,))
 ])
 
-# Pre-processing transforms: Scale 2 is standard resizing [cite: 21, 22]
 tfmc2 = T.Compose([
     T.Resize(SIZE),
     T.ToTensor(),
     T.Normalize((0.5,), (0.5,))
 ])
 
-# Path to the pre-trained model checkpoint [cite: 22, 80]
+# Path to the pre-trained model checkpoint
 ckpts = ["ckpt/fscad_36249.ckpt"]
 
-# Initialize and load the UNet model [cite: 22]
+# Initialize and load the UNet model
 netE = UNet(1, 1, 32, bilinear=True)
 checkpoint = torch.load(ckpts[0], map_location=DEVICE)
-# Remove 'module.' prefix if the checkpoint was saved from a DataParallel model [cite: 22, 81, 82]
 new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint['netE'].items()}
 netE.load_state_dict(new_state_dict)
 netE.to(DEVICE)
 netE.eval()
 
 
+def draw_stenosis_overlay(sub_img, detected_blockages, top_k=3):
+
+    overlay = np.array(sub_img.convert("RGB")).copy()
+
+    # Keep only top-k strongest stenoses
+    detected_blockages = detected_blockages[:top_k]
+
+    for blockage in detected_blockages:
+        x, y = blockage["coords"]   # correctly stored as (x, y)
+        percentage = blockage["percentage"]
+        severity = blockage.get("severity", "Unknown")
+
+        # RGB colors
+        if severity == "Severe":
+            color = (255, 0, 0)       # Red
+        elif severity == "Moderate":
+            color = (255, 255, 0)     # Yellow
+        else:
+            color = (0, 255, 255)     # Cyan for Mild
+
+        # Draw circle
+        cv2.circle(overlay, (x, y), 8, color, 2)
+
+        # Label text
+        label = f"{percentage}% {severity}"
+
+        # Prevent text from going out of image
+        text_x = min(x + 10, overlay.shape[1] - 140)
+        text_y = max(y - 10, 20)
+
+        # Optional black background for readability
+        (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1)
+        cv2.rectangle(
+            overlay,
+            (text_x - 2, text_y - th - 4),
+            (text_x + tw + 2, text_y + 2),
+            (0, 0, 0),
+            thickness=-1
+        )
+
+        cv2.putText(
+            overlay,
+            label,
+            (text_x, text_y),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.45,
+            color,
+            1,
+            cv2.LINE_AA
+        )
+
+    return Image.fromarray(overlay)
+
+
 def predict(img, auto_tresh, options):
-    """
-    Main prediction pipeline for Deep Subtraction Angiography.
-    Processes the input image to generate an enhanced subtraction image and a binary vessel mask. [cite: 23, 28, 29]
-    """
+
+    if img is None:
+        return None, None, None
+
     if auto_tresh:
-        # Determine options based on UI checkboxes [cite: 22, 23]
-        multiangle = True if "Multiangle" in options else False
+        multiangle = "Multiangle" in options
         pad = 50 if "Pad margin" in options else 0
 
-        img = img.convert('L')
-        x1 = tfmc1(img)
-        x2 = tfmc2(img)
+        img_L = img.convert("L")
+        x1 = tfmc1(img_L)
+        x2 = tfmc2(img_L)
 
-        # Dual-scale fusion prediction [cite: 24]
-        _, out1 = fusion_predict(netE, ["none"], x1, multiangle=multiangle, denoise=4, size=SIZE, cutoff=0.4, pad=pad,
-                                 netE=True)
-        _, out2 = fusion_predict(netE, ["none"], x2, multiangle=False, denoise=4, size=SIZE, cutoff=0.4, pad=pad,
-                                 netE=True)
+        # Dual-scale fusion prediction
+        _, out1 = fusion_predict(
+            netE, ["none"], x1,
+            multiangle=multiangle,
+            denoise=4,
+            size=SIZE,
+            cutoff=0.4,
+            pad=pad,
+            netE=True
+        )
 
-        # Merge the two scales using maximum intensity projection [cite: 24]
+        _, out2 = fusion_predict(
+            netE, ["none"], x2,
+            multiangle=False,
+            denoise=4,
+            size=SIZE,
+            cutoff=0.4,
+            pad=pad,
+            netE=True
+        )
+
+        # Merge the two scales
         out_merge = Image.fromarray(
-            np.expand_dims(np.max(np.concatenate((np.array(out1), np.array(out2)), axis=2), axis=2), 2).repeat(3, 2))
+            np.expand_dims(
+                np.max(np.concatenate((np.array(out1), np.array(out2)), axis=2), axis=2),
+                2
+            ).repeat(3, 2)
+        )
 
-        # Generate the vessel segmentation mask [cite: 24, 25]
+        # Vessel segmentation mask
         mask_merge = make_mask(out_merge, remove_size=2000, local_kernel=21, hole_max_size=100)
-        out_merge = T.functional.adjust_gamma(out_merge, 2)
+        out_merge_gamma = T.functional.adjust_gamma(out_merge, 2)
         seg_img = clear_mask(mask_merge)
 
-        # Create the deep subtraction visual output [cite: 25]
-        sub_img = ImageChops.invert(out_merge)
+        # Deep subtraction output
+        sub_img = ImageChops.invert(out_merge_gamma)
         sub_img = T.ToTensor()(sub_img)
-        sub_img = sub_img * (2 ** (-0.5))  # Adjust intensity [cite: 25]
+        sub_img = sub_img * (2 ** (-0.5))
         sub_img = T.ToPILImage()(sub_img)
-    else:
-        # Simplified inference mode [cite: 25, 26]
-        img = img.convert('L')
-        x = tfmc1(img)
-        input = x.unsqueeze(0).to(DEVICE)
-        with torch.no_grad():
-            pred_y = netE(input)
 
-        # Process the subtraction image output [cite: 26]
+    else:
+        # Simplified inference mode
+        img_L = img.convert("L")
+        x = tfmc1(img_L)
+        input_tensor = x.unsqueeze(0).to(DEVICE)
+
+        with torch.no_grad():
+            pred_y = netE(input_tensor)
+
+        # Subtraction image
         sub_img = make_grid(pred_y, normalize=True)
-        sub_img = (sub_img.permute(1, 2, 0).detach().cpu().numpy() * 255).astype('uint8')
-        sub_img = cv2.fastNlMeansDenoising(sub_img, None, 3, 7, 21)  # Denoising [cite: 26, 27]
+        sub_img = (sub_img.permute(1, 2, 0).detach().cpu().numpy() * 255).astype("uint8")
+        sub_img = cv2.fastNlMeansDenoising(sub_img, None, 3, 7, 21)
 
         sub_img = T.ToPILImage()(sub_img)
         sub_img = ImageOps.autocontrast(sub_img, cutoff=1)
@@ -99,23 +172,34 @@ def predict(img, auto_tresh, options):
         sub_img = sub_img * (2 ** (-0.5))
         sub_img = T.ToPILImage()(sub_img)
 
-        # Process the binary segmentation mask [cite: 28]
-        seg_img = torch.sign(pred_y)
-        seg_img = ((seg_img.cpu().detach() + 1) / 2).numpy().astype(bool)
-        seg_img = morphology.remove_small_objects(seg_img, 500)  # Remove noise [cite: 28]
-        seg_img = (seg_img * 255).astype('uint8')
-        seg_img = torch.from_numpy(seg_img / 255)
-        seg_img = T.ToPILImage()(seg_img[0])
+        # Binary segmentation mask
+        seg_img_tensor = torch.sign(pred_y)
+        seg_img_np = ((seg_img_tensor.cpu().detach() + 1) / 2).numpy().astype(bool)
+        seg_img_np = morphology.remove_small_objects(seg_img_np, 500)
+        seg_img_np = (seg_img_np * 255).astype("uint8")
+        seg_img = T.ToPILImage()(seg_img_np[0])
 
-    return sub_img, seg_img
+    # --- STENOSIS ANALYSIS ---
+    analyzer = VesselAnalyzer(seg_img)
+    analyzer.get_vessel_geometry()
+    detected_blockages = analyzer.calculate_stenosis()
+
+    # --- OVERLAY VISUALIZATION ---
+    if len(detected_blockages) > 0:
+        final_overlay = draw_stenosis_overlay(sub_img, detected_blockages, top_k=3)
+    else:
+        # If no stenosis detected, just return subtraction image itself
+        final_overlay = sub_img.copy()
+
+    return sub_img, seg_img, final_overlay
 
 
 # Gradio Interface Setup
-title = "DeepSA: Deep Subtraction Angiography"
-description = "Vessel Enhancement and Segmentation Model for Coronary Angiograms."
+title = "DeepSA: Enhanced Cardiac Analysis"
+description = "Subtraction, Segmentation, and Automated Stenosis Pinpointing for Coronary Angiograms."
 article = "<p style='text-align: center'>Re-implemented for DSGP Group 3 Project</p>"
 
-# Load example images if available in the directory
+# Load example images if available
 examples = list(Path("data/frames").glob("*.png"))
 examples = [[str(e)] for e in examples]
 
@@ -127,8 +211,9 @@ demo = gr.Interface(
         gr.CheckboxGroup(["Multiangle", "Pad margin"], label="Advanced Options")
     ],
     outputs=[
-        gr.Image(type="pil", label='Enhanced Subtraction'),
-        gr.Image(type="pil", label='Vessel Segmentation')
+        gr.Image(type="pil", label="1. Enhanced Subtraction"),
+        gr.Image(type="pil", label="2. Vessel Segmentation"),
+        gr.Image(type="pil", label="3. Stenosis Localization (Blockage %)")
     ],
     title=title,
     description=description,
@@ -137,5 +222,4 @@ demo = gr.Interface(
 )
 
 if __name__ == "__main__":
-    # Launch the local server
-    demo.launch(server_name='127.0.0.1', share=False)
+    demo.launch(server_name="127.0.0.1", share=False)
