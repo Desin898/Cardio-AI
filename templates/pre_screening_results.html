@@ -1,151 +1,104 @@
-{% extends "base.html" %}
-
-{% block title %}Screening Results{% endblock %}
-
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-{{ result.color }} text-white">
-                <h4 class="mb-0"><i class="bi {{ result.icon }}"></i> Initial Screening Results</h4>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioAI · Screening Result</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(145deg, #e9eff9 0%, #d8e3f0 100%); font-family: 'Inter', sans-serif; padding:1.5rem; }
+        .main-container { max-width:800px; margin:0 auto; }
+        .card { border-radius:32px; background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); border: none; padding: 2rem; }
+        .risk-badge { font-size: 1.2rem; padding: 0.5rem 1.5rem; border-radius: 40px; }
+        .factor-item { background: rgba(255,255,255,0.5); border-radius: 20px; padding: 1rem; margin-bottom: 0.75rem; }
+        .btn-secondary { border-radius: 40px; background: #e0e7f0; color: #1f3a6b; border: none; }
+        .btn-secondary:hover { background: #d0d9e5; }
+        .section-title { font-weight:600; color:#13293e; border-left:4px solid #2a5298; padding-left:15px; margin: 1.5rem 0 1.2rem; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="card">
+            <div class="d-flex align-items-center mb-4">
+                <i class="fas fa-heartbeat fs-1 me-3" style="color:#2a5298;"></i>
+                <h2 class="mb-0">Screening Result</h2>
             </div>
-            <div class="card-body">
-                <!-- Result Card -->
-                <div class="card mb-4 border-{{ result.color }}">
-                    <div class="card-body text-center">
-                        <h1 class="display-1 mb-3">
-                            {% if result.risk_status == 'HIGH_RISK' %}
-                            ⚠️
-                            {% else %}
-                            ✅
-                            {% endif %}
-                        </h1>
-                        <h3 class="card-title text-{{ result.color }}">
-                            {{ result.risk_status }}
-                        </h3>
-                        <div class="display-4 fw-bold text-{{ result.color }}">
-                            {{ (result.risk_probability * 100)|round(1) }}%
-                        </div>
-                        <p class="lead mt-3">{{ result.message }}</p>
-                        
-                        <div class="mt-4">
-                            <h5>System Decision:</h5>
-                            <div class="alert alert-{{ result.color }}">
-                                <h4 class="alert-heading">
-                                    {% if result.decision == 'MANDATORY_ECG' %}
-                                    <i class="bi bi-exclamation-triangle"></i> ECG Required
-                                    {% else %}
-                                    <i class="bi bi-check-circle"></i> ECG Optional
-                                    {% endif %}
-                                </h4>
-                                <p class="mb-0">{{ result.next_step }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Risk Factors -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Key Contributing Factors</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            {% for factor in result.explanation %}
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h6>{{ factor.factor }}</h6>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <small class="text-muted">Value:</small>
-                                                <div class="fw-bold">{{ factor.value }}</div>
-                                            </div>
-                                            <div class="text-end">
-                                                <small class="text-muted">Impact:</small>
-                                                <div class="fw-bold {% if 'higher' in factor.effect %}text-danger{% else %}text-success{% endif %}">
-                                                    {{ factor.impact }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2">
-                                            <span class="badge bg-{% if 'higher' in factor.effect %}danger{% else %}success{% endif %}">
-                                                {{ factor.effect }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Next Steps -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-arrow-right-circle"></i> Recommended Next Steps</h5>
-                    </div>
-                    <div class="card-body">
-                        {% if result.decision == 'MANDATORY_ECG' %}
-                        <div class="alert alert-warning">
-                            <h6><i class="bi bi-exclamation-triangle"></i> Immediate Action Required</h6>
-                            <p>Based on your risk profile, ECG analysis is mandatory for accurate assessment.</p>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <a href="{{ url_for('upload_ecg') }}" class="btn btn-warning btn-lg">
-                                <i class="bi bi-heart-pulse"></i> Upload ECG Now
-                            </a>
-                        </div>
-                        {% else %}
-                        <div class="alert alert-info">
-                            <h6><i class="bi bi-info-circle"></i> Optional ECG Upload</h6>
-                            <p>While not required, you can still upload an ECG for additional verification.</p>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <a href="{{ url_for('upload_ecg') }}" class="btn btn-outline-primary btn-lg">
-                                <i class="bi bi-cloud-upload"></i> Upload ECG (Optional)
-                            </a>
-                            <a href="{{ url_for('patient_dashboard') }}" class="btn btn-secondary">
-                                <i class="bi bi-house-door"></i> Return to Dashboard
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- AI Model Info -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-cpu"></i> AI Model Details</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-md-3">
-                                <i class="bi bi-diagram-3 fs-1 text-primary"></i>
-                                <h6>Random Forest</h6>
-                                <p class="small">Ensemble learning method</p>
-                            </div>
-                            <div class="col-md-3">
-                                <i class="bi bi-lightbulb fs-1 text-warning"></i>
-                                <h6>SHAP Explainability</h6>
-                                <p class="small">Transparent AI decisions</p>
-                            </div>
-                            <div class="col-md-3">
-                                <i class="bi bi-shield-check fs-1 text-success"></i>
-                                <h6>Clinical Validation</h6>
-                                <p class="small">Trained on medical data</p>
-                            </div>
-                            <div class="col-md-3">
-                                <i class="bi bi-gate fs-1 text-info"></i>
-                                <h6>Gateway Screening</h6>
-                                <p class="small">Process 04: Initial Filter</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+            <div id="resultContent">
+                <!-- dynamic content inserted by JS -->
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="/" class="btn btn-secondary px-4 py-2 me-2">New Screening</a>
+                <a href="#" id="uploadLink" class="btn btn-primary px-4 py-2">Proceed to ECG Upload</a>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <script>
+        function displayResult() {
+            const resultStr = localStorage.getItem('screeningResult');
+            if (!resultStr) {
+                window.location.href = '/';  // no result, go back to form
+                return;
+            }
+
+            const result = JSON.parse(resultStr);
+            const container = document.getElementById('resultContent');
+            const uploadLink = document.getElementById('uploadLink');
+
+            // Set link based on whether ECG is required (adjust URLs to your actual pages)
+            if (result.requires_ecg) {
+                uploadLink.href = '/upload_ecg.html';   // mandatory upload page
+                uploadLink.textContent = 'Upload ECG (Mandatory)';
+            } else {
+                uploadLink.href = '/upload_ecg_optional.html'; // optional upload page
+                uploadLink.textContent = 'Upload ECG (Optional)';
+            }
+
+            const badgeClass = result.color === 'red' ? 'bg-danger' : 'bg-success';
+
+            let html = `
+                <div class="text-center mb-4">
+                    <span class="risk-badge ${badgeClass} text-white">${result.risk_status}</span>
+                </div>
+                <div class="mb-4">
+                    <h4>Risk Probability: ${(result.risk_probability * 100).toFixed(1)}%</h4>
+                    <p class="lead">${result.message}</p>
+                </div>
+                <hr>
+                <h5 class="section-title">Key Contributing Factors</h5>
+            `;
+
+            if (result.explanation && result.explanation.length > 0) {
+                result.explanation.forEach((factor, idx) => {
+                    const emoji = factor.effect === 'higher risk' ? '🔴' : '🟢';
+                    html += `
+                        <div class="factor-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span><strong>${idx+1}. ${emoji} ${factor.factor}</strong> (value: ${factor.value})</span>
+                                <span class="badge bg-light text-dark">impact: ${factor.impact > 0 ? '+' : ''}${factor.impact}</span>
+                            </div>
+                            <small class="text-muted">${factor.effect}</small>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p>No explanation factors available.</p>';
+            }
+
+            html += `
+                <hr>
+                <p><strong>Next step:</strong> ${result.next_step.replace('_', ' ')}</p>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        displayResult();
+    </script>
+</body>
+</html>
