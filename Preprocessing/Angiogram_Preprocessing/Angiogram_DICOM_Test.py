@@ -4,7 +4,7 @@ from Angiogram_DICOM_KeyFrame_Extraction import process_angiogram
 # ----------------------------------------
 # CONFIGURE TEST FILE HERE
 # ----------------------------------------
-TEST_FILE = Path("C:/Users/User/Documents/IIT Stage 2/IIT Stage 2 Semester 1/CM2603  Data Science Group Project/Angiogram Videos/MP4/Patient-0002.mp4")
+TEST_FILE = Path("C:/Users/User/Documents/IIT Stage 2/IIT Stage 2 Semester 1/CM2603  Data Science Group Project/Angiogram Videos/DICOM/Patient-0002")
 # OR
 # TEST_FILE = Path("test_data/sample_video.mp4")
 
