@@ -20,9 +20,10 @@ class VesselAnalyzer:
         local_window=10,
         inner_gap=4,
         min_stenosis_percent=30.0,
-        duplicate_distance=30
+        duplicate_distance=30,
+        lesion_half_window=3,
+        min_lesion_length_pixels=5
     ):
-
         mask_np = np.array(mask_pil.convert("L"))
 
         # Binary threshold
@@ -45,6 +46,8 @@ class VesselAnalyzer:
         self.inner_gap = inner_gap
         self.min_stenosis_percent = min_stenosis_percent
         self.duplicate_distance = duplicate_distance
+        self.lesion_half_window = lesion_half_window
+        self.min_lesion_length_pixels = min_lesion_length_pixels
 
     def get_vessel_geometry(self):
         """
@@ -55,13 +58,11 @@ class VesselAnalyzer:
         return self.skeleton, self.distance_map
 
     def _smooth_profile(self, diameters):
-
         n = len(diameters)
 
         if n < 5:
             return diameters.copy()
 
-        # Use odd window size only
         win = min(9, n if n % 2 == 1 else n - 1)
         if win >= 5:
             try:
@@ -69,11 +70,9 @@ class VesselAnalyzer:
             except Exception:
                 pass
 
-        # fallback
         return np.convolve(diameters, np.ones(5) / 5, mode="same")
 
     def _classify_stenosis(self, percent):
-
         if percent < 40:
             return "Mild"
         elif percent < 70:
@@ -81,9 +80,6 @@ class VesselAnalyzer:
         return "Severe"
 
     def _is_local_minimum(self, profile, idx):
-        """
-        Check whether current point is a local minimum.
-        """
         if idx <= 0 or idx >= len(profile) - 1:
             return False
         return profile[idx] < profile[idx - 1] and profile[idx] <= profile[idx + 1]
@@ -91,7 +87,6 @@ class VesselAnalyzer:
     def _compute_local_reference(self, profile, idx):
         """
         Compute local reference diameter using nearby proximal/distal windows.
-        This is a simple MVP approximation of interpolated reference diameter.
         """
         left_start = idx - self.local_window
         left_end = idx - self.inner_gap
@@ -107,7 +102,6 @@ class VesselAnalyzer:
         if len(left_ref) == 0 or len(right_ref) == 0:
             return None
 
-        # Use median for robustness against noise
         ref_candidates = np.concatenate([left_ref, right_ref])
         d_ref = float(np.median(ref_candidates))
 
@@ -116,10 +110,42 @@ class VesselAnalyzer:
 
         return d_ref
 
+    def _estimate_lesion_length(self, profile, idx, d_ref):
+        """
+        Estimate how many nearby pixels stay below 90% of reference diameter.
+        """
+        threshold = 0.9 * d_ref
+        count = 1
+
+        # expand left
+        j = idx - 1
+        while j >= 0 and profile[j] < threshold:
+            count += 1
+            j -= 1
+
+        # expand right
+        j = idx + 1
+        while j < len(profile) and profile[j] < threshold:
+            count += 1
+            j += 1
+
+        return count
+
+    def _compute_confidence(self, sten_pct, lesion_length, d_ref, d_min):
+        """
+        Simple confidence score from 0 to 1.
+        """
+        severity_score = min(sten_pct / 100.0, 1.0)
+        length_score = min(lesion_length / 12.0, 1.0)
+
+        # Bigger actual drop -> better confidence
+        drop = max(d_ref - d_min, 0.0)
+        drop_score = min(drop / max(d_ref, 1e-6), 1.0)
+
+        confidence = 0.5 * severity_score + 0.3 * length_score + 0.2 * drop_score
+        return round(float(confidence), 3)
+
     def _is_duplicate(self, x, y, blockages):
-        """
-        Avoid marking multiple nearby points for the same lesion.
-        """
         for b in blockages:
             bx, by = b["coords"]
             if np.linalg.norm(np.array([x, y]) - np.array([bx, by])) < self.duplicate_distance:
@@ -136,7 +162,6 @@ class VesselAnalyzer:
         if len(summary) == 0:
             return []
 
-        # Keep only meaningful long branches
         major_branches = summary[summary["branch-distance"] > self.min_branch_length]
 
         blockages = []
@@ -147,14 +172,10 @@ class VesselAnalyzer:
             if len(path_coords) < (2 * self.end_ignore_pixels + 5):
                 continue
 
-            # Radius and diameter along branch path
             radii = self.distance_map[path_coords[:, 0], path_coords[:, 1]]
             diameters = radii * 2.0
-
-            # Smooth the curve
             smooth_diameters = self._smooth_profile(diameters)
 
-            # Ignore the first and last few pixels to avoid false positives
             start_idx = self.end_ignore_pixels
             end_idx = len(smooth_diameters) - self.end_ignore_pixels
 
@@ -164,7 +185,6 @@ class VesselAnalyzer:
             for i in range(start_idx, end_idx):
                 d_min = float(smooth_diameters[i])
 
-                # Only evaluate real local minima
                 if not self._is_local_minimum(smooth_diameters, i):
                     continue
 
@@ -174,25 +194,32 @@ class VesselAnalyzer:
 
                 sten_pct = (1.0 - (d_min / d_ref)) * 100.0
 
-                # Filter unrealistic or weak findings
                 if sten_pct < self.min_stenosis_percent or sten_pct > 95:
                     continue
 
-                y, x = path_coords[i]   # path_coords is (row, col) = (y, x)
+                lesion_length = self._estimate_lesion_length(smooth_diameters, i, d_ref)
+                if lesion_length < self.min_lesion_length_pixels:
+                    continue
+
+                y, x = path_coords[i]
 
                 if self._is_duplicate(x, y, blockages):
                     continue
 
+                lesion_radius = max(int(round(d_ref / 2.0)), 6)
+                confidence = self._compute_confidence(sten_pct, lesion_length, d_ref, d_min)
+
                 blockages.append({
-                    "coords": (int(x), int(y)),   # save correctly as (x, y)
+                    "coords": (int(x), int(y)),
                     "percentage": round(float(sten_pct), 1),
                     "severity": self._classify_stenosis(sten_pct),
                     "branch_id": int(branch_id),
                     "d_min": round(d_min, 2),
-                    "d_ref": round(d_ref, 2)
+                    "d_ref": round(d_ref, 2),
+                    "lesion_length": int(lesion_length),
+                    "lesion_radius": int(lesion_radius),
+                    "confidence": confidence
                 })
 
-        # Sort strongest stenosis first
-        blockages.sort(key=lambda b: b["percentage"], reverse=True)
-
+        blockages.sort(key=lambda b: (b["percentage"], b["confidence"]), reverse=True)
         return blockages
