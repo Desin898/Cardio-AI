@@ -1,214 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CardioAI · Pre‑screening</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { background: linear-gradient(145deg, #e9eff9 0%, #d8e3f0 100%); font-family: 'Inter', sans-serif; padding:1.5rem; }
-        .main-container { max-width:950px; margin:0 auto; }
-        .header-box { margin-bottom: 1.5rem; }
-        .card { border-radius:32px; background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); border: none; }
-        .section-title { font-weight:600; color:#13293e; border-left:4px solid #2a5298; padding-left:15px; margin: 1.5rem 0 1.2rem; }
-        .form-control, .form-select { border-radius:18px; background:rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.1); }
-        .btn-primary { border-radius:40px; background:linear-gradient(105deg,#1f3a6b,#2d4f89); border: none; padding: 12px; }
-        .btn-primary:hover { background:linear-gradient(105deg,#163157,#1f3f6b); }
-        .alert { border-radius: 18px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioAI · Pre-screening</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+background: linear-gradient(145deg, #e9eff9 0%, #d8e3f0 100%);
+font-family: 'Inter', sans-serif;
+padding:1.5rem;
+}
+
+.main-container {
+max-width:950px;
+margin:0 auto;
+}
+
+.header-box {
+margin-bottom: 1.5rem;
+}
+
+.card {
+border-radius:32px;
+background:rgba(255,255,255,0.75);
+backdrop-filter:blur(12px);
+border: none;
+}
+
+.section-title {
+font-weight:600;
+color:#13293e;
+border-left:4px solid #2a5298;
+padding-left:15px;
+margin: 1.5rem 0 1.2rem;
+}
+
+.form-control, .form-select {
+border-radius:18px;
+background:rgba(255,255,255,0.7);
+border: 1px solid rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+border-radius:40px;
+background:linear-gradient(105deg,#1f3a6b,#2d4f89);
+border: none;
+padding: 12px;
+}
+
+.btn-primary:hover {
+background:linear-gradient(105deg,#163157,#1f3f6b);
+}
+
+.alert {
+border-radius: 18px;
+}
+</style>
 </head>
+
 <body>
-    <div class="main-container">
-        <div class="header-box">
-            <h3><i class="fas fa-clipboard-list me-2"></i>Initial Risk Screening</h3>
-            <p class="mb-0">AI-based cardiovascular pre‑screening</p>
-        </div>
 
-        <div class="card p-4">
-            <div class="alert alert-info mb-4 rounded-4">This system evaluates your health data to determine whether ECG testing is required.</div>
+<div class="main-container">
 
-            <form id="screeningForm">
-                <!-- Personal Information (unchanged) -->
-                <div class="section-title">Personal Information</div>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <label>Age</label>
-                        <input type="number" class="form-control" name="age" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Gender</label>
-                        <select class="form-select" name="gender" required>
-                            <option value="">Select</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label>BMI</label>
-                        <input type="number" step="0.1" class="form-control" name="bmi" required>
-                    </div>
-                </div>
+<div class="header-box">
+<h3><i class="fas fa-clipboard-list me-2"></i>Initial Risk Screening</h3>
+<p class="mb-0">AI-based cardiovascular pre-screening</p>
+</div>
 
-                <!-- Clinical Measurements (unchanged) -->
-                <div class="section-title">Clinical Measurements</div>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-3"><input type="number" class="form-control" name="systolic_bp" placeholder="Systolic BP" required></div>
-                    <div class="col-md-3"><input type="number" class="form-control" name="diastolic_bp" placeholder="Diastolic BP" required></div>
-                    <div class="col-md-3"><input type="number" class="form-control" name="cholesterol" placeholder="Cholesterol (mg/dL)" required></div>
-                    <div class="col-md-3"><input type="number" class="form-control" name="glucose" placeholder="Glucose (mg/dL)" required></div>
-                </div>
+<div class="card p-4">
 
-                <!-- Lifestyle Factors (original, with years smoking toggle) -->
-                <div class="section-title">Lifestyle Factors</div>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <select class="form-select" name="smoker" id="smoker" required>
-                            <option value="">Smoking Status</option>
-                            <option value="Yes">Current</option>
-                            <option value="No">Non-smoker</option>
-                            <option value="Former">Former</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="number" class="form-control" id="yearsSmoking" name="years_smoking" placeholder="Years Smoking" disabled>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="number" step="0.1" class="form-control" name="exercise_hours" placeholder="Exercise hrs/week" required>
-                    </div>
-                </div>
+<div class="alert alert-info mb-4 rounded-4">
+This system evaluates your health data to determine whether ECG testing is required.
+</div>
 
-                <!-- ADDITIONAL HEALTH FACTORS (required by the model) -->
-                <div class="section-title">Additional Health Factors</div>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <select class="form-select" name="diabetes" required>
-                            <option value="">Diabetes?</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-select" name="alcohol" required>
-                            <option value="">Alcohol Consumption</option>
-                            <option value="None">None</option>
-                            <option value="Light">Light</option>
-                            <option value="Heavy">Heavy</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-select" name="physical_activity" required>
-                            <option value="">Physical Activity</option>
-                            <option value="Sedentary">Sedentary</option>
-                            <option value="Moderate">Moderate</option>
-                            <option value="Active">Active</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row g-3 mt-2">
-                    <div class="col-md-4">
-                        <select class="form-select" name="family_history" required>
-                            <option value="">Family History of CAD?</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-select" name="stress_level" required>
-                            <option value="">Stress Level</option>
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="number" step="0.1" class="form-control" name="sleep_hours" placeholder="Sleep (hours/night)" required>
-                    </div>
-                </div>
+<form id="screeningForm">
 
-                <button type="submit" class="btn btn-primary w-100 mt-4 py-3" id="submitBtn">Analyze Risk</button>
-            </form>
-        </div>
-    </div>
+<!-- Personal Information -->
+<div class="section-title">Personal Information</div>
 
-    <script>
-        // (Optional) Login check – you can keep or remove
-        // const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        // if (!currentUser) { window.location.href = 'patient_login.html'; }
+<div class="row g-3 mb-4">
 
-        // Toggle years smoking
-        const smoker = document.getElementById("smoker");
-        const years = document.getElementById("yearsSmoking");
-        smoker.addEventListener("change", () => {
-            years.disabled = !(smoker.value === "Yes" || smoker.value === "Former");
-            if (years.disabled) years.value = "";
-        });
+<div class="col-md-4">
+<label>Age</label>
+<input type="number" class="form-control" name="age" required>
+</div>
 
-        // Form submission: send to Flask backend
-        document.getElementById("screeningForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
+<div class="col-md-4">
+<label>Gender</label>
+<select class="form-select" name="gender" required>
+<option value="">Select</option>
+<option>Male</option>
+<option>Female</option>
+</select>
+</div>
 
-            // Basic validation (systolic > diastolic)
-            const sys = parseInt(document.querySelector('[name="systolic_bp"]').value);
-            const dia = parseInt(document.querySelector('[name="diastolic_bp"]').value);
-            if (sys <= dia) {
-                alert("Systolic BP must be higher than Diastolic BP.");
-                return;
-            }
+<div class="col-md-4">
+<label>BMI</label>
+<input type="number" step="0.1" class="form-control" name="bmi" required>
+</div>
 
-            // Collect all data
-            const formData = {
-                age: parseInt(document.querySelector('[name="age"]').value),
-                gender: document.querySelector('[name="gender"]').value,
-                bmi: parseFloat(document.querySelector('[name="bmi"]').value),
-                systolic_bp: sys,
-                diastolic_bp: dia,
-                cholesterol: parseInt(document.querySelector('[name="cholesterol"]').value),
-                glucose: parseInt(document.querySelector('[name="glucose"]').value),
-                smoker: document.querySelector('[name="smoker"]').value,
-                years_smoking: years.disabled ? 0 : parseInt(years.value) || 0,
-                exercise_hours: parseFloat(document.querySelector('[name="exercise_hours"]').value),
-                // new fields
-                diabetes: document.querySelector('[name="diabetes"]').value,
-                alcohol: document.querySelector('[name="alcohol"]').value,
-                physical_activity: document.querySelector('[name="physical_activity"]').value,
-                family_history: document.querySelector('[name="family_history"]').value,
-                stress_level: document.querySelector('[name="stress_level"]').value,
-                sleep_hours: parseFloat(document.querySelector('[name="sleep_hours"]').value)
-            };
+</div>
 
-            // Disable button, show spinner
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-pulse me-2"></i>Processing...';
-            btn.disabled = true;
+<!-- Clinical Measurements -->
+<div class="section-title">Clinical Measurements</div>
 
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
+<div class="row g-3 mb-4">
 
-                if (!response.ok) throw new Error(`Server error: ${response.status}`);
+<div class="col-md-3">
+<input type="number" class="form-control" name="systolic_bp" placeholder="Systolic BP" required>
+</div>
 
-                const result = await response.json();
+<div class="col-md-3">
+<input type="number" class="form-control" name="diastolic_bp" placeholder="Diastolic BP" required>
+</div>
 
-                if (result.success) {
-                    localStorage.setItem('screeningResult', JSON.stringify(result));
-                    window.location.href = 'pre_screening_results.html';
-                } else {
-                    alert('Prediction failed: ' + result.message);
-                    btn.innerHTML = 'Analyze Risk';
-                    btn.disabled = false;
-                }
-            } catch (error) {
-                alert('Error connecting to server: ' + error.message);
-                btn.innerHTML = 'Analyze Risk';
-                btn.disabled = false;
-            }
-        });
-    </script>
+<div class="col-md-3">
+<input type="number" class="form-control" name="cholesterol" placeholder="Total Cholesterol (mg/dL)" required>
+</div>
+
+<div class="col-md-3">
+<input type="number" class="form-control" name="hdl_cholesterol" placeholder="HDL Cholesterol (mg/dL)" required>
+</div>
+
+</div>
+
+<div class="row g-3 mb-4">
+
+<div class="col-md-3">
+<input type="number" class="form-control" name="glucose" placeholder="Glucose (mg/dL)" required>
+</div>
+
+<div class="col-md-3">
+<select class="form-select" name="bp_treatment" required>
+<option value="">On BP Medication?</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+</select>
+</div>
+
+</div>
+
+<!-- Lifestyle Factors -->
+<div class="section-title">Lifestyle Factors</div>
+
+<div class="row g-3 mb-4">
+
+<div class="col-md-4">
+<select class="form-select" name="smoker" id="smoker" required>
+<option value="">Smoking Status</option>
+<option value="Yes">Current</option>
+<option value="No">Non-smoker</option>
+<option value="Former">Former</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<input type="number" class="form-control" id="yearsSmoking" name="years_smoking" placeholder="Years Smoking" disabled>
+</div>
+
+<div class="col-md-4">
+<input type="number" step="0.1" class="form-control" name="exercise_hours" placeholder="Exercise hrs/week" required>
+</div>
+
+</div>
+
+<!-- Additional Health Factors -->
+<div class="section-title">Additional Health Factors</div>
+
+<div class="row g-3">
+
+<div class="col-md-4">
+<select class="form-select" name="diabetes" required>
+<option value="">Diabetes?</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<select class="form-select" name="alcohol" required>
+<option value="">Alcohol Consumption</option>
+<option value="None">None</option>
+<option value="Light">Light</option>
+<option value="Heavy">Heavy</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<select class="form-select" name="physical_activity" required>
+<option value="">Physical Activity</option>
+<option value="Sedentary">Sedentary</option>
+<option value="Moderate">Moderate</option>
+<option value="Active">Active</option>
+</select>
+</div>
+
+</div>
+
+<div class="row g-3 mt-2">
+
+<div class="col-md-4">
+<select class="form-select" name="family_history" required>
+<option value="">Family History of CAD?</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<select class="form-select" name="stress_level" required>
+<option value="">Stress Level</option>
+<option value="Low">Low</option>
+<option value="Medium">Medium</option>
+<option value="High">High</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<input type="number" step="0.1" class="form-control" name="sleep_hours" placeholder="Sleep (hours/night)" required>
+</div>
+
+</div>
+
+<button type="submit" class="btn btn-primary w-100 mt-4 py-3" id="submitBtn">
+Analyze Risk
+</button>
+
+</form>
+</div>
+</div>
+
+<script>
+
+const smoker = document.getElementById("smoker");
+const years = document.getElementById("yearsSmoking");
+
+smoker.addEventListener("change", () => {
+years.disabled = !(smoker.value === "Yes" || smoker.value === "Former");
+if (years.disabled) years.value = "";
+});
+
+document.getElementById("screeningForm").addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const sys = parseInt(document.querySelector('[name="systolic_bp"]').value);
+const dia = parseInt(document.querySelector('[name="diastolic_bp"]').value);
+
+if (sys <= dia){
+alert("Systolic BP must be higher than Diastolic BP.");
+return;
+}
+
+const formData = {
+
+age: parseInt(document.querySelector('[name="age"]').value),
+gender: document.querySelector('[name="gender"]').value,
+bmi: parseFloat(document.querySelector('[name="bmi"]').value),
+
+systolic_bp: sys,
+diastolic_bp: dia,
+
+cholesterol: parseInt(document.querySelector('[name="cholesterol"]').value),
+hdl_cholesterol: parseInt(document.querySelector('[name="hdl_cholesterol"]').value),
+
+glucose: parseInt(document.querySelector('[name="glucose"]').value),
+bp_treatment: document.querySelector('[name="bp_treatment"]').value,
+
+smoker: document.querySelector('[name="smoker"]').value,
+years_smoking: years.disabled ? 0 : parseInt(years.value) || 0,
+
+exercise_hours: parseFloat(document.querySelector('[name="exercise_hours"]').value),
+
+diabetes: document.querySelector('[name="diabetes"]').value,
+alcohol: document.querySelector('[name="alcohol"]').value,
+physical_activity: document.querySelector('[name="physical_activity"]').value,
+family_history: document.querySelector('[name="family_history"]').value,
+stress_level: document.querySelector('[name="stress_level"]').value,
+sleep_hours: parseFloat(document.querySelector('[name="sleep_hours"]').value)
+
+};
+
+const btn = document.getElementById('submitBtn');
+
+btn.innerHTML = '<i class="fas fa-spinner fa-pulse me-2"></i>Processing...';
+btn.disabled = true;
+
+try{
+
+const response = await fetch('/predict',{
+
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(formData)
+
+});
+
+if(!response.ok) throw new Error(`Server error: ${response.status}`);
+
+const result = await response.json();
+
+if(result.success){
+
+localStorage.setItem('screeningResult', JSON.stringify(result));
+window.location.href='pre_screening_results.html';
+
+}else{
+
+alert('Prediction failed: ' + result.message);
+btn.innerHTML='Analyze Risk';
+btn.disabled=false;
+
+}
+
+}catch(error){
+
+alert('Error connecting to server: ' + error.message);
+btn.innerHTML='Analyze Risk';
+btn.disabled=false;
+
+}
+
+});
+
+</script>
+
 </body>
 </html>
