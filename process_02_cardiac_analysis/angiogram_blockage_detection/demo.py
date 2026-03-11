@@ -42,38 +42,96 @@ netE.to(DEVICE)
 netE.eval()
 
 
-def draw_stenosis_overlay(sub_img, detected_blockages, top_k=3):
+def get_severity_color(severity):
+    """
+    Return RGB color for severity class.
+    """
+    if severity == "Severe":
+        return (255, 0, 0)      # Red
+    elif severity == "Moderate":
+        return (255, 255, 0)    # Yellow
+    return (0, 255, 255)        # Cyan for Mild
 
+
+def draw_info_box(image, text_lines, start_x=10, start_y=10):
+    """
+    Draw a small summary panel on the image.
+    """
+    overlay = image.copy()
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.42
+    thickness = 1
+    line_height = 18
+
+    max_width = 0
+    for line in text_lines:
+        (tw, th), _ = cv2.getTextSize(line, font, font_scale, thickness)
+        max_width = max(max_width, tw)
+
+    box_w = max_width + 14
+    box_h = len(text_lines) * line_height + 10
+
+    cv2.rectangle(
+        overlay,
+        (start_x, start_y),
+        (start_x + box_w, start_y + box_h),
+        (0, 0, 0),
+        thickness=-1
+    )
+
+    y = start_y + 16
+    for line in text_lines:
+        cv2.putText(
+            overlay,
+            line,
+            (start_x + 6, y),
+            font,
+            font_scale,
+            (255, 255, 255),
+            thickness,
+            cv2.LINE_AA
+        )
+        y += line_height
+
+    return overlay
+
+
+def draw_stenosis_overlay(sub_img, detected_blockages, top_k=3):
+    """
+    Draw stenosis localization overlay on subtraction image.
+    """
     overlay = np.array(sub_img.convert("RGB")).copy()
 
-    # Keep only top-k strongest stenoses
+    # Keep strongest lesions only
     detected_blockages = detected_blockages[:top_k]
 
-    for blockage in detected_blockages:
-        x, y = blockage["coords"]   # correctly stored as (x, y)
+    summary_lines = [f"Detected lesions: {len(detected_blockages)}"]
+
+    for idx, blockage in enumerate(detected_blockages, start=1):
+        x, y = blockage["coords"]
         percentage = blockage["percentage"]
         severity = blockage.get("severity", "Unknown")
+        confidence = blockage.get("confidence", 0.0)
+        lesion_radius = blockage.get("lesion_radius", 8)
 
-        # RGB colors
-        if severity == "Severe":
-            color = (255, 0, 0)       # Red
-        elif severity == "Moderate":
-            color = (255, 255, 0)     # Yellow
-        else:
-            color = (0, 255, 255)     # Cyan for Mild
+        color = get_severity_color(severity)
 
-        # Draw circle
-        cv2.circle(overlay, (x, y), 8, color, 2)
+        # Draw lesion circle
+        cv2.circle(overlay, (x, y), lesion_radius, color, 2)
+
+        # Draw center point
+        cv2.circle(overlay, (x, y), 2, color, -1)
 
         # Label text
-        label = f"{percentage}% {severity}"
+        label = f"{percentage}% {severity} | C:{confidence:.2f}"
 
-        # Prevent text from going out of image
-        text_x = min(x + 10, overlay.shape[1] - 140)
+        # Keep text inside image
+        text_x = min(x + 10, overlay.shape[1] - 180)
         text_y = max(y - 10, 20)
 
-        # Optional black background for readability
         (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1)
+
+        # Background box
         cv2.rectangle(
             overlay,
             (text_x - 2, text_y - th - 4),
@@ -93,11 +151,16 @@ def draw_stenosis_overlay(sub_img, detected_blockages, top_k=3):
             cv2.LINE_AA
         )
 
+        summary_lines.append(f"{idx}. {percentage}% {severity}")
+
+    overlay = draw_info_box(overlay, summary_lines, start_x=10, start_y=10)
     return Image.fromarray(overlay)
 
 
 def predict(img, auto_tresh, options):
-
+    """
+    Main prediction pipeline for Deep Subtraction Angiography.
+    """
     if img is None:
         return None, None, None
 
@@ -188,8 +251,14 @@ def predict(img, auto_tresh, options):
     if len(detected_blockages) > 0:
         final_overlay = draw_stenosis_overlay(sub_img, detected_blockages, top_k=3)
     else:
-        # If no stenosis detected, just return subtraction image itself
-        final_overlay = sub_img.copy()
+        no_lesion_img = np.array(sub_img.convert("RGB")).copy()
+        no_lesion_img = draw_info_box(
+            no_lesion_img,
+            ["Detected lesions: 0", "No significant stenosis candidate found"],
+            start_x=10,
+            start_y=10
+        )
+        final_overlay = Image.fromarray(no_lesion_img)
 
     return sub_img, seg_img, final_overlay
 
