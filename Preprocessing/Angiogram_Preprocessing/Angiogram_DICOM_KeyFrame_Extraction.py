@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import pydicom
 from datetime import datetime
+from skimage.metrics import structural_similarity as ssim
 
 
 # -----------------------------
@@ -101,13 +102,10 @@ def compute_frame_quality_metrics(frame: np.ndarray):
     }
 
 
-def compute_diagnostic_score(metrics, w1=0.3, w2=0.3, w3=0.3, w4=0.1):
-    return (
-        w1 * metrics["mean_intensity"]
-        + w2 * metrics["contrast"]
-        + w3 * metrics["edge_strength"]
-        - w4 * metrics["noise"]
-    )
+def compute_diagnostic_score(frame, reference):
+    data_range = frame.max() - frame.min() + 1e-6
+    score, _ = ssim(reference, frame, full=True, data_range=data_range)
+    return 1 - score
 
 
 # -----------------------------
@@ -183,10 +181,17 @@ def process_angiogram(file_path: str, output_root="Preprocessed_Angiogram_Output
     frame_list = extract_frames(frames)
 
     frame_metrics = []
+
+    # Baseline reference frame (first frame of angiogram)
+    reference = frame_list[0]
+
     for idx, frame in enumerate(frame_list):
         metrics = compute_frame_quality_metrics(frame)
         metrics["frame_index"] = idx
-        metrics["diagnostic_score"] = compute_diagnostic_score(metrics)
+
+        # SSIM-based diagnostic score
+        metrics["diagnostic_score"] = compute_diagnostic_score(frame, reference)
+
         frame_metrics.append(metrics)
 
     metrics_df = pd.DataFrame(frame_metrics).sort_values(
