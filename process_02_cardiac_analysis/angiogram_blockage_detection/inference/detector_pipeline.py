@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image, ImageChops, ImageOps
 import cv2
 from skimage import morphology
+from pathlib import Path
 
 from models import UNet
 from datasets import tophat
@@ -18,32 +19,52 @@ class StenosisDetector:
     VesselAnalyzer -> predicted stenosis bounding boxes
     """
 
-    def __init__(self, ckpt_path="ckpt/fscad_36249.ckpt", size=512, device=None):
+    def __init__(self, ckpt_path=None, size=512, device=None):
         self.size = size
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-        self.ckpt_path = ckpt_path
+
+
+        self.project_root = Path(__file__).resolve().parent.parent
+
+        # Default checkpoint path
+        if ckpt_path is None:
+            self.ckpt_path = self.project_root / "ckpt" / "fscad_36249.ckpt"
+        else:
+            ckpt_path = Path(ckpt_path)
+            if ckpt_path.is_absolute():
+                self.ckpt_path = ckpt_path
+            else:
+                self.ckpt_path = self.project_root / ckpt_path
+
+        if not self.ckpt_path.exists():
+            raise FileNotFoundError(f"Checkpoint not found: {self.ckpt_path}")
 
         # Preprocessing transforms
         self.tfmc1 = T.Compose([
-            T.Resize(self.size),
+            T.Resize((self.size, self.size)),
             T.Lambda(lambda img: tophat(img, 50)),
             T.ToTensor(),
             T.Normalize((0.5,), (0.5,))
         ])
 
         self.tfmc2 = T.Compose([
-            T.Resize(self.size),
+            T.Resize((self.size, self.size)),
             T.ToTensor(),
             T.Normalize((0.5,), (0.5,))
         ])
 
         # Load model once
         self.netE = UNet(1, 1, 32, bilinear=True)
-        checkpoint = torch.load(self.ckpt_path, map_location=self.device)
+        checkpoint = torch.load(str(self.ckpt_path), map_location=self.device)
+
+        if "netE" not in checkpoint:
+            raise KeyError("Checkpoint does not contain 'netE' weights.")
+
         new_state_dict = {
             k.replace("module.", ""): v
             for k, v in checkpoint["netE"].items()
         }
+
         self.netE.load_state_dict(new_state_dict)
         self.netE.to(self.device)
         self.netE.eval()
@@ -70,7 +91,14 @@ class StenosisDetector:
         raise TypeError("Unsupported image type. Expected PIL.Image or numpy.ndarray.")
 
     def _run_deepsa_pipeline(self, pil_img, auto_thresh=True, multiangle=False, pad_margin=False):
+        """
+        Run DeepSA enhancement and segmentation.
 
+        Returns
+        -------
+        sub_img : PIL.Image
+        seg_img : PIL.Image
+        """
         pad = 50 if pad_margin else 0
 
         if auto_thresh:
@@ -78,7 +106,9 @@ class StenosisDetector:
             x2 = self.tfmc2(pil_img)
 
             _, out1 = fusion_predict(
-                self.netE, ["none"], x1,
+                self.netE,
+                ["none"],
+                x1,
                 multiangle=multiangle,
                 denoise=4,
                 size=self.size,
@@ -88,7 +118,9 @@ class StenosisDetector:
             )
 
             _, out2 = fusion_predict(
-                self.netE, ["none"], x2,
+                self.netE,
+                ["none"],
+                x2,
                 multiangle=False,
                 denoise=4,
                 size=self.size,
@@ -129,11 +161,10 @@ class StenosisDetector:
             with torch.no_grad():
                 pred_y = self.netE(input_tensor)
 
-            sub_img = morphology  # placeholder removed below intentionally
-            sub_img = pred_y[0].detach().cpu()
+            sub_img_tensor = pred_y[0].detach().cpu()
+            sub_img_tensor = ((sub_img_tensor + 1) / 2).clamp(0, 1)
 
-            sub_img = ((sub_img + 1) / 2).clamp(0, 1)
-            sub_img = T.ToPILImage()(sub_img)
+            sub_img = T.ToPILImage()(sub_img_tensor)
             sub_img = ImageOps.autocontrast(sub_img, cutoff=1)
             sub_img = T.functional.adjust_gamma(sub_img, 2)
 
@@ -144,9 +175,13 @@ class StenosisDetector:
 
             seg_img_tensor = torch.sign(pred_y)
             seg_img_np = ((seg_img_tensor.cpu().detach() + 1) / 2).numpy().astype(bool)
+
+            # Remove batch and channel dims safely
+            seg_img_np = seg_img_np[0, 0]
+
             seg_img_np = morphology.remove_small_objects(seg_img_np, 500)
             seg_img_np = (seg_img_np * 255).astype("uint8")
-            seg_img = T.ToPILImage()(seg_img_np[0])
+            seg_img = Image.fromarray(seg_img_np)
 
         return sub_img, seg_img
 
@@ -169,7 +204,6 @@ class StenosisDetector:
             x2 = min(det_w - 1, x + r)
             y2 = min(det_h - 1, y + r)
 
-            # scale back to original image size
             sx1 = int(round(x1 * scale_x))
             sy1 = int(round(y1 * scale_y))
             sx2 = int(round(x2 * scale_x))
@@ -192,12 +226,15 @@ class StenosisDetector:
             Input angiogram image
 
         return_debug : bool
-            If True, also returns extra debug outputs
+            If True, return debug outputs as well
 
         Returns
         -------
-        list
-            Predicted bounding boxes in [x, y, w, h] format
+        list or dict
+            If return_debug is False:
+                list of boxes [x, y, w, h]
+            If return_debug is True:
+                dict with boxes, blockages, subtraction image, segmentation image
         """
         pil_img, orig_w, orig_h = self._prepare_pil_image(image)
 
@@ -213,6 +250,7 @@ class StenosisDetector:
         blockages = analyzer.calculate_stenosis()
 
         det_w, det_h = seg_img.size
+
         pred_boxes = self._blockages_to_boxes(
             blockages,
             det_w=det_w,
