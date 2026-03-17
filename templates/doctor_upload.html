@@ -132,35 +132,38 @@
             <p class="text-muted">Upload patient ECG reports for AI analysis and blockage detection.</p>
         </div>
 
-        <!-- Patient Info -->
-        <div class="mb-4">
-            <h5 class="section-title"><i class="fas fa-user-injured me-2"></i>Patient Information</h5>
-            <input type="text" class="form-control mb-3" id="patient-id" placeholder="Patient ID or Name">
-            <input type="number" class="form-control mb-3" id="patient-age" placeholder="Age" min="1" max="120">
-            <select class="form-select mb-3" id="patient-gender">
-                <option value="" selected disabled>Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-            </select>
-            <textarea class="form-control" id="patient-notes" placeholder="Clinical notes (optional)" rows="3"></textarea>
-        </div>
+        <!-- Form now submits to Flask backend -->
+        <form method="POST" action="{{ url_for('upload_ecg') }}" enctype="multipart/form-data">
+            <!-- Patient Info -->
+            <div class="mb-4">
+                <h5 class="section-title"><i class="fas fa-user-injured me-2"></i>Patient Information</h5>
+                <input type="text" class="form-control mb-3" name="patient_id" placeholder="Patient ID or Name" required>
+                <input type="number" class="form-control mb-3" name="age" placeholder="Age" min="1" max="120" required>
+                <select class="form-select mb-3" name="gender" required>
+                    <option value="" selected disabled>Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+                <textarea class="form-control" name="notes" placeholder="Clinical notes (optional)" rows="3"></textarea>
+            </div>
 
-        <!-- Upload area -->
-        <div class="upload-area" onclick="document.getElementById('ecg-file').click()">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <h4>📁 Upload ECG File</h4>
-            <p>Click to select or drag & drop ECG file</p>
-            <p class="small text-secondary">Supported formats: PDF, JPG, PNG, DICOM</p>
-            <input type="file" id="ecg-file" accept=".pdf,.jpg,.jpeg,.png,.dicom" style="display: none;">
-            <div id="file-name" class="fw-semibold"></div>
-        </div>
+            <!-- Upload area (click triggers file input) -->
+            <div class="upload-area" onclick="document.getElementById('ecg-file').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h4>📁 Upload ECG File</h4>
+                <p>Click to select or drag & drop ECG file</p>
+                <p class="small text-secondary">Supported formats: PDF, JPG, PNG, DICOM</p>
+                <input type="file" id="ecg-file" name="ecg_file" accept=".pdf,.jpg,.jpeg,.png,.dicom" style="display: none;" required>
+                <div id="file-name" class="fw-semibold"></div>
+            </div>
 
-        <!-- Buttons -->
-        <div class="button-group">
-            <a href="doctor_login.html" class="btn-back flex-fill text-center"><i class="bi bi-arrow-left me-2"></i>Back</a>
-            <button class="btn-upload flex-fill" onclick="uploadECG()">Upload & Analyze with AI <i class="bi bi-arrow-right ms-2"></i></button>
-        </div>
+            <!-- Buttons -->
+            <div class="button-group">
+                <a href="doctor_login.html" class="btn-back flex-fill text-center"><i class="bi bi-arrow-left me-2"></i>Back</a>
+                <button type="submit" class="btn-upload flex-fill">Upload & Analyze with AI <i class="bi bi-arrow-right ms-2"></i></button>
+            </div>
+        </form>
 
         <footer class="text-center mt-4 text-secondary small">
             <i class="far fa-clock me-1"></i> AI powered Heart Health
@@ -168,11 +171,12 @@
     </div>
 
     <script>
-        // Check doctor verification
+        // Check doctor verification (client-side simulation)
         if (!localStorage.getItem('doctorVerified')) {
             window.location.href = 'doctor_login.html';
         }
 
+        // Display selected file name
         const fileInput = document.getElementById('ecg-file');
         const fileNameDisplay = document.getElementById('file-name');
 
@@ -183,31 +187,6 @@
                 fileNameDisplay.textContent = '';
             }
         });
-
-        function uploadECG() {
-            const patientId = document.getElementById('patient-id').value;
-            const patientAge = document.getElementById('patient-age').value;
-            const patientGender = document.getElementById('patient-gender').value;
-            const file = fileInput.files[0];
-
-            if (!patientId || !patientAge || !patientGender || !file) {
-                alert('Please fill in all patient information and select an ECG file.');
-                return;
-            }
-
-            alert(`ECG uploaded successfully for patient ${patientId}!\n\nAI analysis initiated. Results will be available shortly.`);
-
-            // Reset form (original functionality)
-            document.getElementById('patient-id').value = '';
-            document.getElementById('patient-age').value = '';
-            document.getElementById('patient-gender').value = '';
-            document.getElementById('patient-notes').value = '';
-            fileInput.value = '';
-            fileNameDisplay.textContent = '';
-
-
-        }
     </script>
 </body>
 </html>
-

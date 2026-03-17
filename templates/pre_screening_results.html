@@ -52,10 +52,10 @@
 
             // Set link based on whether ECG is required (adjust URLs to your actual pages)
             if (result.requires_ecg) {
-                uploadLink.href = '/upload_ecg.html';   // mandatory upload page
+                uploadLink.href = '/upload_ecg.html';   // upload page
                 uploadLink.textContent = 'Upload ECG (Mandatory)';
             } else {
-                uploadLink.href = '/upload_ecg_optional.html'; // optional upload page
+                uploadLink.href = '/upload_ecg.html'; // upload page
                 uploadLink.textContent = 'Upload ECG (Optional)';
             }
 
@@ -102,3 +102,4 @@
     </script>
 </body>
 </html>
+
