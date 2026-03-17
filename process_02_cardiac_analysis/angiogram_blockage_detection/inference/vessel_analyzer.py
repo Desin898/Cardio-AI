@@ -22,7 +22,8 @@ class VesselAnalyzer:
         min_stenosis_percent=30.0,
         duplicate_distance=30,
         lesion_half_window=3,
-        min_lesion_length_pixels=5
+        min_lesion_length_pixels=5,
+        border_margin=25
     ):
         mask_np = np.array(mask_pil.convert("L"))
 
@@ -39,6 +40,8 @@ class VesselAnalyzer:
         self.skeleton = None
         self.distance_map = None
 
+        self.img_h, self.img_w = self.binary_mask.shape
+
         # Parameters
         self.min_branch_length = min_branch_length
         self.end_ignore_pixels = end_ignore_pixels
@@ -48,6 +51,7 @@ class VesselAnalyzer:
         self.duplicate_distance = duplicate_distance
         self.lesion_half_window = lesion_half_window
         self.min_lesion_length_pixels = min_lesion_length_pixels
+        self.border_margin = border_margin
 
     def get_vessel_geometry(self):
         """
@@ -117,13 +121,11 @@ class VesselAnalyzer:
         threshold = 0.9 * d_ref
         count = 1
 
-        # expand left
         j = idx - 1
         while j >= 0 and profile[j] < threshold:
             count += 1
             j -= 1
 
-        # expand right
         j = idx + 1
         while j < len(profile) and profile[j] < threshold:
             count += 1
@@ -132,13 +134,9 @@ class VesselAnalyzer:
         return count
 
     def _compute_confidence(self, sten_pct, lesion_length, d_ref, d_min):
-        """
-        Simple confidence score from 0 to 1.
-        """
         severity_score = min(sten_pct / 100.0, 1.0)
         length_score = min(lesion_length / 12.0, 1.0)
 
-        # Bigger actual drop -> better confidence
         drop = max(d_ref - d_min, 0.0)
         drop_score = min(drop / max(d_ref, 1e-6), 1.0)
 
@@ -149,6 +147,26 @@ class VesselAnalyzer:
         for b in blockages:
             bx, by = b["coords"]
             if np.linalg.norm(np.array([x, y]) - np.array([bx, by])) < self.duplicate_distance:
+                return True
+        return False
+
+    def _is_near_border(self, x, y):
+        """
+        Ignore detections too close to image borders.
+        """
+        return (
+            x < self.border_margin or
+            y < self.border_margin or
+            x > (self.img_w - self.border_margin) or
+            y > (self.img_h - self.border_margin)
+        )
+
+    def _branch_touches_border(self, path_coords):
+        """
+        Ignore branches whose skeleton path touches the image border area.
+        """
+        for y, x in path_coords:
+            if self._is_near_border(int(x), int(y)):
                 return True
         return False
 
@@ -170,6 +188,10 @@ class VesselAnalyzer:
             path_coords = skel_obj.path_coordinates(branch_id).astype(int)
 
             if len(path_coords) < (2 * self.end_ignore_pixels + 5):
+                continue
+
+            # NEW: ignore branches that run into the image border
+            if self._branch_touches_border(path_coords):
                 continue
 
             radii = self.distance_map[path_coords[:, 0], path_coords[:, 1]]
@@ -202,6 +224,10 @@ class VesselAnalyzer:
                     continue
 
                 y, x = path_coords[i]
+
+                # NEW: ignore point if near border
+                if self._is_near_border(int(x), int(y)):
+                    continue
 
                 if self._is_duplicate(x, y, blockages):
                     continue
