@@ -98,7 +98,13 @@ class ArcadeEvaluator:
                     best_iou = iou
                     best_gt_idx = i
 
-            if best_iou >= self.iou_threshold and best_gt_idx not in matched_gt:
+            matched = False
+
+            if best_gt_idx != -1 and best_gt_idx not in matched_gt:
+                if best_iou >= self.iou_threshold or self.point_in_box(pred, gt_boxes[best_gt_idx]):
+                    matched = True
+
+            if matched:
                 self.tp += 1
                 matched_gt.add(best_gt_idx)
             else:
@@ -142,9 +148,20 @@ class ArcadeEvaluator:
 
         return metrics
 
+    def point_in_box(self, pred_box, gt_box):
+        """
+        Check whether predicted box center lies inside ground-truth box.
+        Boxes are [x, y, w, h].
+        """
+        px = pred_box[0] + pred_box[2] / 2.0
+        py = pred_box[1] + pred_box[3] / 2.0
+
+        gx, gy, gw, gh = gt_box
+        return (gx <= px <= gx + gw) and (gy <= py <= gy + gh)
+
 
 if __name__ == "__main__":
-    IMAGE_DIR = r"C:\Users\desin\Downloads\ANGIOGRAM_PREPROCESSED_FINAL-20260213T210059Z-1-001\ANGIOGRAM_PREPROCESSED_FINAL"
+    IMAGE_DIR = r"C:\Users\desin\OneDrive\Desktop\2nd Year\DSGP\Angiogram\archive (2)\arcade\stenosis\train\images"
     ANNOTATION_FILE = r"C:\Users\desin\OneDrive\Desktop\2nd Year\DSGP\Angiogram\archive (2)\arcade\stenosis\train\annotations\train.json"
 
     loader = ArcadeLoader(
