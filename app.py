@@ -203,6 +203,23 @@ with open(FEATURES_PATH, 'rb') as f: GATEWAY_FEATURES = pickle.load(f)
 
 explainer = shap.TreeExplainer(model)
 
+# ── Ten-year CHD model (trained by xx.ipynb) ──────────────────
+TEN_YEAR_MODEL_DIR   = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ten_year_models')
+TEN_YEAR_FEATURES = [
+    "age", "male", "currentSmoker", "cigsPerDay",
+    "BPMeds", "prevalentStroke", "prevalentHyp", "diabetes",
+    "totChol", "sysBP", "diaBP", "pulsePressure", "bp_ratio",
+    "BMI", "heartRate", "glucose"
+]
+try:
+    with open(os.path.join(TEN_YEAR_MODEL_DIR, 'ten_year_model.pkl'),     'rb') as f: ten_year_model     = pickle.load(f)
+    with open(os.path.join(TEN_YEAR_MODEL_DIR, 'ten_year_threshold.pkl'), 'rb') as f: ten_year_threshold = pickle.load(f)
+    logging.info("✅ Ten-year CHD model loaded successfully.")
+except FileNotFoundError:
+    ten_year_model     = None
+    ten_year_threshold = 0.5
+    logging.warning("⚠  ten_year_models/ not found — run xx.ipynb first to train and save the model.")
+
 VALID_DOCTORS = {
     'doctor1': 'pass123',
     'admin':   'admin',
@@ -725,6 +742,23 @@ def upload_ecg():
         metadata['ecg']['processed_csv_path']    = str(csv_path)
         metadata['ecg']['classification_result'] = json.dumps(prediction_result)
 
+        # Persist screening form data so the ECG result page can run 10-year risk.
+        # Inject safe defaults for optional ten-year fields before saving.
+        screening_data_raw = request.form.get('screening_form_data', '')
+        if screening_data_raw:
+            try:
+                sfd = json.loads(screening_data_raw)
+                sfd.setdefault('heart_rate',      72)
+                sfd.setdefault('cigs_per_day',    0)
+                sfd.setdefault('bp_treatment',    'No')
+                sfd.setdefault('previous_stroke', 'No')
+                sfd.setdefault('prevalent_hyp',
+                    'Yes' if (sfd.get('systolic_bp', 0) >= 140 or
+                              sfd.get('diastolic_bp', 0) >= 90) else 'No')
+                metadata['screening_form_data'] = sfd
+            except Exception:
+                pass
+
         with open(metadata_path, 'w') as f:
             json.dump(metadata, f, indent=2)
 
@@ -790,7 +824,8 @@ def ecg_result(session_id):
                                plot_url=plot_url,
                                angiogram_uploaded=angiogram_uploaded,
                                angio_selected=angio_selected,
-                               loc_result=loc_result)
+                               loc_result=loc_result,
+                               patient_data=metadata.get('screening_form_data'))
 
     except Exception as e:
         logging.exception("Error displaying results")
@@ -875,13 +910,26 @@ def predict():
                 'effect': effect
             })
 
+        # Echo back patient_data so results pages can use it for 10-year risk.
+        # Set safe defaults for optional ten-year fields so /predict_ten_year
+        # never raises a KeyError even if the screening form omitted them.
+        patient_data_echo = {k: input_json[k] for k in input_json}
+        patient_data_echo.setdefault('heart_rate',      72)
+        patient_data_echo.setdefault('cigs_per_day',    0)
+        patient_data_echo.setdefault('bp_treatment',    'No')
+        patient_data_echo.setdefault('previous_stroke', 'No')
+        patient_data_echo.setdefault('prevalent_hyp',
+            'Yes' if (input_json.get('systolic_bp', 0) >= 140 or
+                      input_json.get('diastolic_bp', 0) >= 90) else 'No')
+
         if pred_class == 1:
             result = {
                 'success': True, 'risk_status': 'HIGH_RISK',
                 'risk_probability': float(prob), 'decision': 'MANDATORY_ECG',
                 'message': "You show signs of elevated CAD risk. Please upload your ECG.",
                 'explanation': top_factors, 'next_step': 'UPLOAD_ECG',
-                'requires_ecg': True, 'color': 'red'
+                'requires_ecg': True, 'color': 'red',
+                'patient_data': patient_data_echo
             }
         else:
             result = {
@@ -889,11 +937,168 @@ def predict():
                 'risk_probability': float(prob), 'decision': 'OPTIONAL_ECG',
                 'message': "You do not currently show significant CAD risk.",
                 'explanation': top_factors, 'next_step': 'OPTIONAL_UPLOAD',
-                'requires_ecg': False, 'color': 'green'
+                'requires_ecg': False, 'color': 'green',
+                'patient_data': patient_data_echo
             }
         return jsonify(result)
 
     except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+def _framingham_ten_year_risk(features: dict) -> float:
+    """
+    Simplified Framingham 10-year CHD risk score (point-based approximation).
+    Returns a probability in [0.0, 1.0].
+    Used as a rule-based fallback when the trained ML model is unavailable.
+
+    Reference: Wilson et al. (1998), Circulation 97:1837-1847.
+    """
+    age         = features['age']
+    male        = features['male']
+    total_chol  = features['totChol']
+    hdl_chol    = 50.0          # assumed average when not collected
+    sys_bp      = features['sysBP']
+    bp_meds     = features['BPMeds']
+    smoker      = features['currentSmoker']
+    diabetes    = features['diabetes']
+
+    # --- Age points ---
+    if male:
+        age_pts = (0 if age < 35 else 2 if age < 40 else 5 if age < 45 else
+                   6 if age < 50 else 8 if age < 55 else 10 if age < 60 else
+                   11 if age < 65 else 12 if age < 70 else 14 if age < 75 else 15)
+    else:
+        age_pts = (0 if age < 35 else 2 if age < 40 else 4 if age < 45 else
+                   5 if age < 50 else 7 if age < 55 else 8 if age < 60 else
+                   9 if age < 65 else 10 if age < 70 else 11 if age < 75 else 12)
+
+    # --- Total cholesterol points ---
+    if male:
+        chol_pts = (0 if total_chol < 160 else 1 if total_chol < 200 else
+                    2 if total_chol < 240 else 3 if total_chol < 280 else 4)
+    else:
+        chol_pts = (0 if total_chol < 160 else 1 if total_chol < 200 else
+                    3 if total_chol < 240 else 4 if total_chol < 280 else 5)
+
+    # --- HDL-C points (using assumed average) ---
+    hdl_pts = (2 if hdl_chol < 35 else 1 if hdl_chol < 45 else
+               0 if hdl_chol < 50 else -1 if hdl_chol < 60 else -2)
+
+    # --- Systolic BP points ---
+    if male:
+        sbp_pts = (0 if sys_bp < 120 else
+                   (1 if bp_meds else 0) if sys_bp < 130 else
+                   (2 if bp_meds else 1) if sys_bp < 140 else
+                   (2 if bp_meds else 1) if sys_bp < 160 else
+                   (3 if bp_meds else 2))
+    else:
+        sbp_pts = (0 if sys_bp < 120 else
+                   (3 if bp_meds else 1) if sys_bp < 130 else
+                   (4 if bp_meds else 2) if sys_bp < 140 else
+                   (5 if bp_meds else 3) if sys_bp < 160 else
+                   (6 if bp_meds else 4))
+
+    # --- Smoker / Diabetes points ---
+    smoker_pts   = 4 if (male and smoker) else (3 if smoker else 0)
+    diabetes_pts = 3 if (male and diabetes) else (4 if diabetes else 0)
+
+    total_pts = age_pts + chol_pts + hdl_pts + sbp_pts + smoker_pts + diabetes_pts
+
+    # --- Point → 10-year risk lookup (male / female) ---
+    male_risk   = {-3:0.01,-2:0.02,-1:0.02, 0:0.03, 1:0.04, 2:0.04, 3:0.06,
+                    4:0.07, 5:0.09, 6:0.11, 7:0.14, 8:0.18, 9:0.22,10:0.27,
+                   11:0.33,12:0.40,13:0.47,14:0.56,15:0.67,16:0.79,17:0.90}
+    female_risk = {-2:0.01,-1:0.01, 0:0.01, 1:0.01, 2:0.01, 3:0.02, 4:0.02,
+                    5:0.03, 6:0.03, 7:0.04, 8:0.05, 9:0.06,10:0.08,11:0.10,
+                   12:0.12,13:0.14,14:0.17,15:0.20,16:0.24,17:0.27,18:0.32,
+                   19:0.37,20:0.43,21:0.50,22:0.56,23:0.64,24:0.71,25:0.78}
+
+    lookup = male_risk if male else female_risk
+    clamped_pts = max(min(total_pts, max(lookup.keys())), min(lookup.keys()))
+    # Nearest key
+    nearest_key = min(lookup.keys(), key=lambda k: abs(k - clamped_pts))
+    return lookup[nearest_key]
+
+
+@app.route('/predict_ten_year', methods=['POST'])
+def predict_ten_year():
+    """
+    10-Year Coronary Heart Disease risk prediction.
+
+    Primary:  ML model loaded from ten_year_models/ten_year_model.pkl.
+    Fallback: Framingham point-score formula (returns meaningful results
+              even when the model pkl contains None).
+
+    Accepts the same JSON payload as /predict (pre-screening form data).
+    Returns:  { success, percent, category, colour, probability, advice,
+                method }   ← 'ml' or 'framingham'
+    """
+    try:
+        data   = request.get_json() or {}
+        sys_bp = float(data.get('systolic_bp', 120))
+        dia_bp = float(data.get('diastolic_bp', 80))
+
+        features = {
+            'age':            float(data.get('age', 45)),
+            'male':           1 if data.get('gender') == 'Male' else 0,
+            'currentSmoker':  1 if data.get('smoker') == 'Yes' else 0,
+            'cigsPerDay':     float(data.get('cigs_per_day', 0) or 0),
+            'BPMeds':         1 if data.get('bp_treatment') == 'Yes' else 0,
+            'prevalentStroke':1 if data.get('previous_stroke') == 'Yes' else 0,
+            'prevalentHyp':   1 if data.get('prevalent_hyp') == 'Yes' else 0,
+            'diabetes':       1 if data.get('diabetes') == 'Yes' else 0,
+            'totChol':        float(data.get('cholesterol', 200)),
+            'sysBP':          sys_bp,
+            'diaBP':          dia_bp,
+            'pulsePressure':  sys_bp - dia_bp,
+            'bp_ratio':       sys_bp / (dia_bp + 1e-6),
+            'BMI':            float(data.get('bmi', 25)),
+            'heartRate':      float(data.get('heart_rate', 72)),   # safe default
+            'glucose':        float(data.get('glucose', 100)),
+        }
+
+        method = 'ml'
+        if ten_year_model is not None:
+            X    = pd.DataFrame([features])[TEN_YEAR_FEATURES]
+            prob = ten_year_model.predict_proba(X)[0][1]
+        else:
+            logging.warning("ten_year_model is None — using Framingham fallback.")
+            prob   = _framingham_ten_year_risk(features)
+            method = 'framingham'
+
+        # Apply custom threshold if available and it was ML-derived
+        threshold = ten_year_threshold if ten_year_threshold else 0.5
+        pct       = min(round(float(prob) * 100, 1), 100.0)
+
+        # Category uses probability thresholds (10 % / 20 %) for clinical alignment
+        if prob < 0.10:
+            category, colour = 'LOW', 'low'
+        elif prob < 0.20:
+            category, colour = 'MEDIUM', 'medium'
+        else:
+            category, colour = 'HIGH', 'high'
+
+        advice = (
+            'Your projected 10-year risk is low. Maintain healthy habits and attend regular check-ups.'
+            if category == 'LOW' else
+            'Your projected 10-year risk is moderate. Lifestyle changes — diet, exercise, quitting smoking — can significantly reduce this.'
+            if category == 'MEDIUM' else
+            'Your projected 10-year risk is high. Please discuss these results with your doctor as soon as possible.'
+        )
+
+        return jsonify({
+            'success':     True,
+            'percent':     pct,
+            'category':    category,
+            'colour':      colour,
+            'probability': round(float(prob), 4),
+            'advice':      advice,
+            'method':      method,
+        })
+
+    except Exception as e:
+        logging.exception("Ten-year prediction failed")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
