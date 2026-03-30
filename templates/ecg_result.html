@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CardioAI · ECG Analysis Result</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', Arial, sans-serif; margin: 0; background: #f0f4f9; padding: 2rem; }
+    .main-wrap { max-width: 820px; margin: auto; }
+
+    .card-box {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      padding: 1.8rem 2rem;
+      margin-bottom: 1.4rem;
+    }
+    .card-box h2 { color: #1f3a6b; margin-bottom: 0; font-size: 1.4rem; }
+    .card-box h5 { color: #1f3a6b; font-weight: 700; }
+
+    .meta  { color: #666; font-size: 0.92em; margin: 3px 0; }
+    .label { font-weight: 600; color: #333; }
+
+    /* risk colours */
+    .risk-HIGH   { color: #dc3545; font-weight: 700; }
+    .risk-MEDIUM { color: #fd7e14; font-weight: 700; }
+    .risk-LOW    { color: #198754; font-weight: 700; }
+
+    /* result card */
+    .result-card {
+      background: #f8faff;
+      border: 1px solid #dde6f5;
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-top: 1rem;
+    }
+    .result-card p { margin-bottom: 0.5rem; }
+
+    /* HIGH-risk locked panel */
+    .locked-panel {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-top: 1rem;
+      padding: 1.2rem 1.4rem;
+      background: #fff5f5;
+      border: 1.5px solid #f5c6cb;
+      border-left: 5px solid #dc3545;
+      border-radius: 14px;
+    }
+    .locked-panel .lock-icon { font-size: 2rem; flex-shrink: 0; }
+    .locked-panel h6 { color: #b52b27; font-weight: 700; margin-bottom: 5px; }
+    .locked-panel p  { color: #7d2020; font-size: 0.89rem; margin: 0; line-height: 1.55; }
+
+    /* error box */
+    .error-box {
+      background: #f2dede; color: #a94442;
+      padding: 1rem 1.2rem; border-radius: 10px;
+      border: 1px solid #ebccd1; margin-top: 1rem;
+    }
+    .error-box pre {
+      white-space: pre-wrap; word-break: break-word;
+      font-size: 0.8em; margin-top: 8px;
+      background: #fff8f8; padding: 8px;
+      border-radius: 6px; border: 1px solid #e8c0c0;
+    }
+
+    /* plot */
+    .plot img { max-width: 100%; border: 1px solid #ddd; border-radius: 10px; margin-top: 10px; }
+
+    /* angiogram alert */
+    .angiogram-alert {
+      margin-top: 1.2rem;
+      padding: 1rem 1.2rem;
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-left: 5px solid #dc3545;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .angiogram-alert p  { margin: 0; color: #7d3a00; font-size: 0.93em; }
+    .angiogram-alert strong { color: #dc3545; }
+    .btn-angiogram {
+      display: inline-block; padding: 9px 20px;
+      background: #dc3545; color: #fff;
+      border-radius: 8px; text-decoration: none;
+      font-weight: 700; font-size: 0.92em; white-space: nowrap;
+    }
+    .btn-angiogram:hover { background: #b52b27; color: #fff; text-decoration: none; }
+
+    /* 10-year card */
+    .tenyear-box {
+      border-radius: 16px;
+      border: 1.5px solid rgba(42,82,152,0.18);
+      background: linear-gradient(135deg, #f0f5ff 0%, #e8f0fb 100%);
+      padding: 1.4rem 1.6rem;
+    }
+    .gauge-wrap { width: 150px; height: 82px; margin: 0 auto 6px; }
+    .gauge-wrap svg { width: 100%; height: 100%; overflow: visible; }
+    .fill-low    { stroke: #198754; }
+    .fill-medium { stroke: #fd7e14; }
+    .fill-high   { stroke: #dc3545; }
+    .text-cat-low    { color: #198754; }
+    .text-cat-medium { color: #fd7e14; }
+    .text-cat-high   { color: #dc3545; }
+
+    /* unavailable notice */
+    .alert-unavailable {
+      border-radius: 10px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 1rem 1.2rem;
+      color: #6c757d;
+      font-size: 0.88rem;
+    }
+
+    .disclaimer {
+      font-size: 0.77rem; color: #6c757d;
+      margin-top: 0.75rem; padding-top: 0.75rem;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .back-link { display: inline-block; margin-top: 0.5rem; color: #2a5298; text-decoration: none; font-size: 0.92rem; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="main-wrap">
+
+  <!-- HEADER -->
+  <div class="card-box">
+    <div class="d-flex align-items-center gap-3 mb-2">
+      <i class="fas fa-wave-square fs-2" style="color:#2a5298;"></i>
+      <h2>ECG Analysis Result</h2>
+    </div>
+    <p class="meta"><span class="label">Session ID:</span> {{ session_id }}</p>
+    <p class="meta"><span class="label">Patient ID:</span> {{ patient_id }}</p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CASE 1 — Inference error
+       ════════════════════════════════════════════════════════════ -->
+  {% if not prediction %}
+    <div class="card-box">
+      <div class="error-box"><strong>No prediction data found.</strong></div>
+    </div>
+
+  {% elif prediction.error %}
+    <div class="card-box">
+      <div class="error-box">
+        <strong>Inference Error</strong>
+        <pre>{{ prediction.error }}</pre>
+      </div>
+    </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CASE 2 — HIGH risk
+       ════════════════════════════════════════════════════════════ -->
+  {% elif prediction.risk_level == 'HIGH' %}
+    <div class="card-box">
+      <h5><i class="fas fa-heart-broken me-2"></i>ECG Classification</h5>
+      <div class="locked-panel">
+        <div class="lock-icon">🔒</div>
+        <div>
+          <h6>Result Restricted — High Cardiac Risk Detected</h6>
+          <p>
+            Your ECG analysis indicates a <strong>HIGH</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Angiogram button -->
+      <div class="angiogram-alert">
+        <p>
+          <strong>⚠ High Cardiac Risk Detected.</strong><br>
+          Doctor review and angiogram imaging is recommended for this patient.
+        </p>
+        <a href="{{ url_for('doctor_login', session_id=session_id, patient_id=patient_id) }}"
+           class="btn-angiogram">
+          🩻 Upload Angiogram (Doctor Portal)
+        </a>
+      </div>
+    </div>
+
+    <!-- No 10-year card for HIGH risk -->
+
+  <!-- ════════════════════════════════════════════════════════════
+       CASE 3 — MEDIUM or LOW risk  →  show classification + 10-year
+       ════════════════════════════════════════════════════════════ -->
+  {% else %}
+
+    <!-- ECG Classification result -->
+    <div class="card-box">
+      <h5><i class="fas fa-stethoscope me-2"></i>ECG Classification</h5>
+      <div class="result-card">
+        <p><span class="label">Prediction:</span> {{ prediction.prediction }}</p>
+        <p><span class="label">Confidence:</span> {{ prediction.confidence }}</p>
+        <p>
+          <span class="label">Risk Level:</span>
+          <span class="risk-{{ prediction.risk_level }}">{{ prediction.risk_level }}</span>
+        </p>
+        <p class="mb-0">
+          <span class="label">Suspected Vessel / Localization:</span>
+          {{ prediction.suspected_vessel }}
+        </p>
+      </div>
+
+      <!-- Lead activity plot -->
+      {% if plot_url %}
+        <div class="plot mt-3">
+          <h6 class="fw-semibold">Lead Activity Profile</h6>
+          <img src="{{ plot_url }}" alt="Lead Activity Plot">
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 10-Year CHD Risk card — populated by JS -->
+    <div class="card-box" id="tenYearCard">
+      <h5><i class="fas fa-calendar-alt me-2"></i>10-Year Coronary Heart Disease Risk</h5>
+      <p class="text-muted" style="font-size:0.88rem;">
+        Machine-learning model trained on Framingham Heart Study data
+      </p>
+      <div id="tenYearContent">
+        <div class="text-center text-muted py-3">
+          <i class="fas fa-spinner fa-pulse me-2"></i>Computing…
+        </div>
+      </div>
+    </div>
+
+  {% endif %}
+
+  <a href="/" class="back-link"><i class="fas fa-arrow-left me-1"></i>Back to Home</a>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     JS: fetch 10-year CHD risk from /predict_ten_year
+     Only runs for MEDIUM / LOW ECG risk paths.
+     ════════════════════════════════════════════════════════════ -->
+{% if prediction and not prediction.error and prediction.risk_level != 'HIGH' %}
+<script>
+/* Build SVG semicircle gauge */
+function buildGauge(pct, cls) {
+  const R = 60, full = Math.PI * R;
+  const fill = Math.min(pct / 100, 1) * full;
+  return `
+    <div class="gauge-wrap">
+      <svg viewBox="0 0 140 72">
+        <path d="M10,70 A60,60 0 0,1 130,70"
+              fill="none" stroke="#dde6f5" stroke-width="13" stroke-linecap="round"/>
+        <path d="M10,70 A60,60 0 0,1 130,70"
+              fill="none" stroke-width="13" stroke-linecap="round"
+              class="${cls}"
+              stroke-dasharray="${fill.toFixed(2)} ${full.toFixed(2)}"/>
+        <text x="70" y="66" text-anchor="middle"
+              font-size="17" font-weight="700" fill="#13293e">${pct}%</text>
+      </svg>
+    </div>`;
+}
+
+/* Render the 10-year result panel */
+function renderTenYear(fy) {
+  const gauge = buildGauge(fy.percent, `fill-${fy.colour}`);
+  document.getElementById('tenYearContent').innerHTML = `
+    <div class="tenyear-box">
+      <div class="row align-items-center gy-3">
+        <div class="col-sm-4 text-center">
+          ${gauge}
+          <div class="text-cat-${fy.colour} fw-bold fs-5">${fy.category} RISK</div>
+          <div class="text-muted" style="font-size:0.79rem;">10-year CHD probability</div>
+        </div>
+        <div class="col-sm-8">
+          <h6 class="fw-bold mb-3" style="color:#1f3a6b;">10-Year CHD Model Results</h6>
+          <table class="table table-sm table-borderless mb-2" style="font-size:0.9rem;">
+            <tbody>
+              <tr>
+                <td class="text-muted ps-0" style="width:55%;">10-Year CHD Risk</td>
+                <td><strong class="text-cat-${fy.colour}">${fy.percent}%</strong></td>
+              </tr>
+              <tr>
+                <td class="text-muted ps-0">Risk Category</td>
+                <td><strong>${fy.category}</strong></td>
+              </tr>
+              <tr>
+                <td class="text-muted ps-0">Model</td>
+                <td>XGBoost / Logistic Regression (Framingham data)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="mb-0" style="font-size:0.88rem;">${fy.advice}</p>
+        </div>
+      </div>
+      <div class="disclaimer">
+        <strong>Note:</strong> This 10-year coronary heart disease risk estimate is produced by
+        a machine-learning model trained on the Framingham Heart Study dataset. It estimates the
+        probability of a hard CHD event (myocardial infarction or coronary death) over the next
+        decade. It is a validated screening aid, not a clinical diagnosis. Consult a healthcare
+        professional for personalised guidance.
+      </div>
+    </div>`;
+}
+
+/* Fetch 10-year risk from backend using cached patient data */
+(async function fetchTenYear() {
+  const el = document.getElementById('tenYearContent');
+  if (!el) return;
+
+  // Try server-echoed patient_data first, then fall back to localStorage cache
+  const pd = {{ patient_data | tojson | default('null') }}
+          || JSON.parse(localStorage.getItem('screeningFormData') || 'null');
+
+  if (!pd) {
+    el.innerHTML = `
+      <div class="alert-unavailable">
+        <i class="fas fa-info-circle me-2"></i>
+        Patient data not available. Please re-run the pre-screening form to see the
+        10-year projection.
+      </div>`;
+    return;
+  }
+
+  try {
+    const resp = await fetch('/predict_ten_year', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(pd)
+    });
+    const json = await resp.json();
+    if (json.success) {
+      renderTenYear(json);
+    } else {
+      el.innerHTML = `
+        <div class="alert-unavailable">
+          <i class="fas fa-info-circle me-2"></i>
+          10-year risk model unavailable: ${json.message}
+        </div>`;
+    }
+  } catch (err) {
+    el.innerHTML = `
+      <div class="alert-unavailable">
+        <i class="fas fa-info-circle me-2"></i>
+        Could not connect to the 10-year risk model. Ensure the server is running
+        and <code>xx.ipynb</code> has been executed to generate the model files.
+      </div>`;
+  }
+})();
+</script>
+{% endif %}
+
+</body>
+</html>
