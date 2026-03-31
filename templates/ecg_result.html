@@ -38,22 +38,6 @@
     }
     .result-card p { margin-bottom: 0.5rem; }
 
-    /* HIGH-risk locked panel */
-    .locked-panel {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      margin-top: 1rem;
-      padding: 1.2rem 1.4rem;
-      background: #fff5f5;
-      border: 1.5px solid #f5c6cb;
-      border-left: 5px solid #dc3545;
-      border-radius: 14px;
-    }
-    .locked-panel .lock-icon { font-size: 2rem; flex-shrink: 0; }
-    .locked-panel h6 { color: #b52b27; font-weight: 700; margin-bottom: 5px; }
-    .locked-panel p  { color: #7d2020; font-size: 0.89rem; margin: 0; line-height: 1.55; }
-
     /* error box */
     .error-box {
       background: #f2dede; color: #a94442;
@@ -160,38 +144,7 @@
     </div>
 
   <!-- ════════════════════════════════════════════════════════════
-       CASE 2 — HIGH risk
-       ════════════════════════════════════════════════════════════ -->
-  {% elif prediction.risk_level == 'HIGH' %}
-    <div class="card-box">
-      <h5><i class="fas fa-heart-broken me-2"></i>ECG Classification</h5>
-      <div class="locked-panel">
-        <div class="lock-icon">🔒</div>
-        <div>
-          <h6>Result Restricted — High Cardiac Risk Detected</h6>
-          <p>
-            Your ECG analysis indicates a <strong>HIGH</strong>
-          </p>
-        </div>
-      </div>
-
-      <!-- Angiogram button -->
-      <div class="angiogram-alert">
-        <p>
-          <strong>⚠ High Cardiac Risk Detected.</strong><br>
-          Doctor review and angiogram imaging is recommended for this patient.
-        </p>
-        <a href="{{ url_for('doctor_login', session_id=session_id, patient_id=patient_id) }}"
-           class="btn-angiogram">
-          🩻 Upload Angiogram (Doctor Portal)
-        </a>
-      </div>
-    </div>
-
-    <!-- No 10-year card for HIGH risk -->
-
-  <!-- ════════════════════════════════════════════════════════════
-       CASE 3 — MEDIUM or LOW risk  →  show classification + 10-year
+       CASE 2 — Any risk level (HIGH, MEDIUM, LOW) → show classification
        ════════════════════════════════════════════════════════════ -->
   {% else %}
 
@@ -218,9 +171,30 @@
           <img src="{{ plot_url }}" alt="Lead Activity Plot">
         </div>
       {% endif %}
+
+      <!-- Angiogram button — shown for ALL risk levels -->
+      <div class="angiogram-alert">
+        <p>
+          {% if prediction.risk_level == 'HIGH' %}
+            <strong>⚠ High Cardiac Risk Detected.</strong><br>
+            Doctor review and angiogram imaging is strongly recommended for this patient.
+          {% elif prediction.risk_level == 'MEDIUM' %}
+            <strong>⚠ Medium Cardiac Risk Detected.</strong><br>
+            Doctor review and angiogram imaging is recommended for this patient.
+          {% else %}
+            <strong>ℹ Angiogram Imaging Available.</strong><br>
+            A doctor may optionally upload angiogram imaging for further review.
+          {% endif %}
+        </p>
+        <a href="{{ url_for('doctor_login', session_id=session_id, patient_id=patient_id) }}"
+           class="btn-angiogram">
+          🩻 Upload Angiogram (Doctor Portal)
+        </a>
+      </div>
     </div>
 
-    <!-- 10-Year CHD Risk card — populated by JS -->
+    <!-- 10-Year CHD Risk card — only for MEDIUM/LOW risk AND when patient came through pre-screening -->
+    {% if prediction.risk_level != 'HIGH' and patient_data %}
     <div class="card-box" id="tenYearCard">
       <h5><i class="fas fa-calendar-alt me-2"></i>10-Year Coronary Heart Disease Risk</h5>
       <p class="text-muted" style="font-size:0.88rem;">
@@ -232,6 +206,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
   {% endif %}
 
@@ -240,9 +215,9 @@
 
 <!-- ════════════════════════════════════════════════════════════
      JS: fetch 10-year CHD risk from /predict_ten_year
-     Only runs for MEDIUM / LOW ECG risk paths.
+     Runs for all risk levels (HIGH, MEDIUM, LOW).
      ════════════════════════════════════════════════════════════ -->
-{% if prediction and not prediction.error and prediction.risk_level != 'HIGH' %}
+{% if prediction and not prediction.error and prediction.risk_level != 'HIGH' and patient_data %}
 <script>
 /* Build SVG semicircle gauge */
 function buildGauge(pct, cls) {
