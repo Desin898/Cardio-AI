@@ -1,0 +1,36 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# PyCharm
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+
+# ECG preprocessing outputs
+Preprocessing/ECG_Preprocessing/outputs/
+
+# Angiogram preprocessing outputs
+Preprocessing/Angiogram_Preprocessing/Preprocessed_Angiogram_Output/
+
+# Data outputs
+*.csv
+*.png
+*.jpg
+*.jpeg
+*.dcm
+*.mp4
+*.iml
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
