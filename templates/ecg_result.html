@@ -23,12 +23,10 @@
     .meta  { color: #666; font-size: 0.92em; margin: 3px 0; }
     .label { font-weight: 600; color: #333; }
 
-    /* risk colours */
     .risk-HIGH   { color: #dc3545; font-weight: 700; }
     .risk-MEDIUM { color: #fd7e14; font-weight: 700; }
     .risk-LOW    { color: #198754; font-weight: 700; }
 
-    /* result card */
     .result-card {
       background: #f8faff;
       border: 1px solid #dde6f5;
@@ -38,7 +36,6 @@
     }
     .result-card p { margin-bottom: 0.5rem; }
 
-    /* error box */
     .error-box {
       background: #f2dede; color: #a94442;
       padding: 1rem 1.2rem; border-radius: 10px;
@@ -51,10 +48,8 @@
       border-radius: 6px; border: 1px solid #e8c0c0;
     }
 
-    /* plot */
     .plot img { max-width: 100%; border: 1px solid #ddd; border-radius: 10px; margin-top: 10px; }
 
-    /* angiogram alert */
     .angiogram-alert {
       margin-top: 1.2rem;
       padding: 1rem 1.2rem;
@@ -78,7 +73,34 @@
     }
     .btn-angiogram:hover { background: #b52b27; color: #fff; text-decoration: none; }
 
-    /* 10-year card */
+    /* ── Recommendations button ── */
+    .btn-rec {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 10px 22px;
+      background: linear-gradient(105deg, #1a6b4a, #26a06d);
+      color: #fff;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92em;
+      white-space: nowrap;
+      transition: background 0.18s;
+    }
+    .btn-rec:hover { background: linear-gradient(105deg, #145438, #1d8357); color: #fff; text-decoration: none; }
+
+    .rec-unavailable {
+      margin-top: 0.8rem;
+      padding: 0.75rem 1rem;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      color: #6c757d;
+      font-size: 0.83rem;
+    }
+
+    /* ── 10-year card ── */
     .tenyear-box {
       border-radius: 16px;
       border: 1.5px solid rgba(42,82,152,0.18);
@@ -94,7 +116,6 @@
     .text-cat-medium { color: #fd7e14; }
     .text-cat-high   { color: #dc3545; }
 
-    /* unavailable notice */
     .alert-unavailable {
       border-radius: 10px;
       background: #f8f9fa;
@@ -144,7 +165,7 @@
     </div>
 
   <!-- ════════════════════════════════════════════════════════════
-       CASE 2 — Any risk level (HIGH, MEDIUM, LOW) → show classification
+       CASE 2 — Valid result
        ════════════════════════════════════════════════════════════ -->
   {% else %}
 
@@ -172,7 +193,7 @@
         </div>
       {% endif %}
 
-      <!-- Angiogram button — shown for ALL risk levels -->
+      <!-- Angiogram upload alert -->
       <div class="angiogram-alert">
         <p>
           {% if prediction.risk_level == 'HIGH' %}
@@ -191,20 +212,103 @@
           🩻 Upload Angiogram (Doctor Portal)
         </a>
       </div>
+
+      <!-- ════════════════════════════════════════════════════════
+           RECOMMENDATIONS BUTTON
+           Shown for all risk levels if screening data exists.
+           ════════════════════════════════════════════════════════ -->
+      <div class="mt-3">
+        {% if has_screening_data %}
+          <a href="{{ url_for('recommendations_page', session_id=session_id, source='ecg') }}"
+             class="btn-rec">
+            <i class="fas fa-clipboard-list"></i>
+            View Personalised Recommendations
+          </a>
+        {% else %}
+          <div class="rec-unavailable">
+            <i class="fas fa-info-circle me-2"></i>
+            Personalised recommendations require pre-screening form data.
+            Please complete the <a href="/pre_screening.html">pre-screening form</a> first,
+            then upload your ECG from that page.
+          </div>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- 10-Year CHD Risk card — only for MEDIUM/LOW risk AND when patient came through pre-screening -->
-    {% if prediction.risk_level != 'HIGH' and patient_data %}
+    <!-- ════════════════════════════════════════════════════════════
+         10-Year CHD Risk card — shown for MEDIUM and LOW risk only
+         ════════════════════════════════════════════════════════════ -->
+    {% if prediction.risk_level != 'HIGH' %}
     <div class="card-box" id="tenYearCard">
       <h5><i class="fas fa-calendar-alt me-2"></i>10-Year Coronary Heart Disease Risk</h5>
       <p class="text-muted" style="font-size:0.88rem;">
         Machine-learning model trained on Framingham Heart Study data
       </p>
-      <div id="tenYearContent">
-        <div class="text-center text-muted py-3">
-          <i class="fas fa-spinner fa-pulse me-2"></i>Computing…
+
+      {% if ten_year_data and ten_year_data.success %}
+        {% set fy = ten_year_data %}
+        {% set gauge_cls = fy.colour %}
+        <div class="tenyear-box">
+          <div class="row align-items-center gy-3">
+            <div class="col-sm-4 text-center">
+              <div class="gauge-wrap">
+                <svg viewBox="0 0 140 72">
+                  <path d="M10,70 A60,60 0 0,1 130,70"
+                        fill="none" stroke="#dde6f5" stroke-width="13" stroke-linecap="round"/>
+                  <path d="M10,70 A60,60 0 0,1 130,70"
+                        fill="none" stroke-width="13" stroke-linecap="round"
+                        class="fill-{{ gauge_cls }}"
+                        stroke-dasharray="{{ [(fy.percent / 100) * 188.50, 188.50] | join(' ') }}"/>
+                  <text x="70" y="66" text-anchor="middle"
+                        font-size="17" font-weight="700" fill="#13293e">{{ fy.percent }}%</text>
+                </svg>
+              </div>
+              <div class="text-cat-{{ gauge_cls }} fw-bold fs-5">{{ fy.category }} RISK</div>
+              <div class="text-muted" style="font-size:0.79rem;">10-year CHD probability</div>
+            </div>
+            <div class="col-sm-8">
+              <h6 class="fw-bold mb-3" style="color:#1f3a6b;">10-Year CHD Model Results</h6>
+              <table class="table table-sm table-borderless mb-2" style="font-size:0.9rem;">
+                <tbody>
+                  <tr>
+                    <td class="text-muted ps-0" style="width:55%;">10-Year CHD Risk</td>
+                    <td><strong class="text-cat-{{ gauge_cls }}">{{ fy.percent }}%</strong></td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Risk Category</td>
+                    <td><strong>{{ fy.category }}</strong></td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted ps-0">Model</td>
+                    <td>XGBoost / Logistic Regression (Framingham data)</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="mb-0" style="font-size:0.88rem;">{{ fy.advice }}</p>
+            </div>
+          </div>
+          <div class="disclaimer">
+            <strong>Note:</strong> This 10-year coronary heart disease risk estimate is produced by
+            a machine-learning model trained on the Framingham Heart Study dataset. It is a validated
+            screening aid, not a clinical diagnosis. Consult a healthcare professional for personalised guidance.
+          </div>
         </div>
-      </div>
+
+      {% elif not ten_year_model_available %}
+        <div class="alert-unavailable">
+          <i class="fas fa-info-circle me-2"></i>
+          Ten-year CHD model is not loaded. Run <code>xx.ipynb</code>, place the
+          <code>.pkl</code> files in <code>ten_year_models/</code>, then restart Flask.
+        </div>
+
+      {% else %}
+        <div id="tenYearContent">
+          <div class="text-center text-muted py-3">
+            <i class="fas fa-spinner fa-pulse me-2"></i>Computing...
+          </div>
+        </div>
+      {% endif %}
+
     </div>
     {% endif %}
 
@@ -213,13 +317,10 @@
   <a href="/" class="back-link"><i class="fas fa-arrow-left me-1"></i>Back to Home</a>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════
-     JS: fetch 10-year CHD risk from /predict_ten_year
-     Runs for all risk levels (HIGH, MEDIUM, LOW).
-     ════════════════════════════════════════════════════════════ -->
-{% if prediction and not prediction.error and prediction.risk_level != 'HIGH' and patient_data %}
+<!-- JS fallback for 10-year panel when server-side data was unavailable -->
+{% if prediction and not prediction.error and prediction.risk_level != 'HIGH'
+      and ten_year_model_available and not ten_year_data %}
 <script>
-/* Build SVG semicircle gauge */
 function buildGauge(pct, cls) {
   const R = 60, full = Math.PI * R;
   const fill = Math.min(pct / 100, 1) * full;
@@ -238,7 +339,6 @@ function buildGauge(pct, cls) {
     </div>`;
 }
 
-/* Render the 10-year result panel */
 function renderTenYear(fy) {
   const gauge = buildGauge(fy.percent, `fill-${fy.colour}`);
   document.getElementById('tenYearContent').innerHTML = `
@@ -271,57 +371,36 @@ function renderTenYear(fy) {
         </div>
       </div>
       <div class="disclaimer">
-        <strong>Note:</strong> This 10-year coronary heart disease risk estimate is produced by
-        a machine-learning model trained on the Framingham Heart Study dataset. It estimates the
-        probability of a hard CHD event (myocardial infarction or coronary death) over the next
-        decade. It is a validated screening aid, not a clinical diagnosis. Consult a healthcare
-        professional for personalised guidance.
+        <strong>Note:</strong> This 10-year coronary heart disease risk estimate is a validated
+        screening aid, not a clinical diagnosis. Consult a healthcare professional.
       </div>
     </div>`;
 }
 
-/* Fetch 10-year risk from backend using cached patient data */
 (async function fetchTenYear() {
   const el = document.getElementById('tenYearContent');
   if (!el) return;
-
-  // Try server-echoed patient_data first, then fall back to localStorage cache
-  const pd = {{ patient_data | tojson | default('null') }}
-          || JSON.parse(localStorage.getItem('screeningFormData') || 'null');
-
+  const pd = JSON.parse(localStorage.getItem('screeningFormData') || 'null');
   if (!pd) {
-    el.innerHTML = `
-      <div class="alert-unavailable">
-        <i class="fas fa-info-circle me-2"></i>
-        Patient data not available. Please re-run the pre-screening form to see the
-        10-year projection.
-      </div>`;
+    el.innerHTML = `<div class="alert-unavailable">
+      <i class="fas fa-info-circle me-2"></i>
+      Patient data not available. Please re-run the pre-screening form.</div>`;
     return;
   }
-
   try {
     const resp = await fetch('/predict_ten_year', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(pd)
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pd)
     });
     const json = await resp.json();
-    if (json.success) {
-      renderTenYear(json);
-    } else {
-      el.innerHTML = `
-        <div class="alert-unavailable">
-          <i class="fas fa-info-circle me-2"></i>
-          10-year risk model unavailable: ${json.message}
-        </div>`;
+    if (json.success) { renderTenYear(json); }
+    else {
+      el.innerHTML = `<div class="alert-unavailable">
+        <i class="fas fa-info-circle me-2"></i>10-year risk model unavailable: ${json.message}</div>`;
     }
   } catch (err) {
-    el.innerHTML = `
-      <div class="alert-unavailable">
-        <i class="fas fa-info-circle me-2"></i>
-        Could not connect to the 10-year risk model. Ensure the server is running
-        and <code>xx.ipynb</code> has been executed to generate the model files.
-      </div>`;
+    el.innerHTML = `<div class="alert-unavailable">
+      <i class="fas fa-info-circle me-2"></i>Could not connect to the 10-year risk model.</div>`;
   }
 })();
 </script>

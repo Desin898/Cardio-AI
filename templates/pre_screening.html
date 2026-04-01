@@ -49,8 +49,6 @@ body {
 .btn-primary:hover { background: linear-gradient(105deg, #163157, #1f3f6b); }
 
 .alert { border-radius: 18px; }
-
-/* field-level helper hint */
 .field-hint { font-size: 0.75rem; color: #6c757d; margin-top: 3px; padding-left: 6px; }
 </style>
 </head>
@@ -72,18 +70,14 @@ body {
 
     <form id="screeningForm">
 
-      <!-- ═══════════════════════════════════════════════
-           PERSONAL INFORMATION
-           ═══════════════════════════════════════════════ -->
+      <!-- ═══════════════════════════ PERSONAL INFORMATION ═══════════════════════════ -->
       <div class="section-title">Personal Information</div>
 
       <div class="row g-3 mb-4">
-
         <div class="col-md-3">
           <label class="form-label">Age</label>
           <input type="number" class="form-control" name="age" min="18" max="120" required>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">Gender</label>
           <select class="form-select" name="gender" required>
@@ -92,51 +86,42 @@ body {
             <option value="Female">Female</option>
           </select>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">Height (cm)</label>
           <input type="number" class="form-control" name="height_cm"
                  placeholder="e.g. 170" min="100" max="250" required>
           <div class="field-hint">centimetres</div>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">Weight (kg)</label>
           <input type="number" step="0.1" class="form-control" name="weight_kg"
                  placeholder="e.g. 75" min="30" max="300" required>
           <div class="field-hint">kilograms</div>
         </div>
-
       </div>
 
-      <!-- ═══════════════════════════════════════════════
-           CLINICAL MEASUREMENTS
-           ═══════════════════════════════════════════════ -->
+      <!-- ═══════════════════════════ CLINICAL MEASUREMENTS ═══════════════════════════ -->
       <div class="section-title">Clinical Measurements</div>
 
       <div class="row g-3 mb-3">
-
         <div class="col-md-3">
           <label class="form-label">Systolic BP</label>
           <input type="number" class="form-control" name="systolic_bp"
                  placeholder="e.g. 120" min="60" max="260" required>
           <div class="field-hint">mmHg (upper number)</div>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">Diastolic BP</label>
           <input type="number" class="form-control" name="diastolic_bp"
                  placeholder="e.g. 80" min="40" max="160" required>
           <div class="field-hint">mmHg (lower number)</div>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">Heart Rate</label>
           <input type="number" class="form-control" name="heart_rate"
                  placeholder="e.g. 72" min="30" max="220" required>
-          <div class="field-hint">beats per minute (bpm)</div>
+          <div class="field-hint">beats per minute</div>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">On BP Medication?</label>
           <select class="form-select" name="bp_treatment" required>
@@ -145,32 +130,27 @@ body {
             <option value="No">No</option>
           </select>
         </div>
-
       </div>
 
       <div class="row g-3 mb-4">
-
         <div class="col-md-3">
           <label class="form-label">Total Cholesterol</label>
           <input type="number" class="form-control" name="cholesterol"
                  placeholder="e.g. 200" min="50" max="600" required>
           <div class="field-hint">mg/dL</div>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">HDL Cholesterol</label>
           <input type="number" class="form-control" name="hdl_cholesterol"
                  placeholder="e.g. 55" min="10" max="150" required>
           <div class="field-hint">mg/dL (good cholesterol)</div>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">Glucose</label>
           <input type="number" class="form-control" name="glucose"
                  placeholder="e.g. 90" min="40" max="600" required>
           <div class="field-hint">mg/dL (fasting preferred)</div>
         </div>
-
         <div class="col-md-3">
           <label class="form-label">Previous Stroke?</label>
           <select class="form-select" name="previous_stroke" required>
@@ -179,16 +159,12 @@ body {
             <option value="No">No</option>
           </select>
         </div>
-
       </div>
 
-      <!-- ═══════════════════════════════════════════════
-           LIFESTYLE FACTORS
-           ═══════════════════════════════════════════════ -->
+      <!-- ═══════════════════════════ LIFESTYLE FACTORS ═══════════════════════════ -->
       <div class="section-title">Lifestyle Factors</div>
 
       <div class="row g-3 mb-3">
-
         <div class="col-md-4">
           <label class="form-label">Smoking Status</label>
           <select class="form-select" name="smoker" id="smoker" required>
@@ -198,37 +174,31 @@ body {
             <option value="Former">Former Smoker</option>
           </select>
         </div>
-
         <div class="col-md-4">
           <label class="form-label">Years Smoking</label>
           <input type="number" class="form-control" id="yearsSmoking"
                  name="years_smoking" placeholder="e.g. 10" min="0" max="80" disabled>
         </div>
-
         <div class="col-md-4">
           <label class="form-label">Cigarettes per Day</label>
           <input type="number" class="form-control" id="cigsPerDay"
                  name="cigs_per_day" placeholder="e.g. 15" min="0" max="100"
                  step="1" disabled>
-          <div class="field-hint">Current smokers only</div>
+          <div class="field-hint">Current &amp; former smokers</div>
         </div>
-
       </div>
 
       <div class="row g-3 mb-4">
-
         <div class="col-md-4">
           <label class="form-label">Exercise (hrs/week)</label>
           <input type="number" step="0.5" class="form-control" name="exercise_hours"
                  placeholder="e.g. 3.5" min="0" max="40" required>
         </div>
-
         <div class="col-md-4">
           <label class="form-label">Sleep (hours/night)</label>
           <input type="number" step="0.5" class="form-control" name="sleep_hours"
                  placeholder="e.g. 7" min="1" max="24" required>
         </div>
-
         <div class="col-md-4">
           <label class="form-label">Alcohol Consumption</label>
           <select class="form-select" name="alcohol" required>
@@ -238,16 +208,12 @@ body {
             <option value="Heavy">Heavy</option>
           </select>
         </div>
-
       </div>
 
-      <!-- ═══════════════════════════════════════════════
-           ADDITIONAL HEALTH FACTORS
-           ═══════════════════════════════════════════════ -->
+      <!-- ═══════════════════════════ ADDITIONAL HEALTH FACTORS ═══════════════════════════ -->
       <div class="section-title">Additional Health Factors</div>
 
       <div class="row g-3 mb-3">
-
         <div class="col-md-4">
           <label class="form-label">Diabetes?</label>
           <select class="form-select" name="diabetes" required>
@@ -256,7 +222,6 @@ body {
             <option value="No">No</option>
           </select>
         </div>
-
         <div class="col-md-4">
           <label class="form-label">Hypertension (diagnosed)?</label>
           <select class="form-select" name="prevalent_hyp" required>
@@ -266,7 +231,6 @@ body {
           </select>
           <div class="field-hint">Ever told by a doctor you have high BP?</div>
         </div>
-
         <div class="col-md-4">
           <label class="form-label">Physical Activity Level</label>
           <select class="form-select" name="physical_activity" required>
@@ -276,11 +240,9 @@ body {
             <option value="Active">Active</option>
           </select>
         </div>
-
       </div>
 
       <div class="row g-3">
-
         <div class="col-md-4">
           <label class="form-label">Family History of CAD?</label>
           <select class="form-select" name="family_history" required>
@@ -289,7 +251,6 @@ body {
             <option value="No">No</option>
           </select>
         </div>
-
         <div class="col-md-4">
           <label class="form-label">Stress Level</label>
           <select class="form-select" name="stress_level" required>
@@ -299,11 +260,10 @@ body {
             <option value="High">High</option>
           </select>
         </div>
-
       </div>
 
       <button type="submit" class="btn btn-primary w-100 mt-4 py-3" id="submitBtn">
-        <i class="fas fa-brain me-2"></i>Analyze Risk
+        <i class="fas fa-brain me-2"></i>Analyse Risk
       </button>
 
     </form>
@@ -311,39 +271,44 @@ body {
 </div>
 
 <script>
-const smokerEl    = document.getElementById("smoker");
-const yearsEl     = document.getElementById("yearsSmoking");
-const cigsEl      = document.getElementById("cigsPerDay");
+// ── Smoker field toggling ────────────────────────────────────────────
+const smokerEl = document.getElementById('smoker');
+const yearsEl  = document.getElementById('yearsSmoking');
+const cigsEl   = document.getElementById('cigsPerDay');
 
 function updateSmokerFields() {
-  const isCurrentOrFormer = (smokerEl.value === "Yes" || smokerEl.value === "Former");
+  const isCurrentOrFormer = (smokerEl.value === 'Yes' || smokerEl.value === 'Former');
   yearsEl.disabled = !isCurrentOrFormer;
-  if (yearsEl.disabled) yearsEl.value = "";
+  if (yearsEl.disabled) yearsEl.value = '';
 
-  const isCurrent = (smokerEl.value === "Yes");
-  cigsEl.disabled = !isCurrent;
-  if (cigsEl.disabled) cigsEl.value = "";
+  // Cigs per day enabled for current AND former smokers (used by ten-year model)
+  cigsEl.disabled = !isCurrentOrFormer;
+  if (cigsEl.disabled) cigsEl.value = '';
 }
 
-smokerEl.addEventListener("change", updateSmokerFields);
+smokerEl.addEventListener('change', updateSmokerFields);
 updateSmokerFields();
 
-document.getElementById("screeningForm").addEventListener("submit", async function(e) {
+
+// ── Form submission ──────────────────────────────────────────────────
+document.getElementById('screeningForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
   const sys = parseInt(document.querySelector('[name="systolic_bp"]').value);
   const dia = parseInt(document.querySelector('[name="diastolic_bp"]').value);
 
   if (sys <= dia) {
-    alert("Systolic BP must be higher than Diastolic BP.");
+    alert('Systolic BP must be higher than Diastolic BP.');
     return;
   }
 
-  const heightCm  = parseFloat(document.querySelector('[name="height_cm"]').value);
-  const weightKg  = parseFloat(document.querySelector('[name="weight_kg"]').value);
-  const heightM   = heightCm / 100;
-  const bmiCalc   = weightKg / (heightM * heightM);
+  // Calculate BMI from height + weight
+  const heightCm = parseFloat(document.querySelector('[name="height_cm"]').value);
+  const weightKg = parseFloat(document.querySelector('[name="weight_kg"]').value);
+  const heightM  = heightCm / 100;
+  const bmiCalc  = weightKg / (heightM * heightM);
 
+  // Build the payload — every key here must be present in app.py's `required` list
   const formData = {
     // Personal
     age:              parseInt(document.querySelector('[name="age"]').value),
@@ -364,22 +329,19 @@ document.getElementById("screeningForm").addEventListener("submit", async functi
 
     // Lifestyle
     smoker:           smokerEl.value,
-    years_smoking:    yearsEl.disabled ? 0 : (parseInt(yearsEl.value) || 0),
-    cigs_per_day:     cigsEl.disabled  ? 0 : (parseInt(cigsEl.value)  || 0),
+    years_smoking:    yearsEl.disabled  ? 0 : (parseInt(yearsEl.value)  || 0),
+    cigs_per_day:     cigsEl.disabled   ? 0 : (parseInt(cigsEl.value)   || 0),
     exercise_hours:   parseFloat(document.querySelector('[name="exercise_hours"]').value),
     sleep_hours:      parseFloat(document.querySelector('[name="sleep_hours"]').value),
     alcohol:          document.querySelector('[name="alcohol"]').value,
 
     // Health factors
-    diabetes:         document.querySelector('[name="diabetes"]').value,
-    prevalent_hyp:    document.querySelector('[name="prevalent_hyp"]').value,
+    diabetes:          document.querySelector('[name="diabetes"]').value,
+    prevalent_hyp:     document.querySelector('[name="prevalent_hyp"]').value,
     physical_activity: document.querySelector('[name="physical_activity"]').value,
-    family_history:   document.querySelector('[name="family_history"]').value,
-    stress_level:     document.querySelector('[name="stress_level"]').value,
+    family_history:    document.querySelector('[name="family_history"]').value,
+    stress_level:      document.querySelector('[name="stress_level"]').value,
   };
-
-  // ── Cache form data for use by results pages ───────────────────────────
-  localStorage.setItem('screeningFormData', JSON.stringify(formData));
 
   const btn = document.getElementById('submitBtn');
   btn.innerHTML = '<i class="fas fa-spinner fa-pulse me-2"></i>Processing...';
@@ -389,24 +351,34 @@ document.getElementById("screeningForm").addEventListener("submit", async functi
     const response = await fetch('/predict', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(formData)
+      body:    JSON.stringify(formData),
     });
 
-    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Server error ${response.status}: ${errText}`);
+    }
 
     const result = await response.json();
 
-    if (result.success) {
-      localStorage.setItem('screeningResult', JSON.stringify(result));
-      window.location.href = 'pre_screening_results.html';
-    } else {
+    if (!result.success) {
       alert('Prediction failed: ' + result.message);
-      btn.innerHTML = '<i class="fas fa-brain me-2"></i>Analyze Risk';
+      btn.innerHTML = '<i class="fas fa-brain me-2"></i>Analyse Risk';
       btn.disabled  = false;
+      return;
     }
+
+    // ── Store full result (including ten_year_result) for results page ──
+    // The ten_year_result is already computed server-side by /predict and
+    // included in the response — no second fetch needed on the results page.
+    localStorage.setItem('screeningResult',   JSON.stringify(result));
+    localStorage.setItem('screeningFormData', JSON.stringify(formData));
+
+    window.location.href = 'pre_screening_results.html';
+
   } catch (error) {
     alert('Error connecting to server: ' + error.message);
-    btn.innerHTML = '<i class="fas fa-brain me-2"></i>Analyze Risk';
+    btn.innerHTML = '<i class="fas fa-brain me-2"></i>Analyse Risk';
     btn.disabled  = false;
   }
 });

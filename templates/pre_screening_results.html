@@ -58,15 +58,20 @@
       margin: 1.4rem 0 1rem;
     }
 
+    /* ── Navigation buttons ── */
     .btn-outline-navy {
       border-radius: 40px;
       border: 2px solid #2a5298;
       color: #2a5298;
       background: transparent;
       font-weight: 600;
-      padding: 10px 26px;
+      padding: 10px 22px;
       text-decoration: none;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      transition: background 0.18s, color 0.18s;
     }
     .btn-outline-navy:hover { background: #2a5298; color: #fff; }
 
@@ -76,11 +81,32 @@
       border: none;
       color: #fff;
       font-weight: 600;
-      padding: 10px 26px;
+      padding: 10px 22px;
       text-decoration: none;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      transition: background 0.18s;
     }
     .btn-navy:hover { background: linear-gradient(105deg, #163157, #1f3f6b); color: #fff; }
+
+    /* ── Recommendations button ── */
+    .btn-rec {
+      border-radius: 40px;
+      background: linear-gradient(105deg, #1a6b4a, #26a06d);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px 22px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      transition: background 0.18s;
+    }
+    .btn-rec:hover { background: linear-gradient(105deg, #145438, #1d8357); color: #fff; }
 
     /* ── 10-year risk card ── */
     .tenyear-card {
@@ -90,7 +116,6 @@
       padding: 1.5rem 1.6rem;
     }
 
-    /* SVG gauge colour classes */
     .fill-low    { stroke: #198754; }
     .fill-medium { stroke: #fd7e14; }
     .fill-high   { stroke: #dc3545; }
@@ -101,7 +126,6 @@
     .gauge-wrap { position: relative; width: 150px; height: 82px; margin: 0 auto 6px; }
     .gauge-wrap svg { width: 100%; height: 100%; overflow: visible; }
 
-    /* ── High-risk notice ── */
     .alert-high {
       border-radius: 18px;
       background: #fff5f5;
@@ -113,7 +137,6 @@
     .alert-high h6 { color: #b52b27; font-weight: 700; margin-bottom: 4px; }
     .alert-high p  { color: #7d2020; font-size: 0.9rem; margin: 0; }
 
-    /* ── Error / unavailable notice ── */
     .alert-unavailable {
       border-radius: 14px;
       background: #f8f9fa;
@@ -123,7 +146,6 @@
       font-size: 0.88rem;
     }
 
-    /* ── Framingham disclaimer ── */
     .disclaimer {
       font-size: 0.78rem;
       color: #6c757d;
@@ -131,6 +153,8 @@
       padding-top: 0.75rem;
       border-top: 1px solid rgba(0,0,0,0.1);
     }
+
+    #actionButtons { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
   </style>
 </head>
 <body>
@@ -152,7 +176,7 @@
     </div>
   </div>
 
-  <!-- 10-YEAR RISK CARD — shown only when current risk is LOW -->
+  <!-- 10-YEAR RISK CARD — shown when current risk is LOW -->
   <div class="card" id="tenYearCard" style="display:none;">
     <div class="d-flex align-items-center mb-3">
       <i class="fas fa-calendar-alt fs-2 me-3" style="color:#2a5298;"></i>
@@ -168,7 +192,7 @@
     </div>
   </div>
 
-  <!-- ACTION BUTTONS -->
+  <!-- ACTION BUTTONS (populated by JS) -->
   <div class="text-center mt-1 mb-4" id="actionButtons"></div>
 
 </div>
@@ -217,7 +241,7 @@ function renderFactors(explanation) {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Render 10-year risk panel from API response
+   Render 10-year risk panel
    ══════════════════════════════════════════════════════════════════ */
 function renderTenYear(fy) {
   const gauge = buildGauge(fy.percent, `fill-${fy.colour}`);
@@ -241,10 +265,6 @@ function renderTenYear(fy) {
                 <td class="text-muted ps-0">Risk Category</td>
                 <td><strong>${fy.category}</strong></td>
               </tr>
-              <tr>
-                <td class="text-muted ps-0">Model</td>
-                <td>XGBoost / Logistic Regression (Framingham data)</td>
-              </tr>
             </tbody>
           </table>
           <p class="mb-0" style="font-size:0.88rem;">${fy.advice}</p>
@@ -252,17 +272,15 @@ function renderTenYear(fy) {
       </div>
       <div class="disclaimer">
         <strong>Note:</strong> This 10-year coronary heart disease risk estimate is produced by
-        a machine-learning model trained on the Framingham Heart Study dataset. It estimates the
-        probability of a hard CHD event (myocardial infarction or coronary death) over the next
-        decade. It is a validated screening aid, not a clinical diagnosis. Consult a healthcare
-        professional for personalised guidance.
+        a machine-learning model trained on the Framingham Heart Study dataset. It is a validated
+        screening aid, not a clinical diagnosis. Consult a healthcare professional for personalised guidance.
       </div>
     </div>`;
   document.getElementById('tenYearCard').style.display = 'block';
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Fetch 10-year risk from backend  (/predict_ten_year)
+   Fetch 10-year risk from backend
    ══════════════════════════════════════════════════════════════════ */
 async function fetchTenYearRisk(patientData) {
   try {
@@ -286,8 +304,7 @@ async function fetchTenYearRisk(patientData) {
     document.getElementById('tenYearContent').innerHTML = `
       <div class="alert-unavailable">
         <i class="fas fa-info-circle me-2"></i>
-        Could not connect to the 10-year risk model. Please ensure the server is running
-        and that <code>xx.ipynb</code> has been executed to generate the model files.
+        Could not connect to the 10-year risk model.
       </div>`;
     document.getElementById('tenYearCard').style.display = 'block';
   }
@@ -331,7 +348,7 @@ function displayResult() {
   if (isHigh) {
     html += `
       <div class="alert-high">
-        <h6>⚠️ High Current Risk Detected</h6>
+        <h6>⚠ High Current Risk Detected</h6>
         <p>Your cardiovascular risk is currently elevated. ECG testing is strongly recommended.
            A 10-year risk projection is not shown when current risk is high — please proceed
            with clinical evaluation first.</p>
@@ -342,7 +359,6 @@ function displayResult() {
 
   /* ── 10-YEAR RISK — only when current risk is LOW ──────────── */
   if (!isHigh) {
-    // Use patient_data echoed from server, or fall back to cached form data
     const pd = result.patient_data
              || JSON.parse(localStorage.getItem('screeningFormData') || 'null');
     if (pd) {
@@ -351,7 +367,7 @@ function displayResult() {
       document.getElementById('tenYearContent').innerHTML = `
         <div class="alert-unavailable">
           <i class="fas fa-info-circle me-2"></i>
-          Patient data unavailable — please re-run the screening to see the 10-year projection.
+          Patient data unavailable — please re-run the screening.
         </div>`;
       document.getElementById('tenYearCard').style.display = 'block';
     }
@@ -359,9 +375,17 @@ function displayResult() {
 
   /* ── ACTION BUTTONS ─────────────────────────────────────────── */
   const ecgLabel = result.requires_ecg ? 'Upload ECG (Mandatory)' : 'Upload ECG (Optional)';
+
   document.getElementById('actionButtons').innerHTML = `
-    <a href="/" class="btn-outline-navy me-2">New Screening</a>
-    <a href="/upload_ecg.html" class="btn-navy">${ecgLabel}</a>
+    <a href="/" class="btn-outline-navy">
+      <i class="fas fa-redo"></i> New Screening
+    </a>
+    <a href="/recommendations?source=screening" class="btn-rec">
+      <i class="fas fa-clipboard-list"></i> View Recommendations
+    </a>
+    <a href="/upload_ecg.html" class="btn-navy">
+      <i class="fas fa-upload"></i> ${ecgLabel}
+    </a>
   `;
 }
 
