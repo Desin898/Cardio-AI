@@ -24,21 +24,6 @@ from typing import Dict, List
 from cryptography.fernet import Fernet
 
 
-import logging
-from pathlib import Path
-
-# Create logs directory
-log_dir = Path("logs")
-log_dir.mkdir(exist_ok=True)
-
-# Configure logging
-logging.basicConfig(
-    filename=log_dir / "system.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-
 """
 Handles secure encryption and decryption of medical files.
 Manages encryption key generation and protects sensitive ECG and angiogram data before storage.
@@ -151,7 +136,6 @@ class MetadataManager:
             "timestamp": datetime.utcnow().isoformat()
         }
 
-        logging.info(f"Risk prediction stored for patient {metadata['patient_id']} - Risk: {risk_percentage}")
         MetadataManager.write_metadata(metadata_path, metadata)
 
 
@@ -180,7 +164,6 @@ class MetadataManager:
             }
         })
 
-        logging.info(f"ECG uploaded and metadata updated for patient {metadata['patient_id']}")
         MetadataManager.write_metadata(metadata_path, metadata)
         metadata = MetadataManager.read_metadata(metadata_path)
 
@@ -212,7 +195,6 @@ class MetadataManager:
             }
         })
 
-        logging.info(f"Angiogram uploaded for patient {metadata['patient_id']}")
         MetadataManager.write_metadata(metadata_path, metadata)
 
 """
@@ -273,7 +255,7 @@ class PatientSessionManager:
 
     # Patient Session Initialization
     # Multi-Session support
-    def initialize_patient_session(patient_data: Dict, base_dir: str = "Patients") -> Path:
+    def initialize_patient_session(patient_data: Dict, base_dir: str = "patients") -> Path:
         """
         Creates a unique session folder per patient visit.
         Supports scalability for multiple consultations.
@@ -305,7 +287,6 @@ class PatientSessionManager:
         metadata_path = session_dir / "metadata.json"
         MetadataManager.write_metadata(metadata_path, metadata)
 
-        logging.info(f"Patient session created for {patient_data['patient_id']}")
         return metadata_path
 
 """
@@ -322,7 +303,6 @@ class StorageManager:
         enc = EncryptionManager()
         encrypted_path = enc.encrypt_and_save(file_bytes, save_path)
 
-        logging.info(f"Encrypted ECG stored at {encrypted_path}")
         return str(encrypted_path)
 
     def save_encrypted_angiogram(metadata_path: Path, file_bytes: bytes, filename: str) -> str:
@@ -333,7 +313,6 @@ class StorageManager:
         enc = EncryptionManager()
         encrypted_path = enc.encrypt_and_save(file_bytes, save_path)
 
-        logging.info(f"Encrypted angiogram stored at {encrypted_path}")
         return str(encrypted_path)
 
 """
@@ -349,6 +328,10 @@ class RetrievalManager:
     def get_ecg_image_path(metadata_path: Path) -> str:
         metadata = MetadataManager.read_metadata(metadata_path)
         return metadata.get("ecg", {}).get("raw_image_path")
+
+    def get_ecg_image_path_csv(metadata_path: Path) -> str:
+        metadata = MetadataManager.read_metadata(metadata_path)
+        return metadata.get("ecg", {}).get("processed_csv_path")
 
     def get_risk_percentage(metadata_path: Path) -> float:
         metadata = MetadataManager.read_metadata(metadata_path)

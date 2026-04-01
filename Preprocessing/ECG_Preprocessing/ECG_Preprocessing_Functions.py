@@ -166,3 +166,28 @@ def process_single_ecg_image(
 
     flattened = np.concatenate(all_lead_signals, axis=0)
     return flattened
+
+
+# ---------- Create CSV at runtime and return its path ----------
+def process_and_save_csv(img_path, output_csv_path=None, target_len=TARGET_LEAD_LENGTH):
+    """
+    Runs preprocessing and saves the flattened ECG as a CSV.
+    Returns BOTH:
+        - DataFrame (df)
+        - CSV file path (str)
+    """
+    flattened = process_single_ecg_image(img_path, target_len=target_len)
+
+    if flattened is None:
+        raise ValueError("ECG preprocessing failed; no data to save.")
+
+    if output_csv_path is None:
+        output_csv_path = Path(img_path).with_suffix(".csv")
+    else:
+        output_csv_path = Path(output_csv_path)
+
+    df = pd.DataFrame([flattened])
+    df.to_csv(output_csv_path, index=False)
+
+    return df, str(output_csv_path)
+
