@@ -1,23 +1,33 @@
+import sys
+from pathlib import Path
+
 import torch
 import numpy as np
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from ecg_risk_prediction.models.ecg_cnn import ECGCNN
+
+from process_02_cardiac_analysis.ecg_risk_prediction.models.ecg_cnn import ECGCNN
+from Preprocessing.ECG_Preprocessing.ECG_Preprocessing_Functions import process_and_save_csv
 
 # CONFIG
-MODEL_PATH = "../outputs/best_ecg_cnn.pth"
+# Absolute paths so the script works regardless of where it's launched from
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "outputs", "best_ecg_cnn.pth")
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "outputs")
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-OUTPUT_DIR = "../outputs"
-
 
 class CardiacPredictor:
     def __init__(self):
         self.model = ECGCNN(num_classes=4).to(DEVICE)
         self.model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
         self.model.eval()
-        self.classes = ['Normal', 'Abnormal Heartbeat', 'Active Myocardial Infarction', 'History of MI']
+        self.classes = [
+            'Normal',
+            'Abnormal Heartbeat',
+            'Active Myocardial Infarction',
+            'History of MI'
+        ]
 
     def plot_lead_activity(self, lead_variance, suspected_vessel):
         """Generates a visual heatmap of lead activity for the report."""
@@ -26,8 +36,11 @@ class CardiacPredictor:
         sns.barplot(x=leads, y=lead_variance, hue=leads, palette="Reds_r", legend=False)
         plt.title(f"Lead Activity Profile - Suspected: {suspected_vessel}")
         plt.ylabel("Signal Variance (Intensity)")
-        plt.savefig(os.path.join(OUTPUT_DIR, "lead_activity_report.png"))
-        print(f"Visual activity report saved to {OUTPUT_DIR}/lead_activity_report.png")
+
+        output_path = os.path.join(OUTPUT_DIR, "lead_activity_report.png")
+        plt.savefig(output_path)
+        plt.close()
+        print(f"Visual activity report saved to {output_path}")
 
     def get_artery_localization(self, ecg_tensor):
         # Calculate variance across time for each lead (12 rows)
@@ -39,7 +52,11 @@ class CardiacPredictor:
         rca_score = np.mean([lead_activity[1], lead_activity[2], lead_activity[4]])
         lcx_score = np.mean([lead_activity[0], lead_activity[5], lead_activity[10], lead_activity[11]])
 
-        scores = {"LAD (Anterior)": lad_score, "RCA (Inferior)": rca_score, "LCX (Lateral)": lcx_score}
+        scores = {
+            "LAD (Anterior)": lad_score,
+            "RCA (Inferior)": rca_score,
+            "LCX (Lateral)": lcx_score
+        }
         suspected = max(scores, key=scores.get)
 
         # Plot the activity
@@ -48,7 +65,10 @@ class CardiacPredictor:
 
     def predict(self, processed_csv_path):
         df = pd.read_csv(processed_csv_path)
-        if "filename" in df.columns: df = df.drop(columns=["filename"])
+
+        if "filename" in df.columns:
+            df = df.drop(columns=["filename"])
+
         data = df.values.astype(np.float32)[0]  # Take first patient in file
 
         # Preprocess exactly like training
@@ -75,13 +95,55 @@ class CardiacPredictor:
 
 
 if __name__ == "__main__":
+    # Determine the project root (where Pipeline_Management is)
+    script_dir = Path(__file__).resolve().parent
+    # This script is in:
+    # coronary-ai-system/process_02_cardiac_analysis/ecg_risk_prediction/inference/
+    # So go up three levels to reach coronary-ai-system
+    project_root = script_dir.parent.parent.parent
+
+    # Define the Patients directory
+    patients_dir = project_root / "Pipeline_Management" / "Patients"
+
     predictor = CardiacPredictor()
-    # Change this path to test different files!
-    sample_file = (".."
-                   ""
-                   ""
-                   ""
-                   "/data/single_uploaded_ecg_row.csv")
+
+    sample_file = None
+
+    # If an input path is provided, use it
+    if len(sys.argv) > 1:
+        input_path = Path(sys.argv[1]).resolve()
+
+        if not input_path.exists():
+            print(f"Input file not found: {input_path}")
+            sys.exit(1)
+
+        # If user passed an image, preprocess it and get the CSV path back
+        if input_path.suffix.lower() in [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"]:
+            _, sample_file = process_and_save_csv(str(input_path))
+            print(f"Preprocessed CSV saved to: {sample_file}")
+
+        # If user passed a CSV directly, use it as-is
+        elif input_path.suffix.lower() == ".csv":
+            sample_file = str(input_path)
+            print(f"Using CSV file: {sample_file}")
+
+        else:
+            print("Unsupported file type. Please provide an ECG image or CSV file.")
+            sys.exit(1)
+
+    # Fallback: find the most recently modified CSV under Patients
+    else:
+        csv_files = list(patients_dir.rglob("*.csv"))
+
+        if not csv_files:
+            print(f"No preprocessed CSV found in {patients_dir}. Please ensure the ECG has been processed.")
+            sys.exit(1)
+
+        latest_csv = max(csv_files, key=lambda p: p.stat().st_mtime)
+        sample_file = str(latest_csv)
+        print(f"Using latest CSV: {sample_file}")
+
+    # Run prediction
     report = predictor.predict(sample_file)
 
     print("\n--- PATIENT CARDIAC RISK REPORT ---")
@@ -90,3 +152,4 @@ if __name__ == "__main__":
     print(f"Emergency Priority: {report['risk_level']}")
     print(f"Artery Localization: {report['suspected_vessel']}")
     print("------------------------------------\n")
+
