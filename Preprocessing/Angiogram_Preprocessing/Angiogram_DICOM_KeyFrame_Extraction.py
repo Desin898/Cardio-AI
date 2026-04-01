@@ -172,6 +172,28 @@ def preprocess_angiogram_frame(frame: np.ndarray, target_size=(512, 512)):
 # 7. Main Entry Function
 # -----------------------------
 def process_angiogram(file_path: str, output_root="Preprocessed_Angiogram_Output"):
+    """
+    Run the full angiogram preprocessing pipeline.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to a DICOM file or MP4 video.
+    output_root : str or Path
+        Root directory where the patient sub-folder will be created.
+
+    Returns
+    -------
+    dict with keys:
+        patient_id              – unique ID for this run
+        output_directory        – absolute path to the patient output folder
+        selected_frame_indices  – list of original frame indices that were kept
+        variants                – list of dicts, one per saved frame:
+                                    { "label":    "Frame 1 (original index 20)",
+                                      "filename": "frame_01.png" }
+                                  Consumed directly by metadata['angiogram']['variants']
+                                  in the Flask doctor portal flow.
+    """
     file_path = Path(file_path)
 
     if not validate_input(file_path):
@@ -215,21 +237,31 @@ def process_angiogram(file_path: str, output_root="Preprocessed_Angiogram_Output
     patient_dir = output_root / patient_id
     patient_dir.mkdir(parents=True, exist_ok=True)
 
+    # Save frames and build variants list
+    variants = []
     for i, frame in enumerate(preprocessed_frames, start=1):
-        cv2.imwrite(str(patient_dir / f"frame_{i:02d}.png"), frame)
+        filename = f"frame_{i:02d}.png"
+        cv2.imwrite(str(patient_dir / filename), frame)
+        variants.append({
+            "label":    f"Frame {i} (original index {selected_indices[i - 1]})",
+            "filename": filename,
+        })
 
+    # Save pipeline metadata
     metadata_output = {
-        "patient_id": patient_id,
-        "source": metadata["Source"],
+        "patient_id":               patient_id,
+        "source":                   metadata["Source"],
         "number_of_original_frames": metadata["NumberOfFrames"],
-        "selected_frame_indices": selected_indices
+        "selected_frame_indices":   selected_indices,
+        "variants":                 variants,
     }
 
     with open(patient_dir / "metadata.json", "w") as f:
         json.dump(metadata_output, f, indent=4)
 
     return {
-        "patient_id": patient_id,
-        "output_directory": str(patient_dir),
-        "selected_frame_indices": selected_indices
+        "patient_id":             patient_id,
+        "output_directory":       str(patient_dir),
+        "selected_frame_indices": selected_indices,
+        "variants":               variants,   # ← consumed by Flask upload_angiogram route
     }
