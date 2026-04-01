@@ -21,9 +21,7 @@ from werkzeug.utils import secure_filename
 from Preprocessing.Angiogram_Preprocessing.Angiogram_DICOM_KeyFrame_Extraction import process_angiogram
 
 
-# ============================================================
 #  ECG PREPROCESSING FUNCTIONS
-# ============================================================
 
 TARGET_LEAD_LENGTH = 737
 
@@ -112,9 +110,7 @@ def process_single_ecg_image(img_path, target_len=TARGET_LEAD_LENGTH,
     return np.concatenate(all_lead_signals, axis=0)
 
 
-# ============================================================
 #  RETRIEVAL MANAGER
-# ============================================================
 
 from Pipeline_Management.metadata_system import EncryptionManager, MetadataManager
 
@@ -134,9 +130,7 @@ class RetrievalManager:
         return str(temp_path)
 
 
-# ============================================================
 #  ECG INFERENCE
-# ============================================================
 
 INFERENCE_SCRIPT_PATH = os.path.join(
     os.path.dirname(__file__),
@@ -197,9 +191,7 @@ app = Flask(__name__)
 APP_DIR  = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = "Pipeline_Management/Patients"
 
-# ============================================================
 #  NEW GRAPH-AUGMENTED RISK PIPELINE  (Model/models/)
-# ============================================================
 
 NEW_MODEL_DIR = os.path.join(APP_DIR, "Model", "models")
 
@@ -238,9 +230,7 @@ logging.info(
 SMOKER_SAFE_MAP = {"Yes": "Yes", "No": "No", "Former": "No"}
 
 
-# ============================================================
 #  RECOMMENDATION ADVICE CATALOGUE
-# ============================================================
 
 RECOMMENDATION_ADVICE = {
     "Low_Risk": {
@@ -355,9 +345,7 @@ RECOMMENDATION_ADVICE = {
 }
 
 
-# ============================================================
 #  GRAPH-AUGMENTED FEATURE PIPELINE
-# ============================================================
 
 def _encode_safe(encoder, value, safe_map=None):
     """Encode a categorical value, with optional remapping for unseen labels."""
@@ -438,9 +426,7 @@ def prepare_new_features(data: dict):
     return X_base, X_full, X_full_scaled
 
 
-# ============================================================
 #  TEN-YEAR CHD MODEL
-# ============================================================
 
 TEN_YEAR_MODEL_DIR = os.path.join(APP_DIR, "ten_year_models/ten_year_models")
 
@@ -470,9 +456,7 @@ except Exception as e:
     logging.error(f"❌ Failed to load ten-year CHD model: {e}")
 
 
-# ============================================================
 #  DOCTOR CREDENTIALS
-# ============================================================
 
 VALID_DOCTORS = {
     "doctor1": "pass123",
@@ -493,9 +477,7 @@ DEEPSA_URL    = os.environ.get("DEEPSA_URL", f"http://127.0.0.1:{DEEPSA_PORT}")
 DEEPSA_SCRIPT = os.path.join(APP_DIR, "demo.py")
 
 
-# ============================================================
 #  DeepSA PROCESS MANAGEMENT
-# ============================================================
 
 _deepsa_proc: subprocess.Popen | None = None
 _deepsa_lock = threading.Lock()
@@ -533,9 +515,7 @@ def ensure_deepsa_running():
     )
 
 
-# ============================================================
 #  TEN-YEAR CHD HELPERS
-# ============================================================
 
 def _build_ten_year_features(data: dict) -> pd.DataFrame:
     sys_bp     = float(data.get("systolic_bp", 120))
@@ -619,9 +599,9 @@ def _compute_ten_year(data: dict) -> dict:
         return {"success": False, "message": str(e)}
 
 
-# ====================================================================
+
 #  ROUTES — General / Patient
-# ====================================================================
+
 
 @app.route("/")
 def index():
@@ -652,9 +632,9 @@ def result():
     return render_template("pre_screening_results.html")
 
 
-# ====================================================================
+
 #  ROUTES — Doctor portal stubs
-# ====================================================================
+
 
 @app.route("/doctor_upload.html")
 def doctor_upload():
@@ -665,9 +645,9 @@ def doctor_analysis_results():
     return render_template("doctor_analysis_results.html")
 
 
-# ====================================================================
+
 #  ROUTES — Doctor login
-# ====================================================================
+
 
 @app.route("/doctor_login.html")
 @app.route("/doctor_login", methods=["GET"])
@@ -691,9 +671,9 @@ def doctor_login_post():
                            error="Invalid credentials. Please try again.")
 
 
-# ====================================================================
+
 #  ROUTES — Angiogram upload  (doctor portal)
-# ====================================================================
+
 
 @app.route("/upload_angiogram", methods=["GET"])
 def angiogram_upload_page():
@@ -766,9 +746,9 @@ def upload_angiogram():
         return f"Upload failed: {str(e)}", 500
 
 
-# ====================================================================
+
 #  ROUTE — Serve one preprocessed variant image
-# ====================================================================
+
 
 @app.route("/angiogram_image/<session_id>/<filename>")
 def angiogram_image(session_id, filename):
@@ -795,9 +775,9 @@ def angiogram_image(session_id, filename):
     return "Image not found", 404
 
 
-# ====================================================================
+
 #  ROUTE — Variant selection page
-# ====================================================================
+
 
 @app.route("/angiogram_select/<session_id>")
 def angiogram_select(session_id):
@@ -836,9 +816,7 @@ def angiogram_select(session_id):
         return f"Error: {str(e)}", 500
 
 
-# ====================================================================
 #  ROUTE — Confirm selected variant → launch DeepSA & redirect
-# ====================================================================
 
 @app.route("/angiogram_confirm", methods=["POST"])
 def angiogram_confirm():
@@ -917,9 +895,7 @@ def angiogram_confirm():
         return f"Confirmation failed: {str(e)}", 500
 
 
-# ====================================================================
 #  ROUTE — ECG Upload Handler
-# ====================================================================
 
 @app.route("/upload_ecg", methods=["POST"])
 def upload_ecg():
@@ -1003,9 +979,7 @@ def upload_ecg():
         return f"Upload failed: {str(e)}", 500
 
 
-# ====================================================================
 #  ROUTE — ECG Result Display
-# ====================================================================
 
 ECG_RISK_LEVELS_SHOW_TEN_YEAR = {"LOW", "MEDIUM"}
 
@@ -1088,9 +1062,7 @@ def ecg_result(session_id):
         return f"Error displaying results: {str(e)}", 500
 
 
-# ====================================================================
 #  ROUTE — Serve lead activity plot
-# ====================================================================
 
 @app.route("/ecg_plot/<session_id>/<filename>")
 def ecg_plot(session_id, filename):
@@ -1116,10 +1088,7 @@ def ecg_plot(session_id, filename):
     return send_file(str(fallback_path), mimetype="image/png")
 
 
-# ====================================================================
 #  ROUTE — Pre-screening prediction  (/predict)
-#  Now uses the graph-augmented pipeline instead of the gateway model
-# ====================================================================
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -1227,9 +1196,9 @@ def predict():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-# ====================================================================
-#  ROUTE — Standalone ten-year endpoint  (/predict_ten_year)
-# ====================================================================
+
+#  ROUTE — Standalone ten-year
+
 
 @app.route("/predict_ten_year", methods=["POST"])
 def predict_ten_year():
@@ -1244,11 +1213,8 @@ def predict_ten_year():
     return jsonify(result), (200 if result.get("success") else 500)
 
 
-# ====================================================================
-#  ROUTE — Recommendation engine  (/recommend)
-#  Uses rec_multilabel_models (one binary XGB per category) on the
-#  same 16-feature graph-augmented vector.
-# ====================================================================
+
+#  ROUTE — Recommendation
 
 @app.route("/recommend", methods=["POST"])
 def recommend():
@@ -1282,7 +1248,7 @@ def recommend():
             except Exception:
                 active_categories = ["Maintenance"]
 
-        # Build enriched response
+        # Build response
         recommendations = []
         for cat in active_categories:
             if cat in RECOMMENDATION_ADVICE:
@@ -1307,9 +1273,9 @@ def recommend():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-# ====================================================================
+
 #  ROUTE — Recommendations page  (/recommendations)
-# ====================================================================
+
 
 @app.route("/recommendations")
 def recommendations_page():
@@ -1320,10 +1286,10 @@ def recommendations_page():
                            source=source)
 
 
-# ====================================================================
+
 #  ROUTE — Get saved screening data for a session  (/get_screening_data)
 #  Used by the recommendations page when source=ecg
-# ====================================================================
+
 
 @app.route("/get_screening_data/<session_id>")
 def get_screening_data(session_id):
@@ -1349,9 +1315,9 @@ def get_screening_data(session_id):
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-# ====================================================================
+
 #  ROUTES — Standalone angiogram processing demo
-# ====================================================================
+
 
 @app.route("/angiogram_processing")
 def angiogram_upload_form():
@@ -1418,9 +1384,9 @@ def serve_preprocessed_frame(patient_id, filename):
     return send_file(str(img_path), mimetype="image/png")
 
 
-# ====================================================================
+
 #  Entry point
-# ====================================================================
+
 
 if __name__ == "__main__":
     logging.basicConfig(
