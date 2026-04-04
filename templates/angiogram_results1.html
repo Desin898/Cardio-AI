@@ -209,8 +209,7 @@
     </div>
 
     <!--
-        STANDALONE FLOW: posts patient_id (not session_id).
-        angiogram_confirm in app.py detects this and uses
+        in app.py detects this and uses
         serve_preprocessed_frame to build the image URL.
     -->
     <form id="confirmForm" method="POST" action="{{ url_for('angiogram_confirm') }}">
@@ -263,7 +262,7 @@
         <div class="spinner-ring"></div>
         <p>Launching DeepSA and loading your image&hellip;</p>
         <p style="font-size:.82rem;color:rgba(255,255,255,.65);margin-top:.4rem;">
-            This may take up to 30 seconds on first run while the model loads.
+            This may take up to 30 seconds on run while the model loads.
         </p>
     </div>
 
@@ -277,7 +276,6 @@
     </div>
 
     <script>
-        /* Jinja injects patient_id directly — no DOM reading needed */
         const PATIENT_ID = "{{ patient_id }}";
         let   selectedFilename = "";
 
@@ -314,7 +312,7 @@
                 return;
             }
 
-            /* Re-sync hidden inputs right before submit */
+            /* sync hidden inputs right before submit */
             document.getElementById('patientIdInput').value       = PATIENT_ID;
             document.getElementById('selectedVariantInput').value = selectedFilename;
 
