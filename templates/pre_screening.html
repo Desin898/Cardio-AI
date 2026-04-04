@@ -70,7 +70,7 @@ body {
 
     <form id="screeningForm">
 
-      <!-- ═══════════════════════════ PERSONAL INFORMATION ═══════════════════════════ -->
+      <!-- PERSONAL INFORMATION -->
       <div class="section-title">Personal Information</div>
 
       <div class="row g-3 mb-4">
@@ -100,7 +100,7 @@ body {
         </div>
       </div>
 
-      <!-- ═══════════════════════════ CLINICAL MEASUREMENTS ═══════════════════════════ -->
+      <!-- CLINICAL MEASUREMENTS -->
       <div class="section-title">Clinical Measurements</div>
 
       <div class="row g-3 mb-3">
@@ -161,7 +161,7 @@ body {
         </div>
       </div>
 
-      <!-- ═══════════════════════════ LIFESTYLE FACTORS ═══════════════════════════ -->
+      <!-- LIFESTYLE FACTORS -->
       <div class="section-title">Lifestyle Factors</div>
 
       <div class="row g-3 mb-3">
@@ -210,7 +210,7 @@ body {
         </div>
       </div>
 
-      <!-- ═══════════════════════════ ADDITIONAL HEALTH FACTORS ═══════════════════════════ -->
+      <!-- ADDITIONAL HEALTH FACTORS -->
       <div class="section-title">Additional Health Factors</div>
 
       <div class="row g-3 mb-3">
@@ -271,7 +271,7 @@ body {
 </div>
 
 <script>
-// ── Smoker field toggling ────────────────────────────────────────────
+// Smoker field toggling
 const smokerEl = document.getElementById('smoker');
 const yearsEl  = document.getElementById('yearsSmoking');
 const cigsEl   = document.getElementById('cigsPerDay');
@@ -281,7 +281,7 @@ function updateSmokerFields() {
   yearsEl.disabled = !isCurrentOrFormer;
   if (yearsEl.disabled) yearsEl.value = '';
 
-  // Cigs per day enabled for current AND former smokers (used by ten-year model)
+  // Cigs per day enabled for current AND former smokers used by ten-year model
   cigsEl.disabled = !isCurrentOrFormer;
   if (cigsEl.disabled) cigsEl.value = '';
 }
@@ -290,7 +290,7 @@ smokerEl.addEventListener('change', updateSmokerFields);
 updateSmokerFields();
 
 
-// ── Form submission ──────────────────────────────────────────────────
+// Form submission
 document.getElementById('screeningForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -308,7 +308,7 @@ document.getElementById('screeningForm').addEventListener('submit', async functi
   const heightM  = heightCm / 100;
   const bmiCalc  = weightKg / (heightM * heightM);
 
-  // Build the payload — every key here must be present in app.py's `required` list
+  // Build the payload every key here must be present in app.py's `required` list
   const formData = {
     // Personal
     age:              parseInt(document.querySelector('[name="age"]').value),
@@ -368,9 +368,8 @@ document.getElementById('screeningForm').addEventListener('submit', async functi
       return;
     }
 
-    // ── Store full result (including ten_year_result) for results page ──
-    // The ten_year_result is already computed server-side by /predict and
-    // included in the response — no second fetch needed on the results page.
+    // ── Store full result including ten_year_result for results page
+    // included in the response
     localStorage.setItem('screeningResult',   JSON.stringify(result));
     localStorage.setItem('screeningFormData', JSON.stringify(formData));
 
