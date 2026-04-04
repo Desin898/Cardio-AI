@@ -1,0 +1,725 @@
+ID,Name,Age,Gender,Height cm,Weight kg,Blood Pressure mmHg,Cholesterol mg/dL,Glucose mg/dL,Smoker,Exercise hours/week,Heart Attack,recommendation
+1,Patient 1,35,Female,160,65,110/70,180,80,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+2,Patient 2,40,Female,165,70,115/75,190,85,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+3,Patient 3,30,Female,155,60,105/65,170,75,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+4,Patient 4,38,Female,162,68,118/72,195,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+5,Patient 5,42,Female,168,72,120/78,200,90,Yes,3,0,Low risk. Stop smoking.
+6,Patient 6,32,Female,157,62,108/68,175,78,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+7,Patient 7,36,Female,163,67,116/74,185,82,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+8,Patient 8,33,Female,158,63,110/70,180,80,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+9,Patient 9,39,Female,164,69,117/73,190,85,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+10,Patient 10,37,Female,166,71,119/75,195,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+11,Patient 11,34,Female,159,64,112/72,180,82,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+12,Patient 12,41,Female,167,73,121/77,205,90,Yes,2,0,"Low risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+13,Patient 13,31,Female,156,61,109/69,170,75,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+14,Patient 14,43,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+15,Patient 15,35,Female,161,66,113/71,185,80,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+16,Patient 16,40,Female,165,70,115/75,190,85,Yes,2,0,Low risk. Stop smoking.
+17,Patient 17,38,Female,163,67,116/74,195,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+18,Patient 18,36,Female,162,68,118/72,195,88,Yes,2,0,Low risk. Stop smoking.
+19,Patient 19,33,Female,158,63,110/70,180,80,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+20,Patient 20,34,Female,159,64,112/72,180,82,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+21,Patient 21,41,Female,167,73,121/77,205,90,Yes,2,0,"Low risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+22,Patient 22,31,Female,156,61,109/69,170,75,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+23,Patient 23,43,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+24,Patient 24,35,Female,161,66,113/71,185,80,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+25,Patient 25,40,Female,165,70,115/75,190,85,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+26,Patient 26,33,Female,158,63,110/70,180,80,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+27,Patient 27,34,Female,159,64,112/72,180,82,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+28,Patient 28,38,Female,163,67,116/74,195,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+29,Patient 29,36,Female,162,68,118/72,195,88,Yes,2,0,Low risk. Stop smoking.
+30,Patient 30,33,Female,158,63,110/70,180,80,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+31,Patient 31,34,Female,159,64,112/72,180,82,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+32,Patient 32,41,Female,167,73,121/77,205,90,Yes,2,0,"Low risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+33,Patient 33,31,Female,156,61,109/69,170,75,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+34,Patient 34,43,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+35,Patient 35,35,Female,161,66,113/71,185,80,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+36,Patient 36,33,Female,158,63,110/70,180,80,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+37,Patient 37,38,Female,163,67,116/74,195,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+38,Patient 38,36,Female,162,68,118/72,195,88,Yes,2,0,Low risk. Stop smoking.
+39,Patient 39,33,Female,158,63,110/70,180,80,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+40,Patient 40,34,Female,159,64,112/72,180,82,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+41,Patient 41,41,Female,167,73,121/77,205,90,Yes,2,0,"Low risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+42,Patient 42,31,Female,156,61,109/69,170,75,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+43,Patient 43,43,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+44,Patient 44,35,Female,161,66,113/71,185,80,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+45,Patient 45,33,Female,158,63,110/70,180,80,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+46,Patient 46,38,Female,163,67,116/74,195,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+47,Patient 47,36,Female,162,68,118/72,195,88,Yes,2,0,Low risk. Stop smoking.
+48,Patient 48,33,Female,158,63,110/70,180,80,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+49,Patient 49,34,Female,159,64,112/72,180,82,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+50,Patient 50,41,Female,167,73,121/77,205,90,Yes,2,0,"Low risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+51,Patient 51,46,Female,168,72,120/78,200,90,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+52,Patient 52,57,Female,182,88,132/84,225,97,No,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Control blood pressure and monitor regularly."
+53,Patient 53,51,Female,175,80,125/80,205,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+54,Patient 54,59,Female,182,88,132/84,225,97,No,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Control blood pressure and monitor regularly."
+55,Patient 55,54,Female,170,75,125/80,210,92,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+56,Patient 56,49,Female,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+57,Patient 57,44,Female,172,78,126/82,215,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+58,Patient 58,58,Female,175,80,125/80,205,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+59,Patient 59,53,Female,172,78,126/82,215,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+60,Patient 60,52,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+61,Patient 61,47,Female,173,79,122/80,215,96,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+62,Patient 62,30,Female,160,65,110/70,180,80,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+63,Patient 63,39,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+64,Patient 64,31,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+65,Patient 65,55,Female,171,77,124/79,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+66,Patient 66,49,Female,173,79,122/80,215,96,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+67,Patient 67,41,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+68,Patient 68,34,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+69,Patient 69,57,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+70,Patient 70,51,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+71,Patient 71,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+72,Patient 72,36,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+73,Patient 73,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+74,Patient 74,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+75,Patient 75,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+76,Patient 76,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+77,Patient 77,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+78,Patient 78,49,Female,173,79,122/80,215,96,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+79,Patient 79,41,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+80,Patient 80,34,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+81,Patient 81,57,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+82,Patient 82,51,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+83,Patient 83,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+84,Patient 84,36,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+85,Patient 85,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+86,Patient 86,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+87,Patient 87,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+88,Patient 88,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+89,Patient 89,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+90,Patient 90,49,Female,173,79,122/80,215,96,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+91,Patient 91,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+92,Patient 92,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+93,Patient 93,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+94,Patient 94,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+95,Patient 95,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+96,Patient 96,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+97,Patient 97,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+98,Patient 98,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+99,Patient 99,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+100,Patient 100,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+101,Patient 101,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+102,Patient 102,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+103,Patient 103,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+104,Patient 104,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+105,Patient 105,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+106,Patient 106,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+107,Patient 107,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+108,Patient 108,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+109,Patient 109,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+110,Patient 110,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+111,Patient 111,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+112,Patient 112,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+113,Patient 113,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+114,Patient 114,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+115,Patient 115,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+116,Patient 116,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+117,Patient 117,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+118,Patient 118,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+119,Patient 119,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+120,Patient 120,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+121,Patient 121,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+122,Patient 122,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+123,Patient 123,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+124,Patient 124,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+125,Patient 125,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+126,Patient 126,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+127,Patient 127,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+128,Patient 128,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+129,Patient 129,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+130,Patient 130,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+131,Patient 131,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+132,Patient 132,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+133,Patient 133,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+134,Patient 134,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+135,Patient 135,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+136,Patient 136,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+137,Patient 137,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+138,Patient 138,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+139,Patient 139,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+140,Patient 140,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+141,Patient 141,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+142,Patient 142,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+143,Patient 143,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+144,Patient 144,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+145,Patient 145,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+146,Patient 146,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+147,Patient 147,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+148,Patient 148,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+149,Patient 149,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+150,Patient 150,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+151,Patient 151,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+152,Patient 152,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+153,Patient 153,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+154,Patient 154,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+155,Patient 155,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+156,Patient 156,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+157,Patient 157,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+158,Patient 158,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+159,Patient 159,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+160,Patient 160,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+161,Patient 161,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+162,Patient 162,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+163,Patient 163,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+164,Patient 164,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+165,Patient 165,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+166,Patient 166,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+167,Patient 167,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+168,Patient 168,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+169,Patient 169,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+170,Patient 170,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+171,Patient 171,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+172,Patient 172,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+173,Patient 173,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+174,Patient 174,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+175,Patient 175,43,Female,169,74,122/78,200,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+176,Patient 176,31,Female,162,68,118/72,195,88,Yes,1,0,"Low risk. Increase exercise to at least 30 to 45 minutes per day, Stop smoking."
+177,Patient 177,55,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+178,Patient 178,49,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+179,Patient 179,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+180,Patient 180,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+181,Patient 181,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+182,Patient 182,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+183,Patient 183,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+184,Patient 184,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+185,Patient 185,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+186,Patient 186,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+187,Patient 187,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+188,Patient 188,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+189,Patient 189,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+190,Patient 190,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+191,Patient 191,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+192,Patient 192,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+193,Patient 193,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+194,Patient 194,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+195,Patient 195,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+196,Patient 196,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+197,Patient 197,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+198,Patient 198,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+199,Patient 199,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+200,Patient 200,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+201,Patient 201,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+202,Patient 202,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+203,Patient 203,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+204,Patient 204,36,Female,162,68,118/72,195,88,No,1,0,Low risk. Increase exercise to at least 30 to 45 minutes per day.
+205,Patient 205,30,Female,171,77,124/79,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+206,Patient 206,53,Female,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+207,Patient 207,42,Female,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+208,Patient 208,38,Female,163,65,118/75,195,85,Yes,3,0,Low risk. Stop smoking.
+209,Patient 209,42,Female,168,68,115/70,190,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+210,Patient 210,47,Female,165,70,120/75,200,92,No,2,1,High risk. Maintain a healthy lifestyle and attend regular checkups.
+211,Patient 211,49,Female,170,75,119/78,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+212,Patient 212,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+213,Patient 213,48,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+214,Patient 214,37,Female,165,68,117/74,195,88,Yes,3,0,Low risk. Stop smoking.
+215,Patient 215,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+216,Patient 216,40,Female,168,70,118/76,195,88,Yes,3,0,Low risk. Stop smoking.
+217,Patient 217,45,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+218,Patient 218,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+219,Patient 219,41,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+220,Patient 220,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+221,Patient 221,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+222,Patient 222,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+223,Patient 223,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+224,Patient 224,42,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+225,Patient 225,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+226,Patient 226,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+227,Patient 227,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+228,Patient 228,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+229,Patient 229,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+230,Patient 230,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+231,Patient 231,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+232,Patient 232,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+233,Patient 233,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+234,Patient 234,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+235,Patient 235,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+236,Patient 236,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+237,Patient 237,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+238,Patient 238,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+239,Patient 239,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+240,Patient 240,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+241,Patient 241,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+242,Patient 242,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+243,Patient 243,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+244,Patient 244,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+245,Patient 245,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+246,Patient 246,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+247,Patient 247,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+248,Patient 248,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+249,Patient 249,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+250,Patient 250,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+251,Patient 251,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+252,Patient 252,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+253,Patient 253,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+254,Patient 254,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+255,Patient 255,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+256,Patient 256,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+257,Patient 257,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+258,Patient 258,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+259,Patient 259,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+260,Patient 260,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+261,Patient 261,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+262,Patient 262,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+263,Patient 263,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+264,Patient 264,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+265,Patient 265,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+266,Patient 266,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+267,Patient 267,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+268,Patient 268,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+269,Patient 269,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+270,Patient 270,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+271,Patient 271,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+272,Patient 272,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+273,Patient 273,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+274,Patient 274,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+275,Patient 275,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+276,Patient 276,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+277,Patient 277,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+278,Patient 278,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+279,Patient 279,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+280,Patient 280,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+281,Patient 281,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+282,Patient 282,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+283,Patient 283,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+284,Patient 284,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+285,Patient 285,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+286,Patient 286,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+287,Patient 287,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+288,Patient 288,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+289,Patient 289,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+290,Patient 290,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+291,Patient 291,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+292,Patient 292,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+293,Patient 293,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+294,Patient 294,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+295,Patient 295,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+296,Patient 296,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+297,Patient 297,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+298,Patient 298,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+299,Patient 299,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+300,Patient 300,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+301,Patient 301,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+302,Patient 302,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+303,Patient 303,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+304,Patient 304,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+305,Patient 305,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+306,Patient 306,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+307,Patient 307,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+308,Patient 308,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+309,Patient 309,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+310,Patient 310,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+311,Patient 311,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+312,Patient 312,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+313,Patient 313,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+314,Patient 314,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+315,Patient 315,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+316,Patient 316,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+317,Patient 317,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+318,Patient 318,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+319,Patient 319,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+320,Patient 320,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+321,Patient 321,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+322,Patient 322,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+323,Patient 323,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+324,Patient 324,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+325,Patient 325,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+326,Patient 326,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+327,Patient 327,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+328,Patient 328,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+329,Patient 329,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+330,Patient 330,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+331,Patient 331,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+332,Patient 332,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+333,Patient 333,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+334,Patient 334,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+335,Patient 335,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+336,Patient 336,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+337,Patient 337,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+338,Patient 338,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+339,Patient 339,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+340,Patient 340,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+341,Patient 341,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+342,Patient 342,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+343,Patient 343,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+344,Patient 344,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+345,Patient 345,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+346,Patient 346,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+347,Patient 347,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+348,Patient 348,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+349,Patient 349,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+350,Patient 350,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+351,Patient 351,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+352,Patient 352,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+353,Patient 353,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+354,Patient 354,38,Female,164,66,116/73,190,88,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+355,Patient 355,42,Female,169,72,120/75,200,90,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+356,Patient 356,40,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+357,Patient 357,45,Female,170,73,121/77,205,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+358,Patient 358,38,Female,164,66,116/73,190,88,Yes,2,0,Low risk. Stop smoking.
+359,Patient 359,41,Female,169,72,120/75,200,90,Yes,2,0,Low risk. Stop smoking.
+360,Patient 360,39,Female,166,68,118/76,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+361,Patient 361,43,Female,167,70,120/78,200,92,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+362,Patient 362,47,Female,170,73,121/77,205,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+363,Patient 363,45,Male,175,80,120/80,200,90,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+364,Patient 364,55,Male,180,85,130/85,220,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+365,Patient 365,50,Male,170,75,125/80,210,92,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+366,Patient 366,60,Male,175,82,135/85,230,98,No,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Control blood pressure and monitor regularly."
+367,Patient 367,48,Male,178,78,128/82,205,94,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+368,Patient 368,52,Male,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+369,Patient 369,58,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+370,Patient 370,46,Male,176,81,123/78,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+371,Patient 371,57,Male,181,87,130/83,220,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+372,Patient 372,49,Male,177,80,125/80,200,90,Yes,3,1,High risk. Stop smoking.
+373,Patient 373,59,Male,183,89,133/85,230,98,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+374,Patient 374,53,Male,174,82,124/78,215,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+375,Patient 375,47,Male,179,79,126/82,210,92,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+376,Patient 376,56,Male,180,85,130/82,220,95,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+377,Patient 377,51,Male,175,80,125/80,205,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+378,Patient 378,55,Male,181,87,130/83,220,96,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+379,Patient 379,54,Male,178,84,128/82,210,92,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+380,Patient 380,48,Male,177,80,125/80,200,90,Yes,3,1,High risk. Stop smoking.
+381,Patient 381,57,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+382,Patient 382,59,Male,183,89,133/85,230,98,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+383,Patient 383,53,Male,174,82,124/78,215,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+384,Patient 384,47,Male,179,79,126/82,210,92,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+385,Patient 385,56,Male,180,85,130/82,220,95,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+386,Patient 386,51,Male,175,80,125/80,205,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+387,Patient 387,55,Male,181,87,130/83,220,96,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+388,Patient 388,56,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+389,Patient 389,59,Male,183,89,133/85,230,98,No,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Control blood pressure and monitor regularly."
+390,Patient 390,54,Male,178,84,128/82,210,92,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+391,Patient 391,48,Male,177,80,125/80,200,90,Yes,3,1,High risk. Stop smoking.
+392,Patient 392,57,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+393,Patient 393,60,Male,183,89,133/85,230,98,No,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Control blood pressure and monitor regularly."
+394,Patient 394,53,Male,174,82,124/78,215,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+395,Patient 395,47,Male,179,79,126/82,210,92,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+396,Patient 396,56,Male,180,85,130/82,220,95,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+397,Patient 397,51,Male,175,80,125/80,205,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+398,Patient 398,59,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+399,Patient 399,54,Male,178,84,128/82,210,92,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+400,Patient 400,48,Male,177,80,125/80,200,90,Yes,3,1,High risk. Stop smoking.
+401,Patient 401,57,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+402,Patient 402,60,Male,183,89,133/85,230,98,No,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Control blood pressure and monitor regularly."
+403,Patient 403,53,Male,174,82,124/78,215,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+404,Patient 404,47,Male,179,79,126/82,210,92,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+405,Patient 405,56,Male,180,85,130/82,220,95,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+406,Patient 406,51,Male,175,80,125/80,205,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+407,Patient 407,59,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+408,Patient 408,54,Male,178,84,128/82,210,92,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+409,Patient 409,48,Male,177,80,125/80,200,90,Yes,3,1,High risk. Stop smoking.
+410,Patient 410,57,Male,182,88,132/84,225,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+411,Patient 411,60,Male,183,89,133/85,230,98,No,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Control blood pressure and monitor regularly."
+412,Patient 412,53,Male,174,82,124/78,215,94,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+413,Patient 413,39,Male,176,81,123/78,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+414,Patient 414,32,Male,173,79,122/80,215,96,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+415,Patient 415,35,Male,161,66,113/71,185,80,Yes,2,0,Low risk. Stop smoking.
+416,Patient 416,40,Male,165,70,115/75,190,85,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+417,Patient 417,37,Male,168,72,120/78,200,90,Yes,3,0,Low risk. Stop smoking.
+418,Patient 418,33,Male,176,81,123/78,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+419,Patient 419,60,Male,183,89,133/85,230,98,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking, Control blood pressure and monitor regularly."
+420,Patient 420,38,Male,167,73,121/77,205,90,No,2,0,Low risk. Follow a low cholesterol diet and seek medical advice.
+421,Patient 421,36,Male,164,69,117/73,190,85,No,2,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+422,Patient 422,41,Male,169,74,122/78,200,88,Yes,2,0,Low risk. Stop smoking.
+423,Patient 423,34,Male,166,71,119/75,195,88,No,3,0,Low risk. Maintain a healthy lifestyle and attend regular checkups.
+424,Patient 424,42,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+425,Patient 425,50,Male,172,78,126/82,215,94,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+426,Patient 426,54,Male,173,79,122/80,215,96,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+427,Patient 427,45,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+428,Patient 428,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+429,Patient 429,33,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+430,Patient 430,56,Male,173,79,122/80,215,96,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+431,Patient 431,46,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+432,Patient 432,38,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+433,Patient 433,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+434,Patient 434,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+435,Patient 435,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+436,Patient 436,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+437,Patient 437,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+438,Patient 438,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+439,Patient 439,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+440,Patient 440,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+441,Patient 441,33,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+442,Patient 442,56,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+443,Patient 443,46,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+444,Patient 444,38,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+445,Patient 445,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+446,Patient 446,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+447,Patient 447,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+448,Patient 448,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+449,Patient 449,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+450,Patient 450,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+451,Patient 451,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+452,Patient 452,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+453,Patient 453,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+454,Patient 454,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+455,Patient 455,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+456,Patient 456,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+457,Patient 457,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+458,Patient 458,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+459,Patient 459,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+460,Patient 460,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+461,Patient 461,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+462,Patient 462,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+463,Patient 463,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+464,Patient 464,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+465,Patient 465,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+466,Patient 466,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+467,Patient 467,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+468,Patient 468,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+469,Patient 469,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+470,Patient 470,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+471,Patient 471,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+472,Patient 472,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+473,Patient 473,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+474,Patient 474,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+475,Patient 475,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+476,Patient 476,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+477,Patient 477,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+478,Patient 478,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+479,Patient 479,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+480,Patient 480,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+481,Patient 481,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+482,Patient 482,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+483,Patient 483,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+484,Patient 484,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+485,Patient 485,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+486,Patient 486,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+487,Patient 487,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+488,Patient 488,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+489,Patient 489,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+490,Patient 490,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+491,Patient 491,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+492,Patient 492,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+493,Patient 493,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+494,Patient 494,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+495,Patient 495,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+496,Patient 496,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+497,Patient 497,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+498,Patient 498,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+499,Patient 499,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+500,Patient 500,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+501,Patient 501,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+502,Patient 502,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+503,Patient 503,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+504,Patient 504,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+505,Patient 505,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+506,Patient 506,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+507,Patient 507,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+508,Patient 508,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+509,Patient 509,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+510,Patient 510,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+511,Patient 511,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+512,Patient 512,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+513,Patient 513,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+514,Patient 514,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+515,Patient 515,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+516,Patient 516,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+517,Patient 517,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+518,Patient 518,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+519,Patient 519,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+520,Patient 520,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+521,Patient 521,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+522,Patient 522,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+523,Patient 523,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+524,Patient 524,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+525,Patient 525,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+526,Patient 526,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+527,Patient 527,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+528,Patient 528,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+529,Patient 529,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+530,Patient 530,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+531,Patient 531,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+532,Patient 532,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+533,Patient 533,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+534,Patient 534,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+535,Patient 535,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+536,Patient 536,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+537,Patient 537,32,Male,170,75,125/80,210,92,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+538,Patient 538,54,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+539,Patient 539,45,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+540,Patient 540,37,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+541,Patient 541,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+542,Patient 542,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+543,Patient 543,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+544,Patient 544,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+545,Patient 545,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+546,Patient 546,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+547,Patient 547,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+548,Patient 548,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+549,Patient 549,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+550,Patient 550,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+551,Patient 551,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+552,Patient 552,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+553,Patient 553,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+554,Patient 554,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+555,Patient 555,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+556,Patient 556,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+557,Patient 557,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+558,Patient 558,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+559,Patient 559,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+560,Patient 560,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+561,Patient 561,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+562,Patient 562,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+563,Patient 563,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+564,Patient 564,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+565,Patient 565,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+566,Patient 566,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+567,Patient 567,47,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+568,Patient 568,39,Male,166,71,119/75,195,88,Yes,3,0,Low risk. Stop smoking.
+569,Patient 569,35,Male,170,75,125/80,210,92,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+570,Patient 570,58,Male,173,79,122/80,215,96,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+571,Patient 571,50,Male,180,85,122/78,205,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+572,Patient 572,55,Male,178,82,124/80,210,98,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+573,Patient 573,41,Male,172,78,123/79,215,96,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+574,Patient 574,52,Male,181,84,125/78,220,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+575,Patient 575,44,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+576,Patient 576,46,Male,176,80,122/78,215,97,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+577,Patient 577,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+578,Patient 578,51,Male,180,84,124/79,215,96,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+579,Patient 579,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+580,Patient 580,47,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+581,Patient 581,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+582,Patient 582,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+583,Patient 583,56,Male,179,83,123/80,220,100,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+584,Patient 584,53,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+585,Patient 585,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+586,Patient 586,55,Male,181,84,125/78,220,100,No,3,1,High risk. Follow a low cholesterol diet and seek medical advice.
+587,Patient 587,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+588,Patient 588,57,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+589,Patient 589,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+590,Patient 590,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+591,Patient 591,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+592,Patient 592,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+593,Patient 593,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+594,Patient 594,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+595,Patient 595,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+596,Patient 596,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+597,Patient 597,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+598,Patient 598,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+599,Patient 599,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+600,Patient 600,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+601,Patient 601,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+602,Patient 602,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+603,Patient 603,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+604,Patient 604,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+605,Patient 605,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+606,Patient 606,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+607,Patient 607,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+608,Patient 608,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+609,Patient 609,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+610,Patient 610,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+611,Patient 611,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+612,Patient 612,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+613,Patient 613,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+614,Patient 614,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+615,Patient 615,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+616,Patient 616,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+617,Patient 617,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+618,Patient 618,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+619,Patient 619,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+620,Patient 620,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+621,Patient 621,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+622,Patient 622,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+623,Patient 623,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+624,Patient 624,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+625,Patient 625,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+626,Patient 626,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+627,Patient 627,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+628,Patient 628,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+629,Patient 629,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+630,Patient 630,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+631,Patient 631,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+632,Patient 632,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+633,Patient 633,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+634,Patient 634,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+635,Patient 635,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+636,Patient 636,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+637,Patient 637,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+638,Patient 638,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+639,Patient 639,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+640,Patient 640,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+641,Patient 641,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+642,Patient 642,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+643,Patient 643,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+644,Patient 644,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+645,Patient 645,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+646,Patient 646,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+647,Patient 647,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+648,Patient 648,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+649,Patient 649,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+650,Patient 650,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+651,Patient 651,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+652,Patient 652,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+653,Patient 653,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+654,Patient 654,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+655,Patient 655,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+656,Patient 656,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+657,Patient 657,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+658,Patient 658,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+659,Patient 659,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+660,Patient 660,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+661,Patient 661,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+662,Patient 662,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+663,Patient 663,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+664,Patient 664,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+665,Patient 665,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+666,Patient 666,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+667,Patient 667,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+668,Patient 668,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+669,Patient 669,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+670,Patient 670,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+671,Patient 671,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+672,Patient 672,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+673,Patient 673,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+674,Patient 674,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+675,Patient 675,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+676,Patient 676,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+677,Patient 677,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+678,Patient 678,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+679,Patient 679,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+680,Patient 680,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+681,Patient 681,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+682,Patient 682,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+683,Patient 683,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+684,Patient 684,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+685,Patient 685,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+686,Patient 686,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+687,Patient 687,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+688,Patient 688,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+689,Patient 689,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+690,Patient 690,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+691,Patient 691,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+692,Patient 692,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+693,Patient 693,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+694,Patient 694,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+695,Patient 695,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+696,Patient 696,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+697,Patient 697,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+698,Patient 698,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+699,Patient 699,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+700,Patient 700,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+701,Patient 701,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+702,Patient 702,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+703,Patient 703,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+704,Patient 704,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+705,Patient 705,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+706,Patient 706,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+707,Patient 707,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+708,Patient 708,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+709,Patient 709,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+710,Patient 710,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+711,Patient 711,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+712,Patient 712,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+713,Patient 713,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+714,Patient 714,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+715,Patient 715,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+716,Patient 716,44,Male,178,82,124/80,210,97,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+717,Patient 717,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+718,Patient 718,50,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+719,Patient 719,57,Male,182,86,125/78,225,98,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+720,Patient 720,47,Male,178,82,124/80,210,97,No,4,1,High risk. Follow a low cholesterol diet and seek medical advice.
+721,Patient 721,55,Male,181,84,125/78,220,100,Yes,3,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+722,Patient 722,49,Male,177,81,121/78,210,95,Yes,4,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
+723,Patient 723,56,Male,179,83,123/80,220,100,No,2,1,High risk. Follow a low cholesterol diet and seek medical advice.
+724,Patient 724,53,Male,182,86,125/78,225,98,Yes,2,1,"High risk. Follow a low cholesterol diet and seek medical advice, Stop smoking."
