@@ -91,7 +91,7 @@
     }
     .btn-navy:hover { background: linear-gradient(105deg, #163157, #1f3f6b); color: #fff; }
 
-    /* ── Recommendations button ── */
+    /* Recommendations button */
     .btn-rec {
       border-radius: 40px;
       background: linear-gradient(105deg, #1a6b4a, #26a06d);
@@ -108,7 +108,7 @@
     }
     .btn-rec:hover { background: linear-gradient(105deg, #145438, #1d8357); color: #fff; }
 
-    /* ── 10-year risk card ── */
+    /* 10-year risk card */
     .tenyear-card {
       border-radius: 22px;
       border: 1.5px solid rgba(42,82,152,0.2);
@@ -192,14 +192,14 @@
     </div>
   </div>
 
-  <!-- ACTION BUTTONS (populated by JS) -->
+  <!-- ACTION BUTTONS -->
   <div class="text-center mt-1 mb-4" id="actionButtons"></div>
 
 </div>
 
 <script>
 /* ══════════════════════════════════════════════════════════════════
-   Build SVG semicircle gauge
+   Build semicircle gauge
    ══════════════════════════════════════════════════════════════════ */
 function buildGauge(pct, colourClass) {
   const R    = 60;
@@ -221,7 +221,7 @@ function buildGauge(pct, colourClass) {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Render contributing factors list
+   contributing factors list
    ══════════════════════════════════════════════════════════════════ */
 function renderFactors(explanation) {
   if (!explanation || explanation.length === 0) return '<p>No explanation factors available.</p>';
@@ -241,7 +241,7 @@ function renderFactors(explanation) {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Render 10-year risk panel
+   10-year risk panel
    ══════════════════════════════════════════════════════════════════ */
 function renderTenYear(fy) {
   const gauge = buildGauge(fy.percent, `fill-${fy.colour}`);
@@ -323,7 +323,7 @@ function displayResult() {
   const badgeCls  = isHigh ? 'bg-danger'  : 'bg-success';
   const barColour = isHigh ? 'bg-danger'  : 'bg-success';
 
-  /* ── CURRENT RISK CONTENT ─────────────────────────────────── */
+  /* CURRENT RISK CONTENT */
   let html = `
     <div class="text-center mb-3">
       <span class="risk-badge ${badgeCls} text-white">
@@ -348,16 +348,16 @@ function displayResult() {
   if (isHigh) {
     html += `
       <div class="alert-high">
-        <h6>⚠ High Current Risk Detected</h6>
+        <h6> High Current Risk Detected</h6>
         <p>Your cardiovascular risk is currently elevated. ECG testing is strongly recommended.
-           A 10-year risk projection is not shown when current risk is high — please proceed
+           A 10-year risk projection is not shown when current risk is high please proceed
            with clinical evaluation first.</p>
       </div>`;
   }
 
   document.getElementById('currentRiskContent').innerHTML = html;
 
-  /* ── 10-YEAR RISK — only when current risk is LOW ──────────── */
+  /* 10-YEAR RISK — only when current risk is LOW */
   if (!isHigh) {
     const pd = result.patient_data
              || JSON.parse(localStorage.getItem('screeningFormData') || 'null');
@@ -374,19 +374,28 @@ function displayResult() {
   }
 
   /* ── ACTION BUTTONS ─────────────────────────────────────────── */
+  // Recommendations button is hidden when current risk is LOW_RISK.
   const ecgLabel = result.requires_ecg ? 'Upload ECG (Mandatory)' : 'Upload ECG (Optional)';
 
-  document.getElementById('actionButtons').innerHTML = `
+  let buttonsHtml = `
     <a href="/" class="btn-outline-navy">
       <i class="fas fa-redo"></i> New Screening
-    </a>
+    </a>`;
+
+  // Only show recommendations button when risk is HIGH (not LOW_RISK)
+  if (isHigh) {
+    buttonsHtml += `
     <a href="/recommendations?source=screening" class="btn-rec">
       <i class="fas fa-clipboard-list"></i> View Recommendations
-    </a>
+    </a>`;
+  }
+
+  buttonsHtml += `
     <a href="/upload_ecg.html" class="btn-navy">
       <i class="fas fa-upload"></i> ${ecgLabel}
-    </a>
-  `;
+    </a>`;
+
+  document.getElementById('actionButtons').innerHTML = buttonsHtml;
 }
 
 displayResult();
