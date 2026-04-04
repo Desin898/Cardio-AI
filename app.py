@@ -26,7 +26,7 @@ from Preprocessing.ECG_Preprocessing.ECG_Preprocessing_Functions import (
     TARGET_LEAD_LENGTH,
 )
 
-from Pipeline_Management.metadata_system import (
+from Pipeline_Management.Metadata_Extraction_And_Tagging_System import (
     EncryptionManager,
     MetadataManager,
     PatientSessionManager,
