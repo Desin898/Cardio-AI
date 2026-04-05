@@ -47,7 +47,6 @@ Result:
 - Clean vessel segmentation mask
 
 ---
-
 ### 3. Vessel Geometry Analysis (Custom Contribution)
 
 After segmentation, a **custom geometric analysis module** is applied:
