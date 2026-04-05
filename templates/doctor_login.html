@@ -191,21 +191,21 @@
                 return;
             }
 
-            // Persist doctor info (original behaviour kept)
+            // Persist doctor info
             localStorage.setItem('doctorVerified', 'true');
             localStorage.setItem('doctorInfo', JSON.stringify({
                 license, specialty, hospital, email
             }));
 
-            // ── Context-aware redirect ──────────────────────────────────
+            // Context aware redirect ──────────────────────────────────
             if (sessionId) {
-                // Arrived from a high-risk ECG result → go to angiogram upload
+                // Arrived from a high-risk ECG result then go to angiogram upload
                 const dest = '/upload_angiogram'
                     + '?session_id=' + encodeURIComponent(sessionId)
                     + '&patient_id=' + encodeURIComponent(patientId);
                 window.location.href = dest;
             } else {
-                // Normal doctor portal flow → original destination
+                // Normal doctor portal flow then original destination
                 window.location.href = 'doctor_upload.html';
             }
         }

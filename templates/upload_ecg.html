@@ -141,6 +141,20 @@ h2 {
     font-weight: 500;
     color: #1e3c72;
 }
+
+/* Banner shown when screening data is detected */
+.screening-banner {
+    display: none;
+    background: linear-gradient(105deg, #d4edda, #c3e6cb);
+    border: 1px solid #b1dfbb;
+    border-left: 5px solid #198754;
+    border-radius: 14px;
+    padding: 0.85rem 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.88rem;
+    color: #155724;
+}
+.screening-banner i { margin-right: 6px; }
 </style>
 </head>
 
@@ -155,20 +169,34 @@ h2 {
         <p class="text-muted">Upload patient ECG reports for AI analysis and blockage detection.</p>
     </div>
 
-    <form method="POST" action="{{ url_for('upload_ecg') }}" enctype="multipart/form-data">
+    <!-- Shown only when patient arrives from pre screening -->
+    <div class="screening-banner" id="screeningBanner">
+        <i class="fas fa-check-circle"></i>
+        <strong>Pre-screening data detected.</strong>
+        Your screening results will be linked to this ECG for personalised recommendations
+        and 10-year CHD risk analysis.
+    </div>
+
+    <form method="POST" action="{{ url_for('upload_ecg') }}" enctype="multipart/form-data"
+          id="ecgUploadForm">
+
+        <!-- Hidden field populated by JS if screening data exists in localStorage -->
+        <input type="hidden" name="screening_form_data" id="screeningFormDataInput">
 
         <!-- Patient Info -->
         <div class="mb-4">
             <h5 class="section-title">Patient Information</h5>
 
-            <input type="text" class="form-control mb-3" name="patient_id" placeholder="Patient ID" required>
+            <input type="text" class="form-control mb-3" name="patient_id"
+                   id="patientIdField" placeholder="Patient ID" required>
 
             <div class="row">
                 <div class="col-md-6">
-                    <input type="number" class="form-control mb-3" name="age" placeholder="Age" required>
+                    <input type="number" class="form-control mb-3" name="age"
+                           id="ageField" placeholder="Age" required>
                 </div>
                 <div class="col-md-6">
-                    <select class="form-select mb-3" name="gender" required>
+                    <select class="form-select mb-3" name="gender" id="genderField" required>
                         <option disabled selected>Select Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -184,7 +212,8 @@ h2 {
                 <option value="scanned">Scanned ECG</option>
             </select>
 
-            <textarea class="form-control" name="notes" rows="3" placeholder="Additional notes"></textarea>
+            <textarea class="form-control" name="notes" rows="3"
+                      placeholder="Additional notes"></textarea>
         </div>
 
         <!-- Upload -->
@@ -213,17 +242,16 @@ h2 {
 </div>
 
 <script>
-const fileInput = document.getElementById('ecg_file');
+// File preview
+const fileInput       = document.getElementById('ecg_file');
 const fileNameDisplay = document.getElementById('file-name');
-const previewArea = document.getElementById('previewArea');
-const filePreview = document.getElementById('filePreview');
+const previewArea     = document.getElementById('previewArea');
+const filePreview     = document.getElementById('filePreview');
 
 fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
-
     if (file) {
         fileNameDisplay.textContent = "Selected: " + file.name;
-
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -236,6 +264,49 @@ fileInput.addEventListener('change', function(e) {
         }
     }
 });
+
+
+(function injectScreeningData() {
+    // Try both common key names in case your pre_screening.html uses a different one
+    const raw = localStorage.getItem('screeningFormData')
+             || localStorage.getItem('screeningData')
+             || localStorage.getItem('patientScreeningData');
+
+    if (!raw) return;   // Doctor/direct upload — no screening data, nothing to inject
+
+    try {
+        const data = JSON.parse(raw);
+
+        // Inject into the hidden field
+        document.getElementById('screeningFormDataInput').value = raw;
+
+        // Pre-fill patient info fields if available in screening data
+        if (data.patient_id) {
+            const pidField = document.getElementById('patientIdField');
+            if (!pidField.value) pidField.value = data.patient_id;
+        }
+        if (data.age) {
+            const ageField = document.getElementById('ageField');
+            if (!ageField.value) ageField.value = data.age;
+        }
+        if (data.gender) {
+            const genderField = document.getElementById('genderField');
+            const genderLower = String(data.gender).toLowerCase();
+            for (let opt of genderField.options) {
+                if (opt.value.toLowerCase() === genderLower) {
+                    opt.selected = true;
+                    break;
+                }
+            }
+        }
+
+        // Show the green banner
+        document.getElementById('screeningBanner').style.display = 'block';
+
+    } catch (e) {
+        console.warn('Could not parse screeningFormData from localStorage:', e);
+    }
+})();
 </script>
 
 </body>
