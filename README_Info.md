@@ -1,4 +1,4 @@
-# CM2603 – Data Science Group Project  
+# Cardio AI 
 
 ---
 
