@@ -1,7 +1,8 @@
-# CM2603 – Data Science Group Project  
+# Cardio AI
+
+> *"In cardiovascular care, time is muscle. Early detection and precise decision-support are not just technological advancements—they are essential lifelines."*
 
 ---
-
 ## Group Members  
 
 | Person No. | IIT ID  | RGU ID  | Student Name                    |
@@ -15,7 +16,6 @@
 
 ## Introduction  
 
-> **Important**
 
 This project is an AI-Driven Coronary Disease Detection and Decision Support System designed to assist in early identification of cardiovascular risks using patient lifestyle data, ECG signals, and angiogram images. The system provides a multi-stage analysis pipeline to support clinicians and patients in understanding potential heart-related conditions.
 
@@ -65,9 +65,16 @@ These features collectively enhance the system’s ability to support early dete
 
 ---
 
-## Project Management Methodology  
+#  System Screenshots
+<img width="954" height="631" alt="image" src="https://github.com/user-attachments/assets/ce4f17f6-c907-46e5-971f-7da3d2fbf03c" />
+<img width="945" height="618" alt="image" src="https://github.com/user-attachments/assets/ff027cfa-262a-43e8-886f-b565fbb59876" />
+<img width="838" height="1609" alt="image" src="https://github.com/user-attachments/assets/f56a06ac-3d77-4126-a200-e66e9aa3425d" />
+<img width="931" height="805" alt="image" src="https://github.com/user-attachments/assets/8f6fb16b-ce27-4bb6-be11-be82d13c7266" />
+<img width="945" height="849" alt="image" src="https://github.com/user-attachments/assets/ec68b7a4-94cb-4643-9e9b-421bf9e5987c" />
+<img width="955" height="1308" alt="image" src="https://github.com/user-attachments/assets/5cd741ca-443e-475a-b198-7eb1db1ae740" />
 
-> **[!Definition]**  
+
+## Project Management Methodology  
   
 
 The project was managed using a collaborative and iterative development approach. GitHub was used for version control, where each team member maintained separate branches to manage their individual tasks and contributions. Regular discussions were conducted to track progress, resolve issues, and ensure smooth integration of system components. GitHub Projects were also used to organize tasks, set timelines, and monitor development activities throughout the project lifecycle.
