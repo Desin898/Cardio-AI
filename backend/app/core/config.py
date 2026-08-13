@@ -22,5 +22,9 @@ class Settings(BaseModel):
     DEEPSA_URL: str = os.environ.get("DEEPSA_URL", f"http://127.0.0.1:{os.environ.get('DEEPSA_PORT', 7860)}")
     DEEPSA_SCRIPT: Path = Path(__file__).resolve().parent.parent.parent.parent / "demo.py"
 
+    GEMINI_API_KEY: str = os.environ.get("GEMINI_API_KEY", "")
+    GEMINI_MODEL: str = os.environ.get("GEMINI_MODEL", "gemini-1.5-pro")
+
 settings = Settings()
+
 

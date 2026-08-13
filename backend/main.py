@@ -104,6 +104,14 @@ async def alias_session_recommendations(session_id: str):
     from backend.app.api.reports import session_recommendations
     return await session_recommendations(session_id)
 
+@app.post("/ai_summary")
+async def alias_ai_summary(input_data: dict):
+    from backend.app.schemas.patient import AISummaryRequest
+    validated = AISummaryRequest(**input_data)
+    from backend.app.api.reports import generate_ai_summary_endpoint
+    return await generate_ai_summary_endpoint(validated)
+
+
 @app.post("/upload_ecg")
 async def alias_upload_ecg(
     patient_id: str = Form(...),

@@ -84,3 +84,17 @@ class RecommendationResponse(BaseModel):
     total: int
     shap_top_factors: List[Dict[str, Any]]
     graph_features: Dict[str, Any]
+
+class AISummaryRequest(BaseModel):
+    session_id: Optional[str] = Field(default=None, description="Optional patient session ID to auto-load engine outputs")
+    prescreening_output: Optional[Dict[str, Any]] = Field(default=None, description="JSON output from PrescreeningEngine")
+    ecg_output: Optional[Dict[str, Any]] = Field(default=None, description="JSON output from ECGCNNEngine")
+    deepsa_output: Optional[Dict[str, Any]] = Field(default=None, description="JSON output from DeepSAEngine")
+
+class AISummaryResponse(BaseModel):
+    success: bool
+    clinical_summary: str = Field(..., description="Professional 3-sentence clinical summary")
+    patient_next_steps: str = Field(..., description="Patient-friendly next steps")
+    model_used: str = Field(default="gemini-1.5-pro", description="Model used for generation")
+    error: Optional[str] = Field(default=None, description="Error message if generation failed or key is missing")
+
