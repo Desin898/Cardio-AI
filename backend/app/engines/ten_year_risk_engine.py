@@ -1,8 +1,13 @@
 import os
 import pickle
 import logging
+import warnings
 from typing import Dict, Any
 import pandas as pd
+
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", message=".*unpickle.*")
+warnings.filterwarnings("ignore", message=".*InconsistentVersionWarning.*")
 
 from backend.app.core.config import settings
 from backend.app.engines.base_engine import BaseMLEngine
@@ -66,12 +71,14 @@ class TenYearRiskEngine(BaseMLEngine):
     def build_features(self, data: dict) -> pd.DataFrame:
         sys_bp = float(data.get("systolic_bp", 120))
         dia_bp = float(data.get("diastolic_bp", 80))
-        smoker = str(data.get("smoker", "No"))
-
-        is_current_smoker = 1 if smoker == "Yes" else 0
+        smoker_val = data.get("current_smoker")
+        if smoker_val is not None:
+            is_current_smoker = 1 if bool(smoker_val) else 0
+        else:
+            is_current_smoker = 1 if str(data.get("smoker", "")).strip().lower() in ("yes", "true", "1") else 0
 
         cigs_per_day = 0.0
-        if smoker in ("Yes", "Former"):
+        if is_current_smoker or str(data.get("smoker", "")).strip() == "Former":
             cigs_per_day = float(data.get("cigs_per_day", data.get("cigsPerDay", 0)) or 0)
 
         hyp_flag = data.get("prevalent_hyp", "")
@@ -84,14 +91,14 @@ class TenYearRiskEngine(BaseMLEngine):
 
         features = {
             "age": float(data.get("age", 45)),
-            "male": 1 if str(data.get("gender", "")).strip().lower() == "male" else 0,
+            "male": 1 if str(data.get("gender", "")).strip().lower() in ("male", "m", "1") else 0,
             "currentSmoker": is_current_smoker,
             "cigsPerDay": cigs_per_day,
             "BPMeds": 1 if data.get("bp_treatment") == "Yes" else 0,
             "prevalentStroke": 1 if data.get("previous_stroke") == "Yes" else 0,
             "prevalentHyp": prevalent_hyp,
             "diabetes": 1 if data.get("diabetes") == "Yes" else 0,
-            "totChol": float(data.get("cholesterol", data.get("totChol", 200))),
+            "totChol": float(data.get("cholesterol_total", data.get("cholesterol", data.get("totChol", 200)))),
             "sysBP": sys_bp,
             "diaBP": dia_bp,
             "pulsePressure": sys_bp - dia_bp,

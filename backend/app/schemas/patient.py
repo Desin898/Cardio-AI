@@ -1,21 +1,40 @@
 from typing import List, Optional, Any, Dict
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 
 class PatientScreeningInput(BaseModel):
-    age: float = Field(..., ge=1, le=120, description="Patient age in years")
+    # Demographic & Vitals
+    age: int = Field(..., ge=1, le=120, description="Patient age in years")
     gender: str = Field(..., description="Gender: Male/Female")
-    bmi: float = Field(..., ge=10, le=70, description="Body Mass Index")
     systolic_bp: float = Field(..., ge=60, le=260, description="Systolic Blood Pressure (mmHg)")
     diastolic_bp: float = Field(..., ge=40, le=160, description="Diastolic Blood Pressure (mmHg)")
-    cholesterol: float = Field(..., ge=50, le=600, description="Total Cholesterol (mg/dL)")
-    glucose: float = Field(..., ge=40, le=500, description="Fasting Glucose (mg/dL)")
-    smoker: str = Field(..., description="Smoker status: Yes/No/Former")
-    exercise_hours: float = Field(..., ge=0, le=50, description="Exercise hours per week")
-    heart_rate: Optional[float] = Field(default=72.0, description="Heart rate (bpm)")
-    bp_treatment: Optional[str] = Field(default="No", description="Blood pressure treatment: Yes/No")
-    previous_stroke: Optional[str] = Field(default="No", description="Previous stroke: Yes/No")
-    prevalent_hyp: Optional[str] = Field(default="No", description="Prevalent hypertension: Yes/No")
-    cigs_per_day: Optional[float] = Field(default=0.0, description="Cigarettes per day")
+    bmi: float = Field(..., ge=10, le=70, description="Body Mass Index")
+    current_smoker: bool = Field(..., description="Current smoker status (True/False)")
+
+    # Metabolic & Biomarkers
+    hba1c: Optional[float] = Field(default=None, description="HbA1c (%)")
+    hs_troponin: Optional[float] = Field(default=None, description="High-sensitivity Troponin (ng/L)")
+    egfr: Optional[float] = Field(default=None, description="eGFR (mL/min/1.73m^2)")
+    cholesterol_total: float = Field(..., description="Total Cholesterol (mg/dL)")
+    cholesterol_hdl: float = Field(..., description="HDL Cholesterol (mg/dL)")
+    family_history_cad: bool = Field(..., description="Family history of CAD (True/False)")
+
+    @model_validator(mode="before")
+    @classmethod
+    def handle_legacy_fields(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "current_smoker" not in data and "smoker" in data:
+                sm = data["smoker"]
+                if isinstance(sm, str):
+                    data["current_smoker"] = sm.lower() in ("yes", "true", "1")
+                else:
+                    data["current_smoker"] = bool(sm)
+            if "cholesterol_total" not in data and "cholesterol" in data:
+                data["cholesterol_total"] = float(data["cholesterol"])
+            if "cholesterol_hdl" not in data:
+                data["cholesterol_hdl"] = 50.0
+            if "family_history_cad" not in data:
+                data["family_history_cad"] = False
+        return data
 
     model_config = ConfigDict(extra="ignore")
 
@@ -26,11 +45,17 @@ class SHAPFactor(BaseModel):
     effect: str
 
 class PrescreeningResponse(BaseModel):
-    success: bool
+    success: bool = True
+    risk_category: str
     risk_probability: float
-    risk_status: str
-    decision: str
-    message: str
+    probability_percentage: float
+    shap_breakdown: List[Dict[str, Any]] = []
+    recommended_next_path: str
+
+    # Backward compatibility fields
+    risk_status: Optional[str] = None
+    decision: Optional[str] = None
+    message: Optional[str] = None
     explanation: List[Dict[str, Any]] = []
     patient_data: Dict[str, Any] = {}
     ten_year_result: Optional[Dict[str, Any]] = None
