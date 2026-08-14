@@ -21,14 +21,19 @@ class VesselAnalyzer:
         end_ignore_pixels=12,
         local_window=10,
         inner_gap=4,
-        min_stenosis_percent=30.0,
+        min_stenosis_percent=15.0,
         duplicate_distance=30,
-        min_lesion_length_pixels=5,
-        border_margin=25,
+        min_lesion_length_pixels=3,
+        border_margin=15,
         lesion_threshold_ratio=0.90,
-        min_branch_avg_diameter=3.0
+        min_branch_avg_diameter=2.0
     ):
-        mask_np = np.array(mask_pil.convert("L"))
+        if hasattr(mask_pil, "convert"):
+            mask_np = np.array(mask_pil.convert("L"))
+        elif isinstance(mask_pil, np.ndarray):
+            mask_np = mask_pil.copy()
+        else:
+            mask_np = np.array(mask_pil)
 
         binary = mask_np > 127
         binary = remove_small_objects(binary, min_size=min_object_size)
@@ -72,28 +77,25 @@ class VesselAnalyzer:
         return np.convolve(diameters, np.ones(5) / 5, mode="same")
 
     def _classify_stenosis(self, percent):
-        if percent < 40:
+        if percent < 50:
             return "Mild"
         elif percent < 70:
             return "Moderate"
         return "Severe"
 
     def _compute_local_reference(self, profile, idx):
-        left_start = idx - self.local_window
-        left_end = idx - self.inner_gap
-        right_start = idx + self.inner_gap + 1
-        right_end = idx + self.local_window + 1
-
-        if left_start < 0 or right_end > len(profile):
-            return None
+        left_start = max(0, idx - self.local_window)
+        left_end = max(0, idx - self.inner_gap)
+        right_start = min(len(profile), idx + self.inner_gap + 1)
+        right_end = min(len(profile), idx + self.local_window + 1)
 
         left_ref = profile[left_start:left_end]
         right_ref = profile[right_start:right_end]
 
-        if len(left_ref) == 0 or len(right_ref) == 0:
+        ref_candidates = np.concatenate([left_ref, right_ref]) if len(left_ref) > 0 and len(right_ref) > 0 else profile
+        if len(ref_candidates) == 0:
             return None
 
-        ref_candidates = np.concatenate([left_ref, right_ref])
         d_ref = float(np.median(ref_candidates))
 
         if d_ref <= 0:
@@ -126,10 +128,6 @@ class VesselAnalyzer:
         )
 
     def _expand_lesion_segment(self, profile, center_idx, d_ref):
-        """
-        Expand from the center index while the profile remains under
-        a threshold fraction of the local reference diameter.
-        """
         threshold = self.lesion_threshold_ratio * d_ref
 
         left = center_idx
@@ -143,9 +141,6 @@ class VesselAnalyzer:
         return left, right
 
     def _find_best_segment_center(self, profile, left, right):
-        """
-        Pick the minimum-diameter point inside the narrowed segment.
-        """
         segment = profile[left:right + 1]
         rel_idx = int(np.argmin(segment))
         return left + rel_idx
@@ -167,7 +162,7 @@ class VesselAnalyzer:
         for branch_id, row in major_branches.iterrows():
             path_coords = skel_obj.path_coordinates(branch_id).astype(int)
 
-            if len(path_coords) < (2 * self.end_ignore_pixels + 5):
+            if len(path_coords) < (2 * self.end_ignore_pixels + 3):
                 continue
 
             radii = self.distance_map[path_coords[:, 0], path_coords[:, 1]]
@@ -194,11 +189,10 @@ class VesselAnalyzer:
 
                 sten_pct = (1.0 - (d_here / d_ref)) * 100.0
 
-                if sten_pct < self.min_stenosis_percent or sten_pct > 95:
+                if sten_pct < self.min_stenosis_percent or sten_pct > 98:
                     i += 1
                     continue
 
-                # Expand to a full narrowed segment instead of taking one point directly
                 left_idx, right_idx = self._expand_lesion_segment(smooth_diameters, i, d_ref)
                 lesion_length = right_idx - left_idx + 1
 
@@ -216,7 +210,7 @@ class VesselAnalyzer:
 
                 sten_pct_center = (1.0 - (d_min / d_ref_center)) * 100.0
 
-                if sten_pct_center < self.min_stenosis_percent or sten_pct_center > 95:
+                if sten_pct_center < self.min_stenosis_percent or sten_pct_center > 98:
                     i = right_idx + 1
                     continue
 
@@ -230,7 +224,6 @@ class VesselAnalyzer:
                     i = right_idx + 1
                     continue
 
-                # Use segment width and reference to create a better lesion radius
                 lesion_radius = max(int(round(max(d_ref_center, d_min) / 2.0)), 8)
                 confidence = self._compute_confidence(
                     sten_pct_center, lesion_length, d_ref_center, d_min
@@ -250,7 +243,6 @@ class VesselAnalyzer:
                     "segment_end_idx": int(right_idx)
                 })
 
-                # Skip past the current narrowed segment
                 i = right_idx + 1
 
         blockages.sort(key=lambda b: (b["percentage"], b["confidence"], b["lesion_length"]), reverse=True)
