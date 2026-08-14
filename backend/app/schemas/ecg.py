@@ -2,14 +2,16 @@ from typing import Optional, Dict, List, Any
 from pydantic import BaseModel, Field
 
 class ECGInferenceResult(BaseModel):
-    predicted_class: str = Field(default="Unknown", description="Predicted cardiac category")
+    predicted_class: str = Field(default="Unknown", description="Predicted cardiac category (e.g., Active MI, Normal, Abnormal Heartbeat, History of MI)")
     confidence_score: float = Field(default=0.0, description="Model prediction confidence (0.0 - 1.0)")
-    risk_level: str = Field(default="UNKNOWN", description="Emergency priority level: HIGH, MEDIUM, LOW")
+    urgency_level: str = Field(default="UNKNOWN", description="Emergency priority level: CRITICAL, URGENT, ROUTINE, UNKNOWN")
+    risk_level: str = Field(default="UNKNOWN", description="Alias for urgency_level")
     category_probabilities: Dict[str, float] = Field(default_factory=dict, description="Probabilities for each cardiac condition class")
     suspected_artery: str = Field(default="N/A", description="Coronary artery territory suspected of acute occlusion (LAD, LCx, RCA)")
     affected_leads: List[str] = Field(default_factory=list, description="Leads demonstrating significant deviation/elevation")
     lead_analysis_breakdown: Dict[str, float] = Field(default_factory=dict, description="Individual lead variance/deviation scores")
-    
+    clinical_guidance: str = Field(default="", description="Clinical recommendations and guidance based on ECG assessment")
+
     # Backward compatibility fields
     prediction: str = Field(default="Unknown", description="Alias for predicted_class")
     confidence: str = Field(default="0%", description="Formatted string representation of confidence")

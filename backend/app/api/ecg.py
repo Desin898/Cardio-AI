@@ -1,10 +1,13 @@
 import os
+import io
 import json
 import logging
 from pathlib import Path
-from typing import Optional, Union, Any, Dict
+from typing import Optional, Dict, Any
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status, Body
+import pandas as pd
+import numpy as np
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
 from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
 
 from backend.app.core.config import settings
@@ -18,50 +21,57 @@ router = APIRouter(prefix="/ecg", tags=["ecg"])
 
 @router.post("/predict", response_model=ECGInferenceResult)
 async def predict_ecg(
-    request: Optional[ECGPredictRequest] = Body(None),
-    ecg_file: Optional[UploadFile] = File(None),
+    ecg_file: UploadFile = File(...),
+    request: Optional[str] = Form(None),
 ):
     """
     Predict 12-lead ECG cardiac condition and anatomical lead-to-artery localization.
-    Supports both CSV signal vectors and image-extracted signal inputs (File upload or JSON body).
+    Accepts pure file uploads (images: .jpg, .jpeg, .png or signal CSVs) as multipart/form-data.
     """
     try:
-        # Case 1: File Upload (CSV or Image file)
-        if ecg_file is not None:
-            filename = ecg_file.filename or "uploaded_ecg"
-            file_bytes = await ecg_file.read()
+        if not ecg_file:
+            raise HTTPException(status_code=400, detail="No ECG file provided in request.")
 
-            temp_dir = settings.PROJECT_ROOT / "outputs" / "temp"
-            temp_dir.mkdir(parents=True, exist_ok=True)
-            temp_filepath = temp_dir / filename
-            with open(temp_filepath, "wb") as f:
-                f.write(file_bytes)
+        filename = ecg_file.filename or "uploaded_ecg"
+        file_bytes = await ecg_file.read()
 
-            if filename.lower().endswith(".csv"):
+        if not file_bytes:
+            raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+        temp_dir = settings.PROJECT_ROOT / "outputs" / "temp"
+        temp_dir.mkdir(parents=True, exist_ok=True)
+
+        # Dual-mode pipeline handling
+        # Mode A: CSV raw signal file
+        if filename.lower().endswith(".csv"):
+            try:
+                df = pd.read_csv(io.BytesIO(file_bytes))
+                for col in ["filename", "patient_id"]:
+                    if col in df.columns:
+                        df = df.drop(columns=[col])
+                df = df.apply(pd.to_numeric, errors="coerce").dropna()
+                signal_vec = df.values.astype(np.float32)[0].tolist()
+                result = ecg_engine.predict({"signal_vector": signal_vec})
+            except Exception as csve:
+                logging.warning(f"Failed to parse raw CSV directly ({csve}). Falling back to temp file.")
+                temp_filepath = temp_dir / filename
+                with open(temp_filepath, "wb") as f:
+                    f.write(file_bytes)
                 result = ecg_engine.predict({"csv_path": str(temp_filepath)})
-            else:
+
+        # Mode B: ECG image (.jpg, .jpeg, .png, etc.)
+        else:
+            try:
                 csv_path = ecg_service.preprocess_ecg_file(file_bytes, filename, temp_dir)
                 result = ecg_engine.predict({"csv_path": str(csv_path)})
+            except Exception as imge:
+                logging.error(f"Image signal extraction failed: {imge}")
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=f"ECG image processing and signal extraction failed: {str(imge)}"
+                )
 
-            return ECGInferenceResult(**result)
-
-        # Case 2: JSON Payload Body
-        if request is not None:
-            input_dict = {}
-            if request.signal_vector:
-                input_dict["signal_vector"] = request.signal_vector
-            elif request.csv_path:
-                input_dict["csv_path"] = request.csv_path
-            elif request.image_path:
-                input_dict["image_path"] = request.image_path
-
-            if not input_dict:
-                raise HTTPException(status_code=400, detail="Must provide signal_vector, csv_path, or image_path")
-
-            result = ecg_engine.predict(input_dict)
-            return ECGInferenceResult(**result)
-
-        raise HTTPException(status_code=400, detail="No ECG input provided via file or JSON payload")
+        return ECGInferenceResult(**result)
 
     except HTTPException:
         raise
@@ -69,7 +79,7 @@ async def predict_ecg(
         logging.exception("ECG predict endpoint failure")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"ECG prediction failed: {str(e)}"
+            detail=f"ECG prediction processing failed: {str(e)}"
         )
 
 

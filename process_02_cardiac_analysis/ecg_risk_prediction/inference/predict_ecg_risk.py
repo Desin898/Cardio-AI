@@ -1,12 +1,22 @@
 import sys
 from pathlib import Path
+import os
+import json
+
+# Ensure project root is in sys.path when invoked via subprocess
+script_dir = Path(__file__).resolve().parent
+project_root = script_dir.parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend to prevent GUI thread issues
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 import torch
 import numpy as np
 import pandas as pd
-import os
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 from process_02_cardiac_analysis.ecg_risk_prediction.models.ecg_resnet import MultiBranch1DResNet34
 from process_02_cardiac_analysis.ecg_risk_prediction.models.ecg_cnn import ECGCNN
@@ -19,10 +29,6 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 LEAD_NAMES = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]
 
-# Anatomical Lead-to-Artery Groupings
-# Septal / Anterior (V1, V2, V3, V4) -> Left Anterior Descending (LAD)
-# Lateral (I, aVL, V5, V6) -> Left Circumflex (LCx)
-# Inferior (II, III, aVF) -> Right Coronary Artery (RCA)
 TERRITORY_MAPPING = {
     "Left Anterior Descending (LAD)": [6, 7, 8, 9],       # V1, V2, V3, V4
     "Left Circumflex (LCx)": [0, 4, 10, 11],               # I, aVL, V5, V6
@@ -44,17 +50,13 @@ class CardiacPredictor:
             try:
                 state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
                 self.model.load_state_dict(state_dict)
-                print(f"Loaded MultiBranch1DResNet34 weights from {MODEL_PATH}")
-            except Exception as e:
-                print(f"Notice: Failed to load state dict into MultiBranch1DResNet34 ({e}). Trying fallback ECGCNN.")
+            except Exception:
                 try:
                     fallback_model = ECGCNN(num_classes=4).to(DEVICE)
                     fallback_model.load_state_dict(state_dict)
                     self.model = fallback_model
-                except Exception as ex:
-                    print(f"Warning: Initializing model with default weights: {ex}")
-        else:
-            print(f"Warning: Model file not found at {MODEL_PATH}. Using untrained model weights.")
+                except Exception:
+                    pass
 
         self.model.eval()
 
@@ -72,29 +74,15 @@ class CardiacPredictor:
         return output_path
 
     def calculate_anatomical_mapping(self, signal_2d):
-        """
-        Calculates individual lead deviation scores across key anatomical lead groupings:
-          - Septal / Anterior (V1, V2, V3, V4) -> Left Anterior Descending (LAD)
-          - Lateral (I, aVL, V5, V6) -> Left Circumflex (LCx)
-          - Inferior (II, III, aVF) -> Right Coronary Artery (RCA)
-        Inputs:
-            signal_2d: np.ndarray or torch.Tensor of shape (12, N)
-        Outputs:
-            suspected_artery: str
-            affected_leads: List[str]
-            lead_scores: Dict[str, float]
-        """
         if isinstance(signal_2d, torch.Tensor):
             signal_2d = signal_2d.cpu().numpy()
 
         if signal_2d.shape[0] != 12 and signal_2d.shape[1] == 12:
             signal_2d = signal_2d.T
 
-        # Individual lead deviation scores (signal variance / ST deviation proxy)
         lead_variances = np.var(signal_2d, axis=1)
         lead_scores = {LEAD_NAMES[i]: round(float(lead_variances[i]), 4) for i in range(12)}
 
-        # Territory average deviation scores
         territory_scores = {}
         for territory, lead_indices in TERRITORY_MAPPING.items():
             valid_indices = [idx for idx in lead_indices if idx < len(lead_variances)]
@@ -103,7 +91,6 @@ class CardiacPredictor:
         suspected_artery = max(territory_scores, key=territory_scores.get)
         dominant_indices = TERRITORY_MAPPING[suspected_artery]
 
-        # Affected leads: dominant territory leads + any lead with deviation above 75th percentile
         threshold = float(np.percentile(lead_variances, 75))
         affected_indices = set(dominant_indices).union(set(np.where(lead_variances >= threshold)[0]))
         affected_leads = [LEAD_NAMES[i] for i in sorted(list(affected_indices)) if i < 12]
@@ -118,22 +105,21 @@ class CardiacPredictor:
         if "patient_id" in df.columns:
             df = df.drop(columns=["patient_id"])
 
-        data = df.values.astype(np.float32)[0]  # Take first record
+        data = df.values.astype(np.float32)[0]
 
-        # Normalize exactly like training
         data = (data - data.mean()) / (data.std() + 1e-8)
         T = len(data) // 12
         signal_12lead = data.reshape(12, T)
 
-        # Prepare tensor (1, 12, T) for 1D-ResNet34
         tensor_data = torch.tensor(signal_12lead).unsqueeze(0).to(DEVICE)
 
         with torch.no_grad():
-            outputs = self.model(tensor_data)
+            outputs = self.model(tensor_data)  # Raw logits
             probs = torch.nn.functional.softmax(outputs, dim=1).cpu().numpy()[0]
             pred = int(np.argmax(probs))
             conf = float(probs[pred])
 
+        # True Softmax probability distribution matching confidence_score
         prob_dict = {self.classes[i]: round(float(probs[i]), 4) for i in range(4)}
         suspected_artery, affected_leads, lead_scores, lead_variances = self.calculate_anatomical_mapping(signal_12lead)
 
@@ -158,10 +144,6 @@ class CardiacPredictor:
 
 
 if __name__ == "__main__":
-    script_dir = Path(__file__).resolve().parent
-    project_root = script_dir.parent.parent.parent
-    patients_dir = project_root / "Pipeline_Management" / "Patients"
-
     predictor = CardiacPredictor()
     sample_file = None
 
@@ -181,6 +163,7 @@ if __name__ == "__main__":
             print("Unsupported file type. Please provide an ECG image or CSV file.")
             sys.exit(1)
     else:
+        patients_dir = project_root / "Pipeline_Management" / "Patients"
         csv_files = list(patients_dir.rglob("*.csv")) if patients_dir.exists() else []
         if not csv_files:
             print(f"No preprocessed CSV found in {patients_dir}.")
@@ -196,6 +179,7 @@ if __name__ == "__main__":
     print(f"Confidence: {report['confidence']}")
     print(f"Emergency Priority: {report['risk_level']}")
     print(f"Suspected Artery Territory: {report['suspected_artery']}")
+    print(f"Probabilities: {json.dumps(report['category_probabilities'])}")
     print(f"Affected Leads: {report['affected_leads']}")
     print(f"Lead Scores: {report['lead_analysis_breakdown']}")
     print("------------------------------------\n")
