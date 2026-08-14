@@ -2,17 +2,76 @@ import os
 import json
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union, Any, Dict
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status, Body
+from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
 
 from backend.app.core.config import settings
 from backend.app.services.patient_service import patient_service
 from backend.app.services.ecg_service import ecg_service
-from backend.app.engines.ecg_cnn_engine import ecg_cnn_engine
+from backend.app.engines.ecg_engine import ecg_engine
+from backend.app.schemas.ecg import ECGInferenceResult, ECGPredictRequest, ECGUploadResponse
 
 router = APIRouter(prefix="/ecg", tags=["ecg"])
+
+
+@router.post("/predict", response_model=ECGInferenceResult)
+async def predict_ecg(
+    request: Optional[ECGPredictRequest] = Body(None),
+    ecg_file: Optional[UploadFile] = File(None),
+):
+    """
+    Predict 12-lead ECG cardiac condition and anatomical lead-to-artery localization.
+    Supports both CSV signal vectors and image-extracted signal inputs (File upload or JSON body).
+    """
+    try:
+        # Case 1: File Upload (CSV or Image file)
+        if ecg_file is not None:
+            filename = ecg_file.filename or "uploaded_ecg"
+            file_bytes = await ecg_file.read()
+
+            temp_dir = settings.PROJECT_ROOT / "outputs" / "temp"
+            temp_dir.mkdir(parents=True, exist_ok=True)
+            temp_filepath = temp_dir / filename
+            with open(temp_filepath, "wb") as f:
+                f.write(file_bytes)
+
+            if filename.lower().endswith(".csv"):
+                result = ecg_engine.predict({"csv_path": str(temp_filepath)})
+            else:
+                csv_path = ecg_service.preprocess_ecg_file(file_bytes, filename, temp_dir)
+                result = ecg_engine.predict({"csv_path": str(csv_path)})
+
+            return ECGInferenceResult(**result)
+
+        # Case 2: JSON Payload Body
+        if request is not None:
+            input_dict = {}
+            if request.signal_vector:
+                input_dict["signal_vector"] = request.signal_vector
+            elif request.csv_path:
+                input_dict["csv_path"] = request.csv_path
+            elif request.image_path:
+                input_dict["image_path"] = request.image_path
+
+            if not input_dict:
+                raise HTTPException(status_code=400, detail="Must provide signal_vector, csv_path, or image_path")
+
+            result = ecg_engine.predict(input_dict)
+            return ECGInferenceResult(**result)
+
+        raise HTTPException(status_code=400, detail="No ECG input provided via file or JSON payload")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.exception("ECG predict endpoint failure")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"ECG prediction failed: {str(e)}"
+        )
+
 
 @router.post("/upload_ecg")
 async def upload_ecg(
@@ -46,7 +105,7 @@ async def upload_ecg(
 
         encrypted_path = patient_service.save_encrypted_ecg(metadata_path, file_bytes, filename)
         csv_path = ecg_service.preprocess_ecg_file(file_bytes, filename, ecg_folder)
-        prediction_result = ecg_cnn_engine.predict({"csv_path": str(csv_path)})
+        prediction_result = ecg_engine.predict({"csv_path": str(csv_path)})
 
         patient_service.update_ecg_metadata(
             metadata_path,
@@ -99,6 +158,7 @@ async def upload_ecg(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Upload failed: {str(e)}",
         )
+
 
 @router.get("/ecg_plot/{session_id}/{filename}")
 async def ecg_plot(session_id: str, filename: str):

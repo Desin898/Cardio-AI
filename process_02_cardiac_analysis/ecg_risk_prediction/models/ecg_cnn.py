@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from process_02_cardiac_analysis.ecg_risk_prediction.models.ecg_resnet import MultiBranch1DResNet34
+
 class ECGCNN(nn.Module):
     def __init__(self, num_classes=4):
         super().__init__()
@@ -29,6 +31,11 @@ class ECGCNN(nn.Module):
         )
 
     def forward(self, x):
+        if x.dim() == 3:
+            # Reshape (B, 12, N) -> (B, 1, 12, N)
+            x = x.unsqueeze(1)
         x = self.features(x)
         x = x.view(x.size(0), -1)
         return self.classifier(x)
+
+__all__ = ["ECGCNN", "MultiBranch1DResNet34"]
