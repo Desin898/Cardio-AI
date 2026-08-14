@@ -1,0 +1,22 @@
+{
+    "patient_id": "tmpvv6vsqot",
+    "processed_at": "2026-08-15T02:00:04.180916",
+    "source": "IMAGE",
+    "number_of_original_frames": 1,
+    "selected_frame_indices": [
+        0
+    ],
+    "output_directory": "C:\\Users\\desin\\Downloads\\Cardio-AI-main\\Cardio-AI-main\\outputs\\temp_angio\\tmpvv6vsqot",
+    "variants": [
+        {
+            "rank": 1,
+            "frame_index": 0,
+            "filename": "tmpvv6vsqot_frame_0_rank_1.png",
+            "path": "C:\\Users\\desin\\Downloads\\Cardio-AI-main\\Cardio-AI-main\\outputs\\temp_angio\\tmpvv6vsqot\\tmpvv6vsqot_frame_0_rank_1.png",
+            "label": "Keyframe #1 (Frame 0)",
+            "sharpness": 1017.28,
+            "contrast": 66.88510954344689,
+            "edge_strength": 12.635477557666185
+        }
+    ]
+}
