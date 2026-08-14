@@ -83,6 +83,23 @@ class CardiacPredictor:
         lead_variances = np.var(signal_2d, axis=1)
         lead_scores = {LEAD_NAMES[i]: round(float(lead_variances[i]), 4) for i in range(12)}
 
+        # 1. LMCA / Multi-Vessel Ischemia Diagnostic Heuristic
+        avr_var = float(lead_variances[3])
+        diffuse_indices = [0, 1, 9, 10, 11]
+        mean_var = float(np.mean(lead_variances))
+        max_var = float(np.max(lead_variances))
+
+        # aVR is elevated if its variance is above average lead variance and close to peak lead activity
+        avr_is_elevated = (avr_var >= mean_var) and (avr_var >= 0.7 * max_var)
+        high_diffuse_count = sum(1 for idx in diffuse_indices if lead_variances[idx] >= mean_var)
+
+        if avr_is_elevated and (high_diffuse_count >= 3):
+            suspected_artery = "Left Main Coronary Artery (LMCA) / Severe Multi-Vessel Disease"
+            affected_indices = sorted(list(set([3] + [idx for idx in diffuse_indices if lead_variances[idx] >= mean_var])))
+            affected_leads = [LEAD_NAMES[i] for i in affected_indices]
+            return suspected_artery, affected_leads, lead_scores, lead_variances
+
+        # 2. Standard Territory Mapping (LAD, LCx, RCA)
         territory_scores = {}
         for territory, lead_indices in TERRITORY_MAPPING.items():
             valid_indices = [idx for idx in lead_indices if idx < len(lead_variances)]
@@ -91,8 +108,8 @@ class CardiacPredictor:
         suspected_artery = max(territory_scores, key=territory_scores.get)
         dominant_indices = TERRITORY_MAPPING[suspected_artery]
 
-        threshold = float(np.percentile(lead_variances, 75))
-        affected_indices = set(dominant_indices).union(set(np.where(lead_variances >= threshold)[0]))
+        threshold_75 = float(np.percentile(lead_variances, 75))
+        affected_indices = set(dominant_indices).union(set(np.where(lead_variances >= threshold_75)[0]))
         affected_leads = [LEAD_NAMES[i] for i in sorted(list(affected_indices)) if i < 12]
 
         return suspected_artery, affected_leads, lead_scores, lead_variances
@@ -115,26 +132,56 @@ class CardiacPredictor:
 
         with torch.no_grad():
             outputs = self.model(tensor_data)  # Raw logits
-            probs = torch.nn.functional.softmax(outputs, dim=1).cpu().numpy()[0]
+            # Temperature Scaling (T = 1.5) to calibrate probability spikes
+            temperature = 1.5
+            scaled_logits = outputs / temperature
+            probs = torch.nn.functional.softmax(scaled_logits, dim=1).cpu().numpy()[0]
             pred = int(np.argmax(probs))
             conf = float(probs[pred])
 
-        # True Softmax probability distribution matching confidence_score
+        # Calibrated Softmax probability distribution
         prob_dict = {self.classes[i]: round(float(probs[i]), 4) for i in range(4)}
         suspected_artery, affected_leads, lead_scores, lead_variances = self.calculate_anatomical_mapping(signal_12lead)
 
         plot_path = self.plot_lead_activity(lead_variances, suspected_artery)
+
+        is_lmca = "LMCA" in suspected_artery or "Left Main" in suspected_artery
+        is_active_mi = (pred == 2) or is_lmca
+        is_abnormal_arrhythmia = (pred == 1) and not is_lmca
+        is_history_mi = (pred == 3) and not is_lmca
+
+        # Hierarchical Clinical Routing
+        if is_active_mi:
+            final_artery = suspected_artery
+            final_vessel = suspected_artery
+            final_leads = affected_leads
+            risk_level = "CRITICAL" if is_lmca else "HIGH"
+        elif is_abnormal_arrhythmia:
+            final_artery = "N/A - Non-Thrombotic Arrhythmia / Conduction Abnormality"
+            final_vessel = "N/A - Non-Thrombotic Arrhythmia / Conduction Abnormality"
+            final_leads = []
+            risk_level = "MEDIUM"
+        elif is_history_mi:
+            final_artery = "N/A - Prior Infarction / Inactive Blockage"
+            final_vessel = "N/A - Prior Infarction / Inactive Blockage"
+            final_leads = []
+            risk_level = "MEDIUM"
+        else:
+            final_artery = "N/A - No acute blockage detected"
+            final_vessel = "N/A - No acute blockage detected"
+            final_leads = []
+            risk_level = "LOW"
 
         res = {
             "prediction": self.classes[pred],
             "predicted_class": self.classes[pred],
             "confidence": f"{conf * 100:.2f}%",
             "confidence_score": round(conf, 4),
-            "risk_level": "HIGH" if pred == 2 else "MEDIUM" if pred in [1, 3] else "LOW",
+            "risk_level": risk_level,
             "category_probabilities": prob_dict,
-            "suspected_artery": suspected_artery if pred == 2 else "N/A - No acute blockage detected",
-            "suspected_vessel": suspected_artery if pred == 2 else "N/A - No acute blockage detected",
-            "affected_leads": affected_leads if pred == 2 else [],
+            "suspected_artery": final_artery,
+            "suspected_vessel": final_vessel,
+            "affected_leads": final_leads,
             "lead_analysis_breakdown": lead_scores,
             "plot_path": plot_path,
             "error": None

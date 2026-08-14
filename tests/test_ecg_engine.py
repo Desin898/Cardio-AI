@@ -15,8 +15,8 @@ from backend.app.schemas.ecg import ECGInferenceResult
 class TestECGEngine(unittest.TestCase):
     """
     Automated unit tests to verify GroupKFold validation stability,
-    anatomical lead-to-artery mapping logic (LAD, LCx, RCA), Softmax category
-    probability normalization, and POST /api/v1/ecg/predict standalone file upload API endpoints.
+    anatomical lead-to-artery mapping logic (LAD, LCx, RCA, LMCA / Multi-Vessel),
+    Calibrated Temperature Scaling, Hierarchical Clinical Routing, and API endpoints.
     """
 
     def setUp(self):
@@ -92,6 +92,48 @@ class TestECGEngine(unittest.TestCase):
         for lead in ["II", "III", "aVF"]:
             self.assertIn(lead, affected_leads)
 
+    def test_lead_to_artery_mapping_lmca_and_avr_elevation(self):
+        """
+        Verifies that significant ST elevation/variance in lead aVR combined with diffuse
+        depressions across widespread leads (I, II, V4, V5, V6) triggers the LMCA / Multi-Vessel
+        Ischemia heuristic, CRITICAL urgency, and correct clinical guidance.
+        """
+        engine = ECGCNNEngine()
+        signal = np.random.normal(loc=0.0, scale=0.1, size=(12, 100))
+
+        lmca_indices = [3, 0, 1, 9, 10, 11]
+        sine_wave = 5.0 * np.sin(np.linspace(0, 10 * np.pi, 100))
+        for idx in lmca_indices:
+            signal[idx, :] += sine_wave
+
+        suspected_artery, affected_leads, breakdown = engine.calculate_lead_deviation_scores(signal)
+
+        self.assertEqual(suspected_artery, "Left Main Coronary Artery (LMCA) / Severe Multi-Vessel Disease")
+        self.assertIn("aVR", affected_leads)
+
+        res = engine.predict({"signal_vector": signal.flatten().tolist()})
+        self.assertEqual(res["suspected_artery"], "Left Main Coronary Artery (LMCA) / Severe Multi-Vessel Disease")
+        self.assertEqual(res["urgency_level"], "CRITICAL")
+        self.assertIn("aVR", res["affected_leads"])
+        self.assertIn("emergent coronary angiography", res["clinical_guidance"].lower())
+
+    def test_hierarchical_clinical_routing_abnormal_heartbeat(self):
+        """
+        Verifies that Abnormal Heartbeat (non-LMCA) routes to Non-Thrombotic Arrhythmia,
+        urgency URGENT, and telemetry/troponin guidance WITHOUT STEMI cath lab activation.
+        """
+        engine = ECGCNNEngine()
+        # Random signal baseline
+        signal = np.random.randn(12, 100)
+        res = engine.predict({"signal_vector": signal.flatten().tolist()})
+
+        if res["predicted_class"] == "Abnormal Heartbeat":
+            self.assertEqual(res["suspected_artery"], "N/A - Non-Thrombotic Arrhythmia / Conduction Abnormality")
+            self.assertEqual(res["urgency_level"], "URGENT")
+            self.assertEqual(res["affected_leads"], [])
+            self.assertIn("telemetry", res["clinical_guidance"].lower())
+            self.assertNotIn("catheterization laboratory activation recommended for suspected acute myocardial infarction", res["clinical_guidance"].lower())
+
     def test_softmax_probability_distribution_normalization(self):
         """
         Verifies that category_probabilities returns real normalized Softmax probabilities summing to 1.0.
@@ -103,15 +145,12 @@ class TestECGEngine(unittest.TestCase):
         schema_instance = ECGInferenceResult(**res)
         probs = schema_instance.category_probabilities
 
-        # Verify all 4 cardiac classes exist in category_probabilities
         for cls_name in ["Normal", "Abnormal Heartbeat", "Active Myocardial Infarction", "History of MI"]:
             self.assertIn(cls_name, probs)
 
-        # Verify probability sum equals 1.0 (with 0.01 floating point tolerance)
         prob_sum = sum(probs.values())
         self.assertAlmostEqual(prob_sum, 1.0, delta=0.02, msg=f"Probabilities sum to {prob_sum}, expected 1.0")
 
-        # Verify confidence_score matches max class probability
         max_prob_class = max(probs, key=probs.get)
         self.assertAlmostEqual(probs[max_prob_class], schema_instance.confidence_score, delta=0.02)
 
