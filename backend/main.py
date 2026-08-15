@@ -191,14 +191,18 @@ async def patient_register(request: Request):
     return templates.TemplateResponse(request=request, name="patient_register.html")
 
 @app.get("/patient_dashboard.html", response_class=HTMLResponse)
+@app.get("/patient_dashboard", response_class=HTMLResponse)
 async def patient_dashboard(request: Request):
     return templates.TemplateResponse(request=request, name="patient_dashboard.html")
 
 @app.get("/upload_ecg.html", response_class=HTMLResponse)
+@app.get("/upload_ecg", response_class=HTMLResponse)
 async def upload_page(request: Request):
     return templates.TemplateResponse(request=request, name="upload_ecg.html")
 
 @app.get("/pre_screening.html", response_class=HTMLResponse)
+@app.get("/prescreening", response_class=HTMLResponse)
+@app.get("/pre_screening", response_class=HTMLResponse)
 async def pre_screening(request: Request):
     return templates.TemplateResponse(request=request, name="pre_screening.html")
 
@@ -223,7 +227,14 @@ async def doctor_login(request: Request, session_id: str = "", patient_id: str =
         context={"session_id": session_id, "patient_id": patient_id, "error": None},
     )
 
+@app.get("/doctor_dashboard", response_class=HTMLResponse)
+@app.get("/doctor_dashboard.html", response_class=HTMLResponse)
+async def doctor_dashboard(request: Request):
+    return templates.TemplateResponse(request=request, name="doctor_dashboard.html")
+
 @app.get("/upload_angiogram", response_class=HTMLResponse)
+@app.get("/angiogram_qca", response_class=HTMLResponse)
+@app.get("/angiogram_processing.html", response_class=HTMLResponse)
 async def angiogram_upload_page(request: Request, session_id: str = "", patient_id: str = ""):
     return templates.TemplateResponse(
         request=request,

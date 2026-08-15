@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardio-AI · Cath Lab Clinical Command Center (Doctor Portal)</title>
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome & Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: '#06080D',
+                        cardDark: '#0F141C',
+                        surfaceDark: '#141A24',
+                        emeraldNeon: '#00E676',
+                        cyanNeon: '#00D2FF',
+                        crimsonAlert: '#FF3D57',
+                        amberAlert: '#FFB300',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #06080D;
+            color: #E2E8F0;
+        }
+
+        .glass-panel {
+            background: rgba(15, 20, 28, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel-hover:hover {
+            border-color: rgba(0, 210, 255, 0.3);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.1);
+        }
+
+        @keyframes pulseGlowEmerald {
+            0%, 100% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 10px rgba(0, 230, 118, 0.8)); }
+            50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 22px rgba(0, 230, 118, 1)); }
+        }
+        .pulse-emerald {
+            animation: pulseGlowEmerald 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlowCrimson {
+            0%, 100% { border-color: rgba(255, 61, 87, 0.6); box-shadow: 0 0 15px rgba(255, 61, 87, 0.3); }
+            50% { border-color: rgba(255, 61, 87, 1); box-shadow: 0 0 30px rgba(255, 61, 87, 0.6); }
+        }
+        .pulse-crimson-border {
+            animation: pulseGlowCrimson 1.8s infinite ease-in-out;
+        }
+
+        @keyframes rotateHolo {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .holo-ring {
+            animation: rotateHolo 25s linear infinite;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #06080D;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E2638;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00D2FF;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-[#06080D] text-slate-200 font-sans selection:bg-[#00E676] selection:text-black flex flex-col md:flex-row overflow-x-hidden">
+
+    <!-- Ambient Glow Background -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-15"
+         style="background-image: radial-gradient(rgba(0, 210, 255, 0.3) 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <div class="fixed top-0 left-1/4 w-[600px] h-[600px] bg-[#00D2FF]/5 blur-[160px] rounded-full pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-[#00E676]/5 blur-[160px] rounded-full pointer-events-none z-0"></div>
+
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="relative z-30 w-full md:w-64 bg-[#0A0D14] border-b md:border-b-0 md:border-r border-white/10 flex-shrink-0 flex flex-col justify-between p-4">
+        <div>
+            <!-- Brand Header -->
+            <a href="/" class="flex items-center space-x-3 px-2 py-3 mb-6 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00E676] to-[#00D2FF] flex items-center justify-center shadow-[0_0_20px_rgba(0,230,118,0.4)] group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-heart-pulse text-black text-lg"></i>
+                </div>
+                <div>
+                    <div class="text-lg font-black tracking-wider text-white uppercase flex items-center gap-1.5">
+                        CARDIO<span class="text-[#00E676]">-AI</span>
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-400 tracking-widest uppercase">DOCTOR COMMAND CENTER</div>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-1.5 font-medium text-xs">
+                <a href="/doctor_dashboard" class="flex items-center space-x-3 px-3.5 py-3 rounded-xl bg-[#00E676]/10 text-[#00E676] border-l-4 border-[#00E676] font-semibold transition-all">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                    <span>Cath Lab Dashboard</span>
+                </a>
+                <a href="/prescreening" class="flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                    <i class="fa-solid fa-notes-medical text-sm group-hover:text-[#00D2FF]"></i>
+                    <span>CKM Patient Triage</span>
+                </a>
+                <a href="/upload_ecg.html" class="flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                    <i class="fa-solid fa-wave-square text-sm group-hover:text-[#00E676]"></i>
+                    <span>12-Lead ECG Analysis</span>
+                </a>
+                <a href="/angiogram_qca" class="flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                    <i class="fa-solid fa-circle-nodes text-sm group-hover:text-[#00D2FF]"></i>
+                    <span>Angiogram QCA Workspace</span>
+                </a>
+                <a href="/patient_dashboard.html" class="flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                    <i class="fa-solid fa-file-waveform text-sm group-hover:text-[#FF3D57]"></i>
+                    <span>Diagnostic Reports</span>
+                </a>
+                <a href="/" class="flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                    <i class="fa-solid fa-house text-sm group-hover:text-slate-200"></i>
+                    <span>Public Landing Page</span>
+                </a>
+                <a href="/docs" class="flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
+                    <i class="fa-solid fa-sliders text-sm group-hover:text-slate-200"></i>
+                    <span>FastAPI Specs</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Status Footer -->
+        <div class="mt-8 pt-4 border-t border-white/10 text-[11px] font-mono text-slate-400 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-[#00E676] animate-ping"></span>
+                    <span class="text-slate-300">FastAPI Core</span>
+                </span>
+                <span class="text-[#00E676]">v2.0 ACTIVE</span>
+            </div>
+            <div class="flex items-center justify-between text-[10px]">
+                <span>Cath-Lab Net</span>
+                <span class="text-[#00D2FF]">CONNECTED</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTAINER -->
+    <div class="relative z-10 flex-1 flex flex-col min-w-0 overflow-y-auto">
+        
+        <!-- TOP HEADER BAR -->
+        <header class="bg-[#0A0D14]/90 backdrop-blur-md border-b border-white/10 px-6 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-40">
+            
+            <div class="relative w-full md:w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                <input type="text" placeholder="Search Patient ID (e.g. PT-89421-B), MRN, or Chief Complaint..." 
+                       class="w-full pl-9 pr-4 py-2 rounded-xl bg-[#06080D] border border-white/10 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#00D2FF] focus:ring-1 focus:ring-[#00D2FF] transition-all">
+            </div>
+
+            <div class="flex items-center space-x-5 text-xs">
+                
+                <div class="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-[#141A24] border border-white/10 font-mono">
+                    <i class="fa-regular fa-clock text-[#00D2FF]"></i>
+                    <span class="text-slate-300">AUG 15, 2026</span>
+                    <span class="text-slate-600">|</span>
+                    <span class="text-[#00E676]">SHIFT: CATH-1 ALPHA</span>
+                </div>
+
+                <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#00E676]/10 border border-[#00E676]/30 text-[#00E676] font-mono">
+                    <span class="w-2 h-2 rounded-full bg-[#00E676] pulse-emerald"></span>
+                    <span class="font-semibold">SESSION: #8C6E-7739</span>
+                </div>
+
+                <div class="flex items-center space-x-3 pl-2 border-l border-white/10">
+                    <img src="/static/images/clinical_doctor_avatar.jpg" alt="Attending Doctor" 
+                         class="w-8 h-8 rounded-full object-cover border-2 border-[#00E676]">
+                    <div class="hidden xl:block">
+                        <div class="font-bold text-white leading-tight">Dr. Sarah Jenkins, M.D.</div>
+                        <div class="text-[10px] text-slate-400">Chief Interventionalist</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 3-COLUMN COMMAND GRID -->
+        <main class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- LEFT COLUMN: Biometrics & Patient Triage (3 cols) -->
+            <section class="lg:col-span-3 space-y-6">
+                
+                <!-- Active Patient Card -->
+                <div class="glass-panel glass-panel-hover rounded-2xl p-5 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-[#00D2FF]/5 rounded-bl-full pointer-events-none"></div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-md bg-[#00D2FF]/10 text-[#00D2FF] text-[10px] font-mono font-bold tracking-wider uppercase border border-[#00D2FF]/20">
+                            CATH LAB 02 · ADMITTED
+                        </span>
+                        <span class="text-[11px] font-mono text-slate-400">#PT-89421-B</span>
+                    </div>
+
+                    <h2 class="text-xl font-extrabold text-white tracking-tight mb-1">Eleanor Vance</h2>
+                    <div class="text-xs text-slate-400 font-medium mb-4 flex items-center space-x-2">
+                        <span>62 Yrs</span>
+                        <span>•</span>
+                        <span>Female</span>
+                        <span>•</span>
+                        <span class="text-slate-300">MRN: 902-88-11</span>
+                    </div>
+
+                    <div class="bg-[#06080D] rounded-xl p-3 border border-white/10 space-y-1.5 text-xs">
+                        <div class="text-[10px] uppercase font-mono tracking-wider text-slate-400">Admission Chief Complaint</div>
+                        <div class="font-medium text-slate-200 flex items-center space-x-2">
+                            <i class="fa-solid fa-triangle-exclamation text-[#FF3D57]"></i>
+                            <span>Syncope & Acute Substernal Chest Pain</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500">Onset: 45 mins prior to triage</div>
+                    </div>
+                </div>
+
+                <!-- 2x2 Metric Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    
+                    <div class="glass-panel rounded-2xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between text-slate-400 text-[10px] font-mono mb-2">
+                            <span>BLOOD PRESSURE</span>
+                            <i class="fa-solid fa-heart-pulse text-[#00E676]"></i>
+                        </div>
+                        <div class="text-lg font-mono font-extrabold text-white tracking-tight">116/70</div>
+                        <div class="text-[10px] text-[#00E676] font-medium mt-1 flex items-center space-x-1">
+                            <i class="fa-solid fa-circle-check text-[9px]"></i>
+                            <span>Normal Systolic</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between text-slate-400 text-[10px] font-mono mb-2">
+                            <span>HEART RATE</span>
+                            <i class="fa-solid fa-heart text-[#00E676] animate-pulse"></i>
+                        </div>
+                        <div class="text-lg font-mono font-extrabold text-[#00E676] tracking-tight flex items-baseline gap-1">
+                            <span>64</span>
+                            <span class="text-xs font-normal text-slate-400">BPM</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-medium mt-1">Normal Sinus Rhythm</div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between text-slate-400 text-[10px] font-mono mb-2">
+                            <span>GLUCOSE / HbA1c</span>
+                            <i class="fa-solid fa-droplet text-[#00D2FF]"></i>
+                        </div>
+                        <div class="text-lg font-mono font-extrabold text-[#00D2FF] tracking-tight">6.4%</div>
+                        <div class="text-[10px] text-slate-400 font-medium mt-1">128 mg/dL (Pre-Diabetic)</div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-4 border-2 border-[#FF3D57]/40 bg-[#FF3D57]/5">
+                        <div class="flex items-center justify-between text-slate-400 text-[10px] font-mono mb-2">
+                            <span>hs-TROPONIN I</span>
+                            <i class="fa-solid fa-bell text-[#FF3D57] animate-bounce"></i>
+                        </div>
+                        <div class="text-lg font-mono font-extrabold text-[#FF3D57] tracking-tight">0.04</div>
+                        <div class="text-[10px] text-[#FF3D57] font-semibold mt-1">ng/mL · ELEVATED</div>
+                    </div>
+                </div>
+
+                <!-- CKM Triage Profile -->
+                <div class="glass-panel rounded-2xl p-5 border border-white/10 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-bold tracking-wider text-slate-300 uppercase">CKM TRIAGE PROFILE</span>
+                        <span class="px-2 py-0.5 rounded bg-[#FFB300]/10 text-[#FFB300] text-[10px] font-mono font-bold border border-[#FFB300]/20">STAGE 2/3</span>
+                    </div>
+
+                    <div>
+                        <div class="flex items-baseline justify-between text-xs mb-1.5">
+                            <span class="text-slate-400">Ischemic Risk Score</span>
+                            <span class="font-mono font-bold text-[#FF3D57]">88.4%</span>
+                        </div>
+                        <div class="w-full h-2.5 rounded-full bg-[#06080D] overflow-hidden p-0.5 border border-white/10">
+                            <div class="h-full rounded-full bg-gradient-to-r from-[#00E676] via-[#FFB300] to-[#FF3D57]" style="width: 88.4%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 leading-relaxed bg-[#06080D] p-3 rounded-xl border border-white/10">
+                        <span class="text-white font-semibold">Key Biomarkers:</span>
+                        Elevated hs-Troponin I, HbA1c 6.4%, and ECG V2-V4 ST-segment deviation.
+                    </div>
+                </div>
+            </section>
+
+            <!-- CENTER COLUMN: 3D Heart & Live ECG Waveform (6 cols) -->
+            <section class="lg:col-span-6 space-y-6">
+                
+                <div class="glass-panel rounded-3xl p-6 relative overflow-hidden flex flex-col items-center justify-center min-h-[480px] border border-white/10">
+                    
+                    <div class="w-full flex items-center justify-between z-20 mb-2">
+                        <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#00E676]/10 border border-[#00E676]/30 text-[#00E676] text-xs font-semibold">
+                            <i class="fa-solid fa-circle-check text-[11px]"></i>
+                            <span>Clinically Validated</span>
+                        </div>
+                        <div class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#00D2FF]/10 border border-[#00D2FF]/30 text-[#00D2FF] text-xs font-mono">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                            <span>Vascular Age: 34-36 yrs</span>
+                        </div>
+                    </div>
+
+                    <div class="relative w-full max-w-[380px] h-[320px] flex items-center justify-center my-4">
+                        <div class="absolute w-72 h-72 rounded-full border border-dashed border-[#00D2FF]/20 holo-ring pointer-events-none"></div>
+                        <div class="absolute w-80 h-80 rounded-full border border-dotted border-[#00E676]/15 holo-ring pointer-events-none" style="animation-direction: reverse;"></div>
+
+                        <img src="/static/images/glass_heart.jpg" alt="3D Holographic Heart Wireframe" 
+                             class="w-64 h-64 object-contain filter drop-shadow-[0_0_35px_rgba(0,210,255,0.35)] hover:scale-105 transition-transform duration-700 z-10">
+
+                        <div class="absolute top-6 right-2 z-20 bg-[#06080D]/90 border border-[#FF3D57] text-white px-2.5 py-1 rounded-lg text-[10px] font-mono shadow-lg backdrop-blur-md flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#FF3D57] animate-ping"></span>
+                            <span>LAD: 85% Stenosis (Distal)</span>
+                        </div>
+
+                        <div class="absolute bottom-10 right-0 z-20 bg-[#06080D]/90 border border-[#00E676] text-white px-2.5 py-1 rounded-lg text-[10px] font-mono shadow-lg backdrop-blur-md flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#00E676]"></span>
+                            <span>LCx: Patent</span>
+                        </div>
+
+                        <div class="absolute bottom-8 left-0 z-20 bg-[#06080D]/90 border border-[#FFB300] text-white px-2.5 py-1 rounded-lg text-[10px] font-mono shadow-lg backdrop-blur-md flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#FFB300]"></span>
+                            <span>RCA: Mild Plaque</span>
+                        </div>
+
+                        <div class="absolute top-8 left-2 z-20 bg-[#06080D]/90 border border-[#00D2FF] text-white px-2.5 py-1 rounded-lg text-[10px] font-mono shadow-lg backdrop-blur-md flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#00D2FF]"></span>
+                            <span>LMCA: Clear</span>
+                        </div>
+                    </div>
+
+                    <!-- Live ECG Canvas Waveform -->
+                    <div class="w-full bg-[#06080D] rounded-2xl p-3 border border-white/10 z-20">
+                        <div class="flex items-center justify-between text-[11px] font-mono mb-1 text-slate-400">
+                            <span class="flex items-center space-x-2 text-[#00E676]">
+                                <span class="w-2 h-2 rounded-full bg-[#00E676] animate-pulse"></span>
+                                <span class="font-bold">LEAD II ECG WAVEFORM</span>
+                            </span>
+                            <span>64 BPM · Normal Sinus Rhythm</span>
+                        </div>
+                        <canvas id="ecgCanvas" width="500" height="54" class="w-full h-14 rounded-lg bg-[#030508]"></canvas>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="mt-6 z-20 w-full sm:w-auto">
+                        <a href="/upload_ecg.html" 
+                           class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[#00E676] to-[#00D2FF] hover:from-[#00c865] hover:to-[#00b0d8] text-black font-extrabold text-sm tracking-wide shadow-[0_0_30px_rgba(0,230,118,0.5)] transition-all flex items-center justify-center space-x-3 group">
+                            <i class="fa-solid fa-heart-pulse text-base group-hover:scale-110 transition-transform"></i>
+                            <span>Initiate 12-Lead ECG / QCA Analysis</span>
+                            <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3 Feature Shortcut Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="/prescreening" class="glass-panel p-4 rounded-2xl border border-white/10 hover:border-[#00E676]/40 transition-all group">
+                        <div class="text-[#00E676] text-xs font-mono font-bold uppercase mb-1">CKM BIOMARKER</div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-[#00E676] transition-colors">Risk Prescreening</h4>
+                        <p class="text-[11px] text-slate-400 mt-1">Multi-factor ensemble & SHAP explanation.</p>
+                    </a>
+
+                    <a href="/upload_ecg.html" class="glass-panel p-4 rounded-2xl border border-white/10 hover:border-[#00D2FF]/40 transition-all group">
+                        <div class="text-[#00D2FF] text-xs font-mono font-bold uppercase mb-1">1D-RESNET34</div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-[#00D2FF] transition-colors">ECG Signal Model</h4>
+                        <p class="text-[11px] text-slate-400 mt-1">98.8% Accuracy on multi-lead data.</p>
+                    </a>
+
+                    <a href="/angiogram_qca" class="glass-panel p-4 rounded-2xl border border-white/10 hover:border-[#FF3D57]/40 transition-all group">
+                        <div class="text-[#FF3D57] text-xs font-mono font-bold uppercase mb-1">DEEPSA ENGINE</div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-[#FF3D57] transition-colors">Angiogram QCA</h4>
+                        <p class="text-[11px] text-slate-400 mt-1">Stenosis bottleneck detection & vessel profiling.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: Attending Profile & Specialists (3 cols) -->
+            <section class="lg:col-span-3 space-y-6">
+                
+                <div class="glass-panel rounded-2xl p-5 border border-white/10 space-y-3">
+                    <div class="text-xs font-mono font-bold tracking-wider text-slate-400 uppercase">ATTENDING CARDIOLOGIST</div>
+                    <div class="flex items-center space-x-3">
+                        <img src="/static/images/clinical_doctor_avatar.jpg" alt="Dr. Sarah Jenkins" 
+                             class="w-14 h-14 rounded-full object-cover border-2 border-[#00E676] shadow-md">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-white">Dr. Sarah Jenkins, M.D.</h3>
+                            <div class="text-[11px] text-[#00E676] font-medium">FACC Interventional Lead</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5">10+ Yrs Cath Lab Experience</div>
+                        </div>
+                    </div>
+                    <div class="bg-[#06080D] p-2.5 rounded-xl border border-white/10 text-[11px] font-mono text-slate-300 flex items-center justify-between">
+                        <span>SHIFT SCHEDULE</span>
+                        <span class="text-[#00D2FF]">07:00 - 19:00</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-5 border border-white/10 space-y-3">
+                    <div class="flex items-center justify-between text-xs font-mono font-bold text-slate-400 uppercase">
+                        <span>CONSULTING SPECIALISTS</span>
+                        <span class="text-[#00E676]">3 ONLINE</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs">
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-[#06080D] border border-white/5">
+                            <div>
+                                <div class="font-bold text-slate-200">Dr. Marcus Vance</div>
+                                <div class="text-[10px] text-slate-400">Cardiovascular Surgery</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-[#00E676]/10 text-[#00E676] text-[10px] font-mono font-bold">AVAILABLE</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-[#06080D] border border-white/5">
+                            <div>
+                                <div class="font-bold text-slate-200">Dr. Elena Rostova</div>
+                                <div class="text-[10px] text-slate-400">QCA AI Specialist</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-[#00D2FF]/10 text-[#00D2FF] text-[10px] font-mono font-bold">ACTIVE SESSION</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-[#06080D] border border-white/5">
+                            <div>
+                                <div class="font-bold text-slate-200">Dr. Aris Thorne</div>
+                                <div class="text-[10px] text-slate-400">Electrophysiology</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-[#FFB300]/10 text-[#FFB300] text-[10px] font-mono font-bold">IN SURGERY</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency STAT Cath Lab Trigger Card -->
+                <div class="glass-panel rounded-2xl p-5 border-2 border-[#FF3D57]/60 pulse-crimson-border bg-[#FF3D57]/10 space-y-3 relative overflow-hidden">
+                    <div class="flex items-center space-x-2 text-[#FF3D57] font-mono font-bold text-xs">
+                        <i class="fa-solid fa-triangle-exclamation text-sm animate-bounce"></i>
+                        <span>EMERGENCY CATH LAB ACTIVATION</span>
+                    </div>
+
+                    <h4 class="text-sm font-extrabold text-white">STAT Cath Lab Code Red</h4>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        Instant notification protocol for STEMI triage, direct bypass to QCA pipeline, and emergency cath team assembly.
+                    </p>
+
+                    <a href="/angiogram_qca" 
+                       class="w-full py-2.5 px-4 rounded-xl bg-[#FF3D57] hover:bg-[#e02d46] text-white font-extrabold text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,61,87,0.5)] transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-bolt text-xs"></i>
+                        <span>TRIGGER EMERGENCY QCA</span>
+                    </a>
+                </div>
+
+            </section>
+        </main>
+
+        <footer class="mt-auto border-t border-white/10 py-6 px-6 text-xs text-slate-500 font-mono flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                © 2026 Cardio-AI · Cath Lab Clinical Command Center (Doctor Portal)
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="/prescreening" class="hover:text-slate-300 transition-colors">Patient Triage</a>
+                <a href="/upload_ecg.html" class="hover:text-slate-300 transition-colors">12-Lead ECG</a>
+                <a href="/angiogram_qca" class="hover:text-slate-300 transition-colors">Angiogram QCA</a>
+                <a href="/docs" class="hover:text-slate-300 transition-colors">API Specs</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Live Canvas ECG Waveform Animation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('ecgCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            let x = 0;
+            const points = [];
+            const height = canvas.height;
+            const width = canvas.width;
+            
+            function getEcgY(t) {
+                const phase = t % 100;
+                if (phase > 35 && phase < 40) return height / 2 - 6;
+                if (phase >= 40 && phase < 43) return height / 2 + 3;
+                if (phase >= 43 && phase < 47) return height / 2 - 24;
+                if (phase >= 47 && phase < 50) return height / 2 + 8;
+                if (phase >= 55 && phase < 65) return height / 2 - 8;
+                return height / 2;
+            }
+
+            function draw() {
+                ctx.fillStyle = '#030508';
+                ctx.fillRect(0, 0, width, height);
+
+                ctx.strokeStyle = 'rgba(0, 230, 118, 0.08)';
+                ctx.lineWidth = 1;
+                for (let gx = 0; gx < width; gx += 16) {
+                    ctx.beginPath();
+                    ctx.moveTo(gx, 0);
+                    ctx.lineTo(gx, height);
+                    ctx.stroke();
+                }
+                for (let gy = 0; gy < height; gy += 12) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, gy);
+                    ctx.lineTo(width, gy);
+                    ctx.stroke();
+                }
+
+                ctx.strokeStyle = '#00E676';
+                ctx.lineWidth = 2;
+                ctx.shadowColor = '#00E676';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+
+                for (let i = 0; i < points.length; i++) {
+                    const pt = points[i];
+                    if (i === 0) ctx.moveTo(pt.x, pt.y);
+                    else ctx.lineTo(pt.x, pt.y);
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                const y = getEcgY(x);
+                points.push({ x: x % width, y: y });
+                if (points.length > width) {
+                    points.shift();
+                }
+
+                x += 2;
+                requestAnimationFrame(draw);
+            }
+
+            draw();
+        });
+    </script>
+
+</body>
+</html>
