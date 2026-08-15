@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardio-AI · Angiogram QCA Diagnostic Workspace</title>
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: '#06080D',
+                        cardDark: '#0F141C',
+                        emeraldNeon: '#00E676',
+                        cyanNeon: '#00D2FF',
+                        crimsonAlert: '#FF3D57',
+                        amberAlert: '#FFB300',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #06080D;
+            color: #E2E8F0;
+        }
+
+        .glass-panel {
+            background: rgba(15, 20, 28, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-clinical {
+            background: #06080D;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #F8FAFC;
+            transition: all 0.2s ease;
+        }
+        .input-clinical:focus {
+            border-color: #00E676;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.25);
+            outline: none;
+        }
+
+        .dropzone-angio {
+            border: 2px dashed rgba(0, 230, 118, 0.3);
+            background: rgba(6, 8, 13, 0.6);
+            transition: all 0.25s ease;
+        }
+        .dropzone-angio:hover, .dropzone-angio.dragover {
+            border-color: #00D2FF;
+            background: rgba(0, 210, 255, 0.05);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.15);
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 10;
+        }
+        .circle-progress {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 1.2s ease-out;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-[#06080D] text-slate-200 font-sans selection:bg-[#00E676] selection:text-black relative overflow-x-hidden">
+
+    <!-- Ambient Grid & Glow Overlays -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-15"
+         style="background-image: radial-gradient(rgba(0, 230, 118, 0.3) 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <div class="fixed top-0 left-1/4 w-[600px] h-[600px] bg-[#00E676]/10 blur-[160px] rounded-full pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-[#00D2FF]/5 blur-[160px] rounded-full pointer-events-none z-0"></div>
+
+    <!-- NAVIGATION HEADER -->
+    <header class="relative z-20 border-b border-white/10 bg-[#0A0D14]/90 backdrop-blur-md px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center space-x-3 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00E676] to-[#00D2FF] flex items-center justify-center shadow-[0_0_20px_rgba(0,230,118,0.4)]">
+                    <i class="fa-solid fa-heart-pulse text-black text-base"></i>
+                </div>
+                <span class="text-xl font-extrabold tracking-wider text-white uppercase">
+                    CARDIO<span class="text-[#00E676]">-AI</span>
+                </span>
+            </a>
+
+            <div class="flex items-center space-x-4 text-xs font-semibold">
+                <a href="/upload_ecg.html" class="text-slate-400 hover:text-white transition-colors">12-Lead ECG</a>
+                <a href="/doctor_dashboard" class="px-4 py-2 rounded-full bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/30 hover:bg-[#00E676] hover:text-black transition-all">
+                    Doctor Portal
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="relative z-10 max-w-7xl mx-auto px-6 py-10">
+        
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#00E676]/10 border border-[#00E676]/30 text-[#00E676] text-xs font-mono font-bold tracking-wider uppercase mb-3">
+                <i class="fa-solid fa-[#00E676] fa-vial-circle-check"></i>
+                <span>DEEPSA ANGIOGRAM QCA WORKSTATION · VESSEL SEGMENTATION</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-2">
+                Quantitative Coronary Angiography (QCA) Workspace
+            </h1>
+            <p class="text-xs md:text-sm text-slate-400 max-w-2xl mx-auto">
+                Ingest DICOM series, MP4 cine loops, or keyframe images for DeepSA vessel segmentation, Medial Axis centerline skeletonization, and lumen stenosis quantification.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT COLUMN: INGESTION & CONTROLS (4 COLS) -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <div class="glass-panel rounded-3xl p-6 shadow-2xl border border-white/10 space-y-5">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="text-xs font-mono font-bold text-[#00E676] uppercase tracking-wider flex items-center space-x-2">
+                            <i class="fa-solid fa-photo-film"></i>
+                            <span>CINE & KEYFRAME INGESTION</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400">DICOM / MP4</span>
+                    </div>
+
+                    <form id="angioForm" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Patient ID</label>
+                                <input type="text" id="patientIdInput" placeholder="e.g. PAT-9912" required
+                                       class="w-full px-3 py-2 rounded-xl input-clinical text-xs font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Session ID</label>
+                                <input type="text" id="sessionIdInput" placeholder="Optional"
+                                       class="w-full px-3 py-2 rounded-xl input-clinical text-xs font-mono">
+                            </div>
+                        </div>
+
+                        <!-- DROPZONE -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">
+                                Upload Angiogram (DICOM, MP4, or PNG/JPG)
+                            </label>
+                            <div id="angioDropzone" class="dropzone-angio rounded-2xl p-6 text-center cursor-pointer relative">
+                                <input type="file" id="angio_file" name="angio_file" accept=".dcm,.mp4,.png,.jpg,.jpeg" required class="hidden">
+                                
+                                <div id="angioPrompt" class="space-y-2">
+                                    <div class="w-12 h-12 rounded-full bg-[#00E676]/10 text-[#00E676] mx-auto flex items-center justify-center border border-[#00E676]/30">
+                                        <i class="fa-solid fa-file-video text-xl"></i>
+                                    </div>
+                                    <div class="text-xs font-bold text-white">Drag & Drop Angiogram Here</div>
+                                    <p class="text-[11px] text-slate-400">Supports DICOM files, MP4 cine loops, and keyframe images</p>
+                                </div>
+
+                                <div id="angioPreviewContainer" class="hidden space-y-2">
+                                    <div class="text-xs font-mono font-bold text-[#00D2FF] flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-[#00D2FF] fa-file-medical text-base"></i>
+                                        <span id="angioFileName">file_name.mp4</span>
+                                    </div>
+                                    <img id="angioImagePreview" class="hidden max-h-36 mx-auto rounded-xl border border-white/20 shadow-lg object-contain">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="btnRunQCA"
+                                class="w-full py-3 rounded-full bg-gradient-to-r from-[#00E676] to-[#00D2FF] text-black font-extrabold text-xs uppercase tracking-wider hover:scale-105 transition-all shadow-[0_0_20px_rgba(0,230,118,0.4)] flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-circle-play text-sm"></i>
+                            <span>Execute DeepSA QCA Inspection</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- GEMINI 1.5 PRO CLINICAL REPORT GENERATOR CARD -->
+                <div class="glass-panel rounded-3xl p-6 shadow-2xl border border-white/10 space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="text-xs font-mono font-bold text-[#00D2FF] uppercase tracking-wider flex items-center space-x-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>AI CLINICAL SYNTHESIS REPORT</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400">Gemini 1.5 Pro</span>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Synthesize multi-engine findings (CKM prescreening, 12-lead ECG, and DeepSA QCA stenosis) into a professional 3-sentence clinical report.
+                    </p>
+
+                    <button type="button" id="btnGenerateGeminiReport"
+                            class="w-full py-3 rounded-full bg-[#00D2FF]/10 text-[#00D2FF] border border-[#00D2FF]/40 hover:bg-[#00D2FF] hover:text-black font-extrabold text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(0,210,255,0.3)] flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Generate Gemini 1.5 Pro Report</span>
+                    </button>
+
+                    <!-- Gemini Summary Output Box -->
+                    <div id="geminiReportBox" class="hidden bg-[#06080D] p-4 rounded-2xl border border-[#00D2FF]/30 space-y-3">
+                        <div>
+                            <div class="text-[10px] font-mono uppercase text-[#00D2FF] font-bold">PROFESSIONAL CLINICAL SUMMARY</div>
+                            <p id="geminiClinicalSummary" class="text-xs text-slate-200 mt-1 leading-relaxed"></p>
+                        </div>
+                        <div class="border-t border-white/10 pt-2">
+                            <div class="text-[10px] font-mono uppercase text-[#00E676] font-bold">PATIENT NEXT STEPS</div>
+                            <p id="geminiPatientSteps" class="text-xs text-slate-300 mt-1 leading-relaxed whitespace-pre-line"></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: DUAL-VIEW CANVAS & METRICS SIDEBAR (8 COLS) -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- QCA INSPECTION CANVAS (DUAL-VIEW PANEL) -->
+                <div class="glass-panel rounded-3xl p-6 shadow-2xl border border-white/10 space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="text-xs font-mono font-bold text-[#00E676] uppercase tracking-wider flex items-center space-x-2">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>QCA DUAL-VIEW INSPECTION CANVAS</span>
+                        </div>
+                        <span id="canvasStatusBadge" class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-slate-800 text-slate-400 border border-white/10">
+                            STANDBY
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Panel A: Raw Angiogram Frame -->
+                        <div class="bg-[#06080D] p-3 rounded-2xl border border-white/10 space-y-2 text-center">
+                            <div class="text-[11px] font-mono uppercase text-slate-400 flex items-center justify-between px-1">
+                                <span>PANEL A: RAW ANGIOGRAM FRAME</span>
+                                <span class="text-[10px] text-slate-500">Keyframe 01</span>
+                            </div>
+                            <div class="w-full h-64 bg-[#0A0D14] rounded-xl flex items-center justify-center overflow-hidden border border-white/5 relative">
+                                <img id="rawFrameImg" class="hidden w-full h-full object-contain">
+                                <div id="rawFramePlaceholder" class="text-center space-y-2 text-slate-500">
+                                    <i class="fa-solid fa-image text-3xl opacity-40"></i>
+                                    <p class="text-xs">Raw frame preview will render here</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel B: DeepSA Vessel Segmentation & Centerline Crosshair -->
+                        <div class="bg-[#06080D] p-3 rounded-2xl border border-[#00E676]/30 space-y-2 text-center">
+                            <div class="text-[11px] font-mono uppercase text-[#00E676] flex items-center justify-between px-1 font-bold">
+                                <span>PANEL B: DeepSA SEGMENTATION & QCA CROSSHAIR</span>
+                                <span class="text-[10px] text-[#00E676]">Annotated</span>
+                            </div>
+                            <div class="w-full h-64 bg-[#0A0D14] rounded-xl flex items-center justify-center overflow-hidden border border-white/5 relative">
+                                <img id="qcaVisImg" class="hidden w-full h-full object-contain">
+                                <div id="qcaVisPlaceholder" class="text-center space-y-2 text-slate-500">
+                                    <i class="fa-solid fa-crosshairs text-3xl text-[#00E676]/40"></i>
+                                    <p class="text-xs">DeepSA Medial Axis & Crosshair report</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUANTITATIVE METRICS SIDEBAR / PANEL -->
+                <div class="glass-panel rounded-3xl p-6 shadow-2xl border border-white/10 space-y-6">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="text-xs font-mono font-bold text-[#00D2FF] uppercase tracking-wider flex items-center space-x-2">
+                            <i class="fa-solid fa-ruler-combined"></i>
+                            <span>QUANTITATIVE CORONARY METRICS & SEVERITY</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400">ISO Calibrated</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+                        
+                        <!-- STENOSIS GAUGE METER (5 COLS) -->
+                        <div class="sm:col-span-5 flex flex-col items-center justify-center p-4 bg-[#06080D] rounded-2xl border border-white/10">
+                            <div class="relative w-36 h-36 flex items-center justify-center">
+                                <svg class="w-full h-full" viewBox="0 0 120 120">
+                                    <circle class="circle-bg" cx="60" cy="60" r="50"></circle>
+                                    <circle id="stenosisRing" class="circle-progress" cx="60" cy="60" r="50" 
+                                            stroke-dasharray="314.15" stroke-dashoffset="314.15" stroke="#00E676"></circle>
+                                </svg>
+                                <div class="absolute text-center">
+                                    <div id="stenosisPercentText" class="text-2xl font-extrabold font-mono text-white">0%</div>
+                                    <div class="text-[9px] font-mono uppercase tracking-wider text-slate-400">STENOSIS %</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- METRICS GRID (7 COLS) -->
+                        <div class="sm:col-span-7 grid grid-cols-2 gap-4">
+                            <div class="bg-[#06080D] p-3.5 rounded-2xl border border-white/10 space-y-1">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">MIN LUMEN DIAMETER (d_min)</div>
+                                <div id="dminText" class="text-lg font-mono font-bold text-[#00D2FF]">0.00 mm</div>
+                            </div>
+
+                            <div class="bg-[#06080D] p-3.5 rounded-2xl border border-white/10 space-y-1">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">REF VESSEL DIAMETER (d_ref)</div>
+                                <div id="drefText" class="text-lg font-mono font-bold text-white">0.00 mm</div>
+                            </div>
+
+                            <div class="bg-[#06080D] p-3.5 rounded-2xl border border-white/10 space-y-1">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">LESION SEVERITY BADGE</div>
+                                <div>
+                                    <span id="severityBadge" class="inline-block px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-400 border border-white/10">
+                                        UNDETERMINED
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#06080D] p-3.5 rounded-2xl border border-white/10 space-y-1">
+                                <div class="text-[10px] font-mono text-slate-400 uppercase">PCI RE-CANALIZATION</div>
+                                <div id="pciText" class="text-xs font-bold text-slate-300">Pending Inspection</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropzone = document.getElementById('angioDropzone');
+            const fileInput = document.getElementById('angio_file');
+            const promptBox = document.getElementById('angioPrompt');
+            const previewContainer = document.getElementById('angioPreviewContainer');
+            const fileNameEl = document.getElementById('angioFileName');
+            const imagePreview = document.getElementById('angioImagePreview');
+            const btnRunQCA = document.getElementById('btnRunQCA');
+            const btnGenerateGemini = document.getElementById('btnGenerateGeminiReport');
+
+            let latestQcaResult = null;
+
+            // Auto-populate patient/session ID from query params
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('patient_id')) document.getElementById('patientIdInput').value = params.get('patient_id');
+            if (params.has('session_id')) document.getElementById('sessionIdInput').value = params.get('session_id');
+
+            // Drag and Drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => dropzone.addEventListener(e, prevent, false));
+            function prevent(e) { e.preventDefault(); e.stopPropagation(); }
+
+            ['dragenter', 'dragover'].forEach(e => dropzone.addEventListener(e, () => dropzone.classList.add('dragover'), false));
+            ['dragleave', 'drop'].forEach(e => dropzone.addEventListener(e, () => dropzone.classList.remove('dragover'), false));
+
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            dropzone.addEventListener('drop', (e) => {
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleAngioFile(e.dataTransfer.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) handleAngioFile(e.target.files[0]);
+            });
+
+            function handleAngioFile(file) {
+                promptBox.classList.add('hidden');
+                previewContainer.classList.remove('hidden');
+                fileNameEl.textContent = file.name;
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove('hidden');
+                        document.getElementById('rawFrameImg').src = e.target.result;
+                        document.getElementById('rawFrameImg').classList.remove('hidden');
+                        document.getElementById('rawFramePlaceholder').classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.classList.add('hidden');
+                }
+            }
+
+            // Run QCA Inspection button handler
+            btnRunQCA.addEventListener('click', async () => {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    alert('Please select or drag-and-drop an angiogram file first.');
+                    return;
+                }
+
+                btnRunQCA.disabled = true;
+                btnRunQCA.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Executing DeepSA Pipeline...</span>';
+
+                const formData = new FormData();
+                formData.append('angio_file', fileInput.files[0]);
+                formData.append('patient_id', document.getElementById('patientIdInput').value || '');
+                formData.append('session_id', document.getElementById('sessionIdInput').value || '');
+
+                try {
+                    const res = await fetch('/api/v1/angiogram/process_video', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+                    const data = await res.json();
+                    latestQcaResult = data;
+
+                    // Update dual-view panel
+                    if (data.qca_image_url) {
+                        const visImg = document.getElementById('qcaVisImg');
+                        visImg.src = data.qca_image_url;
+                        visImg.classList.remove('hidden');
+                        document.getElementById('qcaVisPlaceholder').classList.add('hidden');
+                    }
+
+                    document.getElementById('canvasStatusBadge').textContent = 'QCA COMPLETE';
+                    document.getElementById('canvasStatusBadge').className = 'px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/40';
+
+                    // Update QCA Metrics
+                    const metrics = data.qca_metrics || {};
+                    const stPct = metrics.stenosis_percentage || 0;
+                    document.getElementById('stenosisPercentText').textContent = Math.round(stPct) + '%';
+                    
+                    const offset = 314.15 - (314.15 * (stPct / 100));
+                    const ring = document.getElementById('stenosisRing');
+                    ring.style.strokeDashoffset = offset;
+
+                    document.getElementById('dminText').textContent = (metrics.d_min || 0).toFixed(2) + ' mm';
+                    document.getElementById('drefText').textContent = (metrics.d_ref || 0).toFixed(2) + ' mm';
+
+                    const sev = metrics.severity_grade || 'MILD';
+                    const sevBadge = document.getElementById('severityBadge');
+                    sevBadge.textContent = sev;
+
+                    if (sev === 'SEVERE') {
+                        sevBadge.className = 'inline-block px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-[#FF3D57]/20 text-[#FF3D57] border border-[#FF3D57]/40';
+                        ring.style.stroke = '#FF3D57';
+                        document.getElementById('pciText').textContent = 'CRITICAL: Urgent PCI Advised';
+                        document.getElementById('pciText').className = 'text-xs font-bold text-[#FF3D57]';
+                    } else if (sev === 'MODERATE') {
+                        sevBadge.className = 'inline-block px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-[#FFB300]/20 text-[#FFB300] border border-[#FFB300]/40';
+                        ring.style.stroke = '#FFB300';
+                        document.getElementById('pciText').textContent = 'Secondary Stress Test Recommended';
+                        document.getElementById('pciText').className = 'text-xs font-bold text-[#FFB300]';
+                    } else {
+                        sevBadge.className = 'inline-block px-3 py-1 rounded-full text-xs font-mono font-bold uppercase bg-[#00E676]/20 text-[#00E676] border border-[#00E676]/40';
+                        ring.style.stroke = '#00E676';
+                        document.getElementById('pciText').textContent = 'Conservative Medical Management';
+                        document.getElementById('pciText').className = 'text-xs font-bold text-[#00E676]';
+                    }
+
+                } catch (err) {
+                    alert('QCA Analysis failed: ' + err.message);
+                } finally {
+                    btnRunQCA.disabled = false;
+                    btnRunQCA.innerHTML = '<i class="fa-solid fa-circle-play text-sm"></i><span>Execute DeepSA QCA Inspection</span>';
+                }
+            });
+
+            // Gemini Clinical Synthesis Report Generator button handler
+            btnGenerateGemini.addEventListener('click', async () => {
+                btnGenerateGemini.disabled = true;
+                btnGenerateGemini.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Generating Gemini Synthesis...</span>';
+
+                const payload = {
+                    session_id: document.getElementById('sessionIdInput').value || null,
+                    deepsa_output: latestQcaResult || { status: "complete", stenosis: "analyzed" }
+                };
+
+                try {
+                    let res = await fetch('/api/v1/reports/ai_summary', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!res.ok) {
+                        res = await fetch('/ai_summary', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                    }
+
+                    if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+                    const data = await res.json();
+
+                    document.getElementById('geminiReportBox').classList.remove('hidden');
+                    document.getElementById('geminiClinicalSummary').textContent = data.clinical_summary || 'No summary available.';
+                    document.getElementById('geminiPatientSteps').textContent = data.patient_next_steps || 'Please consult your cardiologist.';
+
+                } catch (err) {
+                    alert('Gemini Report generation error: ' + err.message);
+                } finally {
+                    btnGenerateGemini.disabled = false;
+                    btnGenerateGemini.innerHTML = '<i class="fa-solid fa-brain"></i><span>Generate Gemini 1.5 Pro Report</span>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

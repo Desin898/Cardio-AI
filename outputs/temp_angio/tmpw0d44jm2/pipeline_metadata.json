@@ -1,0 +1,22 @@
+{
+    "patient_id": "tmpw0d44jm2",
+    "processed_at": "2026-08-16T02:51:48.117607",
+    "source": "IMAGE",
+    "number_of_original_frames": 1,
+    "selected_frame_indices": [
+        0
+    ],
+    "output_directory": "C:\\Users\\desin\\Downloads\\Cardio-AI-main\\Cardio-AI-main\\outputs\\temp_angio\\tmpw0d44jm2",
+    "variants": [
+        {
+            "rank": 1,
+            "frame_index": 0,
+            "filename": "tmpw0d44jm2_frame_0_rank_1.png",
+            "path": "C:\\Users\\desin\\Downloads\\Cardio-AI-main\\Cardio-AI-main\\outputs\\temp_angio\\tmpw0d44jm2\\tmpw0d44jm2_frame_0_rank_1.png",
+            "label": "Keyframe #1 (Frame 0)",
+            "sharpness": 1017.28,
+            "contrast": 66.88510954344689,
+            "edge_strength": 12.635477557666185
+        }
+    ]
+}

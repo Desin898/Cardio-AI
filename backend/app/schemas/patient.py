@@ -22,18 +22,53 @@ class PatientScreeningInput(BaseModel):
     @classmethod
     def handle_legacy_fields(cls, data: Any) -> Any:
         if isinstance(data, dict):
+            # Gender mapping: 1 / "1" / "Male" -> "Male", 0 / "0" / "Female" -> "Female"
+            if "gender" in data:
+                g = data["gender"]
+                if g == 1 or g == "1" or str(g).lower() in ("male", "m"):
+                    data["gender"] = "Male"
+                elif g == 0 or g == "0" or str(g).lower() in ("female", "f"):
+                    data["gender"] = "Female"
+
+            # Smoker mapping: 1 / "1" / "Yes" / True -> True, 0 / "0" / "No" / False -> False
             if "current_smoker" not in data and "smoker" in data:
                 sm = data["smoker"]
                 if isinstance(sm, str):
                     data["current_smoker"] = sm.lower() in ("yes", "true", "1")
                 else:
                     data["current_smoker"] = bool(sm)
+            elif "current_smoker" in data:
+                sm = data["current_smoker"]
+                if isinstance(sm, str):
+                    data["current_smoker"] = sm.lower() in ("yes", "true", "1")
+                else:
+                    data["current_smoker"] = bool(sm)
+
+            # Family history mapping
+            if "family_history_cad" not in data and "family_history" in data:
+                fh = data["family_history"]
+                if isinstance(fh, str):
+                    data["family_history_cad"] = fh.lower() in ("yes", "true", "1")
+                else:
+                    data["family_history_cad"] = bool(fh)
+            elif "family_history_cad" in data:
+                fh = data["family_history_cad"]
+                if isinstance(fh, str):
+                    data["family_history_cad"] = fh.lower() in ("yes", "true", "1")
+                else:
+                    data["family_history_cad"] = bool(fh)
+
+            # Cholesterol & Troponin mapping
             if "cholesterol_total" not in data and "cholesterol" in data:
                 data["cholesterol_total"] = float(data["cholesterol"])
+            if "cholesterol_hdl" not in data and "hdl_cholesterol" in data:
+                data["cholesterol_hdl"] = float(data["hdl_cholesterol"])
             if "cholesterol_hdl" not in data:
                 data["cholesterol_hdl"] = 50.0
-            if "family_history_cad" not in data:
-                data["family_history_cad"] = False
+
+            if "hs_troponin" not in data and "troponin" in data:
+                data["hs_troponin"] = float(data["troponin"]) if data["troponin"] is not None else None
+
         return data
 
     model_config = ConfigDict(extra="ignore")

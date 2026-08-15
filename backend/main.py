@@ -234,11 +234,12 @@ async def doctor_dashboard(request: Request):
 
 @app.get("/upload_angiogram", response_class=HTMLResponse)
 @app.get("/angiogram_qca", response_class=HTMLResponse)
+@app.get("/angiogram_qca.html", response_class=HTMLResponse)
 @app.get("/angiogram_processing.html", response_class=HTMLResponse)
 async def angiogram_upload_page(request: Request, session_id: str = "", patient_id: str = ""):
     return templates.TemplateResponse(
         request=request,
-        name="angiogram_processing.html",
+        name="angiogram_qca.html",
         context={"session_id": session_id, "patient_id": patient_id},
     )
 

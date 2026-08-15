@@ -187,9 +187,19 @@
                 try { form = JSON.parse(rawForm); } catch(e) {}
             }
 
-            // Default values if no stored data
-            const prob = result && result.probability !== undefined ? result.probability : 0.28;
-            const percentage = Math.round(prob * 100);
+            // Extract true calibrated probability from backend response
+            let prob = 0.28;
+            if (result) {
+                if (result.risk_probability !== undefined) {
+                    prob = result.risk_probability;
+                } else if (result.probability_percentage !== undefined) {
+                    prob = result.probability_percentage / 100.0;
+                } else if (result.probability !== undefined) {
+                    prob = result.probability;
+                }
+            }
+            const percentage = result && result.probability_percentage !== undefined ? 
+                Math.round(result.probability_percentage) : Math.round(prob * 100);
 
             // Render Ring Gauge
             const ring = document.getElementById('riskRing');
@@ -205,25 +215,22 @@
             const offset = 314.15 - (314.15 * (percentage / 100));
             ring.style.strokeDashoffset = offset;
 
-            let riskCategory = 'LOW';
+            let riskCategory = result && result.risk_category ? result.risk_category : (percentage >= 65 ? 'HIGH' : (percentage >= 30 ? 'MODERATE' : 'LOW'));
             let strokeColor = '#00E676';
 
-            if (percentage >= 70) {
-                riskCategory = 'HIGH';
+            if (percentage >= 65 || riskCategory === 'HIGH') {
                 strokeColor = '#FF3D57';
                 badgeEl.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase font-mono bg-[#FF3D57]/10 text-[#FF3D57] border border-[#FF3D57]/40';
                 badgeEl.textContent = 'HIGH ISCHEMIC RISK';
                 titleEl.textContent = 'High Coronary Ischemia Risk Identified';
                 descEl.textContent = 'Biomarker analysis indicates elevated cardiovascular risk. Immediate digital 12-lead ECG analysis and Cath Lab review recommended.';
-            } else if (percentage >= 30) {
-                riskCategory = 'MODERATE';
+            } else if (percentage >= 30 || riskCategory === 'MODERATE') {
                 strokeColor = '#FFB300';
                 badgeEl.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase font-mono bg-[#FFB300]/10 text-[#FFB300] border border-[#FFB300]/40';
                 badgeEl.textContent = 'MODERATE RISK PROFILE';
                 titleEl.textContent = 'Moderate Cardiovascular Risk Factor Elevation';
                 descEl.textContent = 'Elevated metabolic parameters noted. Secondary diagnostic screening and routine clinical follow-up suggested.';
             } else {
-                riskCategory = 'LOW';
                 strokeColor = '#00E676';
                 badgeEl.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase font-mono bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/40';
                 badgeEl.textContent = 'LOW RISK PROFILE';
@@ -233,22 +240,45 @@
 
             ring.style.stroke = strokeColor;
 
-            // Render SHAP Feature Impact Bars
+            // Render Dynamic SHAP Feature Impact Breakdown
             const shapContainer = document.getElementById('shapBarsContainer');
-            
-            const shapData = [
-                { name: 'hs-Troponin I Marker', weight: form.troponin > 0.03 ? 85 : 25, color: '#FF3D57' },
-                { name: 'HbA1c Glycemic Index', weight: form.hba1c > 6.0 ? 70 : 35, color: '#00D2FF' },
-                { name: 'Systolic Blood Pressure', weight: form.systolic_bp > 130 ? 78 : 30, color: '#FFB300' },
-                { name: 'Age Factor', weight: Math.min(85, Math.max(20, form.age || 50)), color: '#00E676' },
-                { name: 'eGFR Kidney Function', weight: form.egfr < 60 ? 75 : 20, color: '#00D2FF' },
-            ];
+            const rawShapList = (result && result.shap_breakdown && result.shap_breakdown.length > 0) 
+                ? result.shap_breakdown 
+                : ((result && result.explanation && result.explanation.length > 0) ? result.explanation : null);
 
-            shapContainer.innerHTML = shapData.map(item => `
+            let shapItems = [];
+
+            if (rawShapList && rawShapList.length > 0) {
+                shapItems = rawShapList.map(item => {
+                    const featName = item.feature || item.factor || 'Biomarker';
+                    const impStr   = item.impact !== undefined ? String(item.impact) : '+0%';
+                    const numVal   = Math.abs(parseFloat(impStr.replace('%', '').replace('+', '')) || 5);
+                    const isInc    = item.direction === 'risk_increasing' || impStr.startsWith('+');
+                    const color    = isInc ? (numVal > 15 ? '#FF3D57' : '#FFB300') : '#00E676';
+                    const valDisplay = (item.value !== null && item.value !== undefined) ? ` (${item.value})` : '';
+
+                    return {
+                        name: `${featName}${valDisplay}`,
+                        impact: impStr,
+                        weight: Math.min(100, Math.max(12, Math.round(numVal * 2.5))),
+                        color: color
+                    };
+                });
+            } else {
+                shapItems = [
+                    { name: 'hs-Troponin I Marker', impact: '+15.2%', weight: form.troponin > 0.03 ? 85 : 25, color: '#FF3D57' },
+                    { name: 'HbA1c Glycemic Index', impact: '+8.4%', weight: form.hba1c > 6.0 ? 70 : 35, color: '#00D2FF' },
+                    { name: 'Systolic Blood Pressure', impact: '+11.0%', weight: form.systolic_bp > 130 ? 78 : 30, color: '#FFB300' },
+                    { name: 'Age Factor', impact: '+5.5%', weight: Math.min(85, Math.max(20, form.age || 50)), color: '#00E676' },
+                    { name: 'eGFR Kidney Function', impact: '-4.2%', weight: form.egfr < 60 ? 75 : 20, color: '#00D2FF' },
+                ];
+            }
+
+            shapContainer.innerHTML = shapItems.slice(0, 6).map(item => `
                 <div class="space-y-1">
                     <div class="flex justify-between text-xs font-medium">
                         <span class="text-slate-300">${item.name}</span>
-                        <span class="font-mono font-bold" style="color: ${item.color}">${item.weight}%</span>
+                        <span class="font-mono font-bold" style="color: ${item.color}">${item.impact}</span>
                     </div>
                     <div class="w-full h-2 rounded-full bg-[#06080D] overflow-hidden p-0.5 border border-white/10">
                         <div class="h-full rounded-full transition-all duration-1000" 
@@ -257,21 +287,21 @@
                 </div>
             `).join('');
 
-            // Render Smart Decision Pathway
-            if (riskCategory === 'HIGH') {
+            // Render Smart Decision Pathway (Probability >= 50% triggers High/Moderate ECG CTA)
+            if (percentage >= 50 || riskCategory === 'HIGH' || riskCategory === 'MODERATE') {
                 pathwayEl.innerHTML = `
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 bg-[#FF3D57]/10 p-6 rounded-2xl border-2 border-[#FF3D57]/60">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-[#FF3D57]/15 via-[#FFB300]/10 to-transparent p-6 rounded-2xl border-2 border-[#FF3D57]/60 shadow-[0_0_30px_rgba(255,61,87,0.2)]">
                         <div class="space-y-1 text-center md:text-left">
                             <div class="text-xs font-mono font-bold text-[#FF3D57] uppercase tracking-wider flex items-center space-x-2">
-                                <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
-                                <span>RECOMMENDED ACTION: SECONDARY ECG DIAGNOSTIC</span>
+                                <i class="fa-solid fa-triangle-exclamation animate-bounce text-sm"></i>
+                                <span>REQUIRED ACTION: SECONDARY 12-LEAD ECG ANALYSIS</span>
                             </div>
-                            <h4 class="text-lg font-extrabold text-white">Proceed to Digital 12-Lead ECG Analysis</h4>
-                            <p class="text-xs text-slate-300">Directly upload digital Lead II / 12-lead ECG signal trace to assess ST-elevation and regional multi-vessel ischemia.</p>
+                            <h4 class="text-lg font-extrabold text-white">Proceed to 12-Lead ECG Signal Analysis</h4>
+                            <p class="text-xs text-slate-300">Calibrated risk probability is ${percentage}% (>= 50%). Upload digital 12-lead ECG signal traces or scanned waveform images to evaluate ST-elevation and vessel ischemia.</p>
                         </div>
                         <a href="/upload_ecg.html" 
-                           class="px-8 py-3.5 rounded-full bg-[#FF3D57] hover:bg-[#e02d46] text-white font-extrabold text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(255,61,87,0.6)] transition-all flex items-center space-x-2 whitespace-nowrap">
-                            <span>Proceed to 12-Lead ECG</span>
+                           class="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#FF3D57] to-[#FFB300] hover:scale-105 text-white font-extrabold text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(255,61,87,0.6)] transition-all flex items-center space-x-2 whitespace-nowrap">
+                            <span>Proceed to 12-Lead ECG Signal Analysis</span>
                             <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>

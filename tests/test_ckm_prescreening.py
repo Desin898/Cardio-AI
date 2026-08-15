@@ -166,5 +166,10 @@ class TestCKMPrescreeningEngine(unittest.TestCase):
                 print("Caught unpickle warnings:", [str(item.message) for item in unpickle_warnings])
             self.assertEqual(len(unpickle_warnings), 0)
 
+    def test_07_web_workspace_endpoints_200_ok(self):
+        for route in ["/pre_screening.html", "/pre_screening_results.html", "/upload_ecg.html", "/angiogram_qca.html", "/angiogram_qca"]:
+            response = self.client.get(route)
+            self.assertEqual(response.status_code, 200, f"Route {route} failed with status {response.status_code}")
+
 if __name__ == "__main__":
     unittest.main()

@@ -429,34 +429,77 @@
             const heightM  = heightCm / 100;
             const bmiCalc  = weightKg / (heightM * heightM);
 
+            const sexVal    = document.querySelector('[name="gender"]').value;
+            const bpMedVal  = document.querySelector('[name="bp_treatment"]').value;
+            const smokerVal = document.querySelector('[name="smoker"]').value;
+            const diabVal   = document.querySelector('[name="diabetes"]').value;
+            const famVal    = document.querySelector('[name="family_history"]').value;
+            const stressVal = document.querySelector('[name="stress_level"]').value;
+
+            // Exact Numerical Serialization:
+            // Sex: "Male" -> 1, "Female" -> 0
+            const genderNum = (sexVal === 'Male' || sexVal === '1') ? 1 : 0;
+            // BP Med / Smoker / Diabetes / Family History: "Yes" -> 1, "No" -> 0
+            const bpMedNum  = (bpMedVal === 'Yes' || bpMedVal === '1') ? 1 : 0;
+            const smokerNum = (smokerVal === 'Yes' || smokerVal === '1') ? 1 : 0;
+            const diabNum   = (diabVal === 'Yes' || diabVal === '1') ? 1 : 0;
+            const famNum    = (famVal === 'Yes' || famVal === '1') ? 1 : 0;
+            // Stress Level: "High" -> 2, "Moderate"/"Medium" -> 1, "Low" -> 0
+            const stressNum = (stressVal === 'High') ? 2 : ((stressVal === 'Moderate' || stressVal === 'Medium') ? 1 : 0);
+
+            // Parse all numeric biomarkers as floats
+            const ageNum         = parseFloat(document.querySelector('[name="age"]').value || 50);
+            const sysNum         = parseFloat(sys);
+            const diaNum         = parseFloat(dia);
+            const bmiNum         = parseFloat(bmiCalc.toFixed(2));
+            const cholNum        = parseFloat(document.querySelector('[name="cholesterol"]').value || 200);
+            const hdlNum         = parseFloat(document.querySelector('[name="hdl_cholesterol"]').value || 50);
+            const glucoseNum     = parseFloat(document.querySelector('[name="glucose"]').value || 100);
+            const heartRateNum   = parseFloat(document.querySelector('[name="heart_rate"]').value || 70);
+
+            const hba1cRaw       = document.querySelector('[name="hba1c"]').value;
+            const hba1cNum       = hba1cRaw !== "" ? parseFloat(hba1cRaw) : 5.7;
+
+            const tropRaw        = document.querySelector('[name="troponin"]').value;
+            const tropNum        = tropRaw !== "" ? parseFloat(tropRaw) : 0.01;
+
+            const egfrRaw        = document.querySelector('[name="egfr"]').value;
+            const egfrNum        = egfrRaw !== "" ? parseFloat(egfrRaw) : 90.0;
+
             const formData = {
-                age:              parseInt(document.querySelector('[name="age"]').value || 50),
-                gender:           document.querySelector('[name="gender"]').value || 'Male',
-                height_cm:        heightCm,
-                weight_kg:        weightKg,
-                bmi:              parseFloat(bmiCalc.toFixed(2)),
-                systolic_bp:      sys,
-                diastolic_bp:     dia,
-                heart_rate:       parseInt(document.querySelector('[name="heart_rate"]').value || 70),
-                bp_treatment:     document.querySelector('[name="bp_treatment"]').value || 'No',
-                cholesterol:      parseInt(document.querySelector('[name="cholesterol"]').value || 200),
-                hdl_cholesterol:  parseInt(document.querySelector('[name="hdl_cholesterol"]').value || 50),
-                glucose:          parseInt(document.querySelector('[name="glucose"]').value || 100),
-                previous_stroke:  document.querySelector('[name="previous_stroke"]').value || 'No',
-                smoker:           document.querySelector('[name="smoker"]').value || 'No',
-                years_smoking:    0,
-                cigs_per_day:     0,
-                exercise_hours:   parseFloat(document.querySelector('[name="exercise_hours"]').value || 3),
-                sleep_hours:      parseFloat(document.querySelector('[name="sleep_hours"]').value || 7),
-                alcohol:          'None',
-                diabetes:          document.querySelector('[name="diabetes"]').value || 'No',
-                prevalent_hyp:     'No',
-                physical_activity: 'Moderate',
-                family_history:    document.querySelector('[name="family_history"]').value || 'No',
-                stress_level:      document.querySelector('[name="stress_level"]').value || 'Medium',
-                hba1c:             parseFloat(document.querySelector('[name="hba1c"]').value || 5.7),
-                troponin:          parseFloat(document.querySelector('[name="troponin"]').value || 0.01),
-                egfr:              parseFloat(document.querySelector('[name="egfr"]').value || 90),
+                age:                ageNum,
+                gender:             genderNum,
+                height_cm:          heightCm,
+                weight_kg:          weightKg,
+                bmi:                bmiNum,
+                systolic_bp:        sysNum,
+                diastolic_bp:       diaNum,
+                heart_rate:         heartRateNum,
+                bp_treatment:       bpMedNum,
+                BPMeds:             bpMedNum,
+                cholesterol:        cholNum,
+                cholesterol_total:  cholNum,
+                hdl_cholesterol:    hdlNum,
+                cholesterol_hdl:    hdlNum,
+                glucose:            glucoseNum,
+                previous_stroke:    (document.querySelector('[name="previous_stroke"]').value === 'Yes') ? 1 : 0,
+                smoker:             smokerNum,
+                current_smoker:     smokerNum,
+                years_smoking:      0,
+                cigs_per_day:       0,
+                exercise_hours:     parseFloat(document.querySelector('[name="exercise_hours"]').value || 3),
+                sleep_hours:        parseFloat(document.querySelector('[name="sleep_hours"]').value || 7),
+                alcohol:            0,
+                diabetes:           diabNum,
+                prevalent_hyp:      sysNum >= 140 ? 1 : 0,
+                physical_activity:  1,
+                family_history:     famNum,
+                family_history_cad: famNum,
+                stress_level:       stressNum,
+                hba1c:              hba1cNum,
+                hs_troponin:         tropNum,
+                troponin:           tropNum,
+                egfr:               egfrNum,
             };
 
             const btn = document.getElementById('submitBtn');
