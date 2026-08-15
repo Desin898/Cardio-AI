@@ -65,18 +65,23 @@ export default function HomePage() {
           </div>
 
           {/* Massive HEART SYNC Metallic Title */}
-          <h1 className="text-7xl md:text-9xl font-extrabold tracking-widest uppercase select-none drop-shadow-2xl">
+          <h1 className="relative z-0 text-7xl md:text-9xl font-extrabold tracking-widest uppercase select-none drop-shadow-2xl">
             HEART <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">SYNC</span>
           </h1>
 
           {/* Centerpiece 3D Glass Heart & CTA Button */}
-          <div className="relative -mt-20 md:-mt-32 flex justify-center items-center">
-            <div className="relative w-[340px] md:w-[450px] h-[340px] md:h-[450px] flex justify-center items-center">
-              {/* Glass Heart Image */}
+          <div className="relative z-10 -mt-20 md:-mt-32 flex justify-center items-center">
+            <div className="relative w-[340px] md:w-[460px] h-[340px] md:h-[460px] flex justify-center items-center">
+              {/* Glass Heart Image with Seamless Radial Blend Mask */}
               <img
                 src="/static/images/glass_heart.jpg"
                 alt="3D Translucent Glass Heart"
-                className="w-full h-full object-contain filter drop-shadow-[0_25px_60px_rgba(0,210,255,0.35)] hover:scale-105 transition-transform duration-700 ease-out"
+                className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_25px_60px_rgba(0,210,255,0.35)] hover:scale-105 transition-transform duration-700 ease-out"
+                style={{
+                  maskImage: 'radial-gradient(circle at center, black 50%, transparent 88%)',
+                  WebkitMaskImage: 'radial-gradient(circle at center, black 50%, transparent 88%)',
+                  mixBlendMode: 'lighten',
+                }}
               />
               {/* Floating Glowing Lime CTA Pill Overlay */}
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
